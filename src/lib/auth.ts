@@ -1,24 +1,16 @@
 import { writable } from 'svelte/store';
-import { UserManager, User } from 'oidc-client-ts';
+import { pb } from './pocketbase';
 
-export const user = writable<User | null>(null);
+export const user = writable(pb.authStore.model);
 
-const userManager = new UserManager({
-	authority: import.meta.env.VITE_OIDC_AUTHORITY,
-	client_id: import.meta.env.VITE_OIDC_CLIENT_ID,
-	redirect_uri: 'http://localhost:5173/callback',
-	post_logout_redirect_uri: 'http://localhost:5173'
+pb.authStore.onChange(() => {
+	user.set(pb.authStore.model);
 });
 
 export async function login() {
-	await userManager.signinRedirect();
+	await pb.collection('users').authWithOAuth2({ provider: 'oidc' });
 }
 
-export async function logout() {
-	await userManager.signoutRedirect();
-}
-
-export async function handleCallback() {
-	const oidcUser = await userManager.signinRedirectCallback();
-	user.set(oidcUser);
+export function logout() {
+	pb.authStore.clear();
 }

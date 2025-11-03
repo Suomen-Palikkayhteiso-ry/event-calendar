@@ -5,6 +5,7 @@
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import { _ } from 'svelte-i18n';
+	import { formatDateInHelsinki } from '$lib/date-utils';
 
 	let event: Event;
 
@@ -40,16 +41,12 @@
 	{/if}
 	<p>
 		<strong>{$_('start')}</strong>
-		{event.all_day
-			? new Date(event.start_date).toLocaleDateString('fi-FI', { timeZone: 'Europe/Helsinki' })
-			: new Date(event.start_date).toLocaleString('fi-FI', { timeZone: 'Europe/Helsinki' })}
+		{formatDateInHelsinki(event.start_date, event.all_day)}
 	</p>
 	{#if event.end_date && event.end_date !== event.start_date}
 		<p>
 			<strong>{$_('end')}</strong>
-			{event.all_day
-				? new Date(event.end_date).toLocaleDateString('fi-FI', { timeZone: 'Europe/Helsinki' })
-				: new Date(event.end_date).toLocaleString('fi-FI', { timeZone: 'Europe/Helsinki' })}
+			{formatDateInHelsinki(event.end_date, event.all_day)}
 		</p>
 	{/if}
 	{#if event.all_day}

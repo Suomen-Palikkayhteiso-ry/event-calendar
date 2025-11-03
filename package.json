@@ -51,7 +51,6 @@
 		"flowbite": "^3.1.2",
 		"flowbite-svelte": "^1.22.0",
 		"ical-generator": "^10.0.0",
-		"oidc-client-ts": "^3.3.0",
 		"pocketbase": "^0.26.3",
 		"svelte-i18n": "^4.0.1"
 	}

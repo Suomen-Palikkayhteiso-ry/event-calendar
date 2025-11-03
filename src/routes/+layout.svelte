@@ -3,13 +3,12 @@
 	import '../app.css';
 	import 'flowbite/dist/flowbite.min.css';
 	import '../lib/i18n';
-	import { user } from '$lib/auth';
 
 	let { children } = $props();
 </script>
 
 <div class="app">
-	<Header {user} />
+	<Header />
 
 	<main>
 		{@render children()}

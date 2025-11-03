@@ -8,6 +8,7 @@
 	import { Datepicker } from 'flowbite-svelte';
 	import { _ } from 'svelte-i18n';
 	import { goto } from '$app/navigation';
+	import { parseUTCDate } from '$lib/date-utils';
 
 	let events: Event[] = [];
 	let calendarOptions = $state({
@@ -65,8 +66,8 @@
 			...events.map((event) => ({
 				id: event.id,
 				title: event.location ? `${event.title} / ${event.location}` : event.title,
-				start: event.start_date,
-				end: event.end_date,
+				start: parseUTCDate(event.start_date),
+				end: event.end_date ? parseUTCDate(event.end_date) : parseUTCDate(event.start_date),
 				allDay: event.all_day,
 				display: event.all_day ? 'block' : 'auto',
 				extendedProps: {

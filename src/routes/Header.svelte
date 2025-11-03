@@ -1,7 +1,5 @@
 <script lang="ts">
-	import { login, logout } from '$lib/auth';
-
-	export let user: any;
+	import { user, login, logout } from '$lib/auth';
 </script>
 
 <header>
@@ -13,7 +11,7 @@
 
 	{#if $user}
 		<div class="auth">
-			<span>Hello, {$user.profile.name}</span>
+			<span>Hello, {$user.name}</span>
 			<button on:click={logout}>Logout</button>
 		</div>
 	{:else}

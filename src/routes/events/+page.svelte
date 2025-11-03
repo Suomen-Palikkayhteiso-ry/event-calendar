@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { pb } from '$lib/pocketbase';
 	import type { Event } from '$lib/types';
+	import { formatDateInHelsinki, localDateToUTC } from '$lib/date-utils';
 
 	let events: Event[] = [];
 	let newEventTitle = '';
@@ -22,8 +23,8 @@
 			title: newEventTitle,
 			location: newEventLocation || undefined,
 			description: newEventDescription || undefined,
-			start_date: newEventStartDate,
-			end_date: newEventEndDate || newEventStartDate,
+			start_date: localDateToUTC(newEventStartDate),
+			end_date: newEventEndDate ? localDateToUTC(newEventEndDate) : localDateToUTC(newEventStartDate),
 			all_day: newEventAllDay
 		});
 		newEventTitle = '';
@@ -57,7 +58,7 @@
 		{#if event.description}
 			<p>{event.description}</p>
 		{/if}
-		<p>{event.start_date} - {event.end_date} {event.all_day ? '(All Day)' : ''}</p>
+		<p>{formatDateInHelsinki(event.start_date, event.all_day)} {#if event.end_date && event.end_date !== event.start_date}- {formatDateInHelsinki(event.end_date, event.all_day)}{/if} {event.all_day ? '(All Day)' : ''}</p>
 		<a href="/events/{event.id}">View/Edit</a>
 	</div>
 {/each}
