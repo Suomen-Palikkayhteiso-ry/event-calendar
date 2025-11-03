@@ -9,6 +9,7 @@
 	import { _ } from 'svelte-i18n';
 	import { goto } from '$app/navigation';
 	import { parseUTCDate } from '$lib/date-utils';
+	import { user } from '$lib/auth';
 
 	let events: Event[] = [];
 	let calendarOptions = $state({
@@ -98,6 +99,12 @@
 
 <h1>{$_('public_calendar')}</h1>
 
+{#if $user}
+	<div class="management-links">
+		<a href="/events" class="manage-link">Manage Events</a>
+	</div>
+{/if}
+
 <div class="mb-4">
 	<label for="datepicker" class="block text-sm font-medium text-gray-700">{$_('select_date')}</label
 	>
@@ -105,3 +112,25 @@
 </div>
 
 <Calendar plugins={[DayGrid]} options={calendarOptions} />
+
+<style>
+	.management-links {
+		margin-bottom: 2rem;
+		text-align: center;
+	}
+
+	.manage-link {
+		display: inline-block;
+		background-color: var(--color-theme);
+		color: white;
+		padding: 0.75rem 1.5rem;
+		text-decoration: none;
+		border-radius: 4px;
+		font-weight: 500;
+		transition: background-color 0.2s;
+	}
+
+	.manage-link:hover {
+		background-color: #004080;
+	}
+</style>
