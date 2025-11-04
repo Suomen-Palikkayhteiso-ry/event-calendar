@@ -3,24 +3,7 @@
 @plugin '@tailwindcss/forms';
 @plugin '@tailwindcss/typography';
 
-@font-face {
-	font-family: 'Outfit';
-	font-style: normal;
-	font-weight: 400;
-	font-display: swap;
-	src:
-		url('/fonts/outfit-400.woff2') format('woff2'),
-		url('/fonts/outfit-400.woff') format('woff');
-}
-@font-face {
-	font-family: 'Outfit';
-	font-style: normal;
-	font-weight: 500;
-	font-display: swap;
-	src:
-		url('/fonts/outfit-500.woff2') format('woff2'),
-		url('/fonts/outfit-500.woff') format('woff');
-}
+@import '../static/fonts/outfit.css'
 
 :root {
 	--font-body: 'Outfit', sans-serif;
