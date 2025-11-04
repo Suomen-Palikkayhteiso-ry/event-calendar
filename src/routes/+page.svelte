@@ -1,13 +1,15 @@
 <script lang="ts">
+	/* eslint-disable @typescript-eslint/no-explicit-any */
 	import { onMount } from 'svelte';
 	import { pb } from '$lib/pocketbase';
 	import type { Event } from '$lib/types';
-	// @ts-ignore
+	// @ts-expect-error Calendar library types not available
 	import { Calendar, DayGrid } from '@event-calendar/core';
 	import '@event-calendar/core/index.css';
 	import { Datepicker } from 'flowbite-svelte';
 	import { _ } from 'svelte-i18n';
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import { parseUTCDate } from '$lib/date-utils';
 	import { user } from '$lib/auth';
 
@@ -23,22 +25,23 @@
 			prev: 'Edellinen',
 			next: 'Seuraava'
 		},
-		eventDidMount: (info: any) => {
-			if (info.event.extendedProps.description) {
-				info.el.title = info.event.extendedProps.description;
+		eventDidMount: (info: unknown) => {
+			if ((info as any).event.extendedProps.description) {
+				(info as any).el.title = (info as any).event.extendedProps.description;
 			}
 			// Make events clickable with pointer cursor
-			if (info.event.id !== 'selected-day') {
-				info.el.style.cursor = 'pointer';
+			if ((info as any).event.id !== 'selected-day') {
+				(info as any).el.style.cursor = 'pointer';
 			}
 		},
-		eventClick: (info: any) => {
-			if (info.event.id === 'selected-day') return;
+		eventClick: (info: unknown) => {
+			if ((info as any).event.id === 'selected-day') return;
 			// Save state to hash
 			const dateStr = selectedDate.toISOString().split('T')[0];
 			const view = calendarOptions.view;
 			window.location.hash = `!date=${dateStr}&view=${view}`;
-			goto('/events/' + info.event.id);
+			// eslint-disable-next-line svelte/no-navigation-without-resolve
+			goto((resolve as any)(`/events/${(info as any).event.id}`));
 		}
 	});
 	let selectedDate = $state(new Date());
@@ -101,7 +104,7 @@
 
 {#if $user}
 	<div class="management-links">
-		<a href="/events" class="manage-link">Manage Events</a>
+		<a href={resolve('/events')} class="manage-link">Manage Events</a>
 	</div>
 {/if}
 

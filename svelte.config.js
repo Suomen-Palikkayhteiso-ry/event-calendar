@@ -9,7 +9,18 @@ const config = {
 	kit: {
 		adapter: adapter({
 			fallback: 'index.html'
-		})
+		}),
+		paths: {
+			base: ''
+		},
+		prerender: {
+			entries: [],
+			handleUnseenRoutes: 'ignore',
+			handleHttpError: ({ status, path }) => {
+				if (path === '/favicon.png' || (status === 404 && path === '/')) return;
+				throw new Error(`${status} ${path}`);
+			}
+		}
 	}
 };
 

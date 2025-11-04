@@ -38,7 +38,6 @@ This is a simple event calendar application built with SvelteKit, PocketBase, an
    ```
 
 3. **Configure PocketBase:**
-
    - Rename `.env.example` to `.env` and update the `POCKETBASE_URL` variable with the URL of your PocketBase instance.
    - The PocketBase configuration is located in `src/lib/pocketbase.ts`.
 

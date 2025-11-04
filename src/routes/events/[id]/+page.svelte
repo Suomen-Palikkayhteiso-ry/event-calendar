@@ -4,6 +4,7 @@
 	import type { Event } from '$lib/types';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import { _ } from 'svelte-i18n';
 	import { formatDateInHelsinki, localDateToUTC, parseUTCDate } from '$lib/date-utils';
 	import { user } from '$lib/auth';
@@ -12,7 +13,7 @@
 	let isEditing = false;
 	let isSubmitting = false;
 	let isDeleting = false;
-	
+
 	// Edit form fields
 	let editTitle = '';
 	let editLocation = '';
@@ -24,12 +25,12 @@
 
 	// Check authentication
 	$: if (!$user) {
-		goto('/');
+		goto(resolve('/'));
 	}
 
 	onMount(() => {
 		if (!$user) return;
-		
+
 		const eventId = $page.params.id;
 		if (!eventId) return;
 
@@ -41,7 +42,7 @@
 				initializeEditForm();
 			})
 			.catch(() => {
-				goto('/events');
+				goto(resolve('/events'));
 			});
 
 		// Add ESC key listener
@@ -50,7 +51,7 @@
 				if (isEditing) {
 					cancelEdit();
 				} else {
-					goto('/events');
+					goto(resolve('/events'));
 				}
 			}
 		};
@@ -82,7 +83,7 @@
 
 	async function saveEdit() {
 		if (!$user || !event) return;
-		
+
 		isSubmitting = true;
 		try {
 			await pb.collection('events').update(event.id, {
@@ -94,9 +95,9 @@
 				all_day: editAllDay,
 				state: editState
 			});
-			
+
 			// Reload event
-			event = await pb.collection('events').getOne(event.id) as unknown as Event;
+			event = (await pb.collection('events').getOne(event.id)) as unknown as Event;
 			isEditing = false;
 		} catch (error) {
 			console.error('Error updating event:', error);
@@ -108,15 +109,15 @@
 
 	async function deleteEvent() {
 		if (!$user || !event) return;
-		
+
 		if (!confirm('Are you sure you want to delete this event? This action cannot be undone.')) {
 			return;
 		}
-		
+
 		isDeleting = true;
 		try {
 			await pb.collection('events').delete(event.id);
-			goto('/events');
+			goto(resolve('/events'));
 		} catch (error) {
 			console.error('Error deleting event:', error);
 			alert('Failed to delete event. Please try again.');
@@ -133,7 +134,7 @@
 		{:else}
 			<h1>{event.title}</h1>
 		{/if}
-		
+
 		<div class="event-actions">
 			{#if !isEditing}
 				<button class="btn-secondary" on:click={startEdit}>Edit</button>
@@ -149,69 +150,55 @@
 			<form on:submit|preventDefault={saveEdit}>
 				<div class="form-group">
 					<label for="editTitle">Title *</label>
-					<input 
-						type="text" 
+					<input
+						type="text"
 						id="editTitle"
-						bind:value={editTitle} 
-						required 
+						bind:value={editTitle}
+						required
 						disabled={isSubmitting}
 					/>
 				</div>
-				
+
 				<div class="form-group">
 					<label for="editLocation">Location</label>
-					<input 
-						type="text" 
-						id="editLocation"
-						bind:value={editLocation} 
-						disabled={isSubmitting}
-					/>
+					<input type="text" id="editLocation" bind:value={editLocation} disabled={isSubmitting} />
 				</div>
-				
+
 				<div class="form-group">
 					<label for="editDescription">Description</label>
-					<textarea 
+					<textarea
 						id="editDescription"
-						bind:value={editDescription} 
+						bind:value={editDescription}
 						rows="3"
 						disabled={isSubmitting}
 					></textarea>
 				</div>
-				
+
 				<div class="form-row">
 					<div class="form-group">
 						<label for="editStartDate">Start Date *</label>
-						<input 
-							type="date" 
+						<input
+							type="date"
 							id="editStartDate"
-							bind:value={editStartDate} 
-							required 
+							bind:value={editStartDate}
+							required
 							disabled={isSubmitting}
 						/>
 					</div>
-					
+
 					<div class="form-group">
 						<label for="editEndDate">End Date</label>
-						<input 
-							type="date" 
-							id="editEndDate"
-							bind:value={editEndDate} 
-							disabled={isSubmitting}
-						/>
+						<input type="date" id="editEndDate" bind:value={editEndDate} disabled={isSubmitting} />
 					</div>
 				</div>
-				
+
 				<div class="form-group">
 					<label class="checkbox-label">
-						<input 
-							type="checkbox" 
-							bind:checked={editAllDay} 
-							disabled={isSubmitting}
-						/>
+						<input type="checkbox" bind:checked={editAllDay} disabled={isSubmitting} />
 						All Day Event
 					</label>
 				</div>
-				
+
 				<div class="form-group">
 					<label for="editState">Status</label>
 					<select id="editState" bind:value={editState} disabled={isSubmitting}>
@@ -219,9 +206,13 @@
 						<option value="published">Published</option>
 					</select>
 				</div>
-				
+
 				<div class="form-actions">
-					<button type="submit" class="btn-primary" disabled={isSubmitting || !editTitle || !editStartDate}>
+					<button
+						type="submit"
+						class="btn-primary"
+						disabled={isSubmitting || !editTitle || !editStartDate}
+					>
 						{isSubmitting ? 'Saving...' : 'Save Changes'}
 					</button>
 					<button type="button" class="btn-secondary" on:click={cancelEdit} disabled={isSubmitting}>
@@ -254,10 +245,11 @@
 			{/if}
 			<p><strong>Status:</strong> {event.state}</p>
 		</div>
-		
+
 		<div class="navigation">
-			<button class="btn-secondary" on:click={() => goto('/events')}>Back to Events</button>
-			<button class="btn-secondary" on:click={() => goto('/')}>Back to Calendar</button>
+			<button class="btn-secondary" on:click={() => goto(resolve('/events'))}>Back to Events</button
+			>
+			<button class="btn-secondary" on:click={() => goto(resolve('/'))}>Back to Calendar</button>
 		</div>
 	{/if}
 {:else}
@@ -369,8 +361,8 @@
 		color: #555;
 	}
 
-	input[type="text"],
-	input[type="date"],
+	input[type='text'],
+	input[type='date'],
 	textarea,
 	select {
 		width: 100%;
@@ -381,8 +373,8 @@
 		box-sizing: border-box;
 	}
 
-	input[type="text"]:focus,
-	input[type="date"]:focus,
+	input[type='text']:focus,
+	input[type='date']:focus,
 	textarea:focus,
 	select:focus {
 		outline: none;

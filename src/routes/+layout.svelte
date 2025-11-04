@@ -17,7 +17,9 @@
 	<footer>
 		<div class="footer-content">
 			<p>
+				<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
 				<a href="/feed.rss" target="_blank">RSS Feed</a> |
+				<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
 				<a href="/feed.ical" target="_blank">iCal Feed</a>
 			</p>
 		</div>

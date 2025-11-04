@@ -1,10 +1,11 @@
 <script lang="ts">
 	import { user, login, logout } from '$lib/auth';
+	import { resolve } from '$app/paths';
 </script>
 
 <header>
 	<div class="corner">
-		<a href="/">
+		<a href={resolve('/')}>
 			<img src="/logo.svg" alt="Suomen Palikkayhteisö ry" class="logo" />
 		</a>
 	</div>

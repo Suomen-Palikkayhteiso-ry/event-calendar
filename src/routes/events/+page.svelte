@@ -5,6 +5,7 @@
 	import { formatDateInHelsinki, localDateToUTC } from '$lib/date-utils';
 	import { user } from '$lib/auth';
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 
 	let events: Event[] = [];
 	let newEventTitle = '';
@@ -17,12 +18,12 @@
 
 	// Check authentication
 	$: if (!$user) {
-		goto('/');
+		goto(resolve('/'));
 	}
 
 	onMount(async () => {
 		if (!$user) return;
-		
+
 		events = await pb.collection('events').getFullList({
 			sort: 'start_date'
 		});
@@ -30,7 +31,7 @@
 
 	async function createEvent() {
 		if (!$user) return;
-		
+
 		isSubmitting = true;
 		try {
 			await pb.collection('events').create({
@@ -38,11 +39,13 @@
 				location: newEventLocation || undefined,
 				description: newEventDescription || undefined,
 				start_date: localDateToUTC(newEventStartDate),
-				end_date: newEventEndDate ? localDateToUTC(newEventEndDate) : localDateToUTC(newEventStartDate),
+				end_date: newEventEndDate
+					? localDateToUTC(newEventEndDate)
+					: localDateToUTC(newEventStartDate),
 				all_day: newEventAllDay,
 				state: 'submitted' // Default state for new events
 			});
-			
+
 			// Reset form
 			newEventTitle = '';
 			newEventLocation = '';
@@ -50,7 +53,7 @@
 			newEventStartDate = '';
 			newEventEndDate = '';
 			newEventAllDay = false;
-			
+
 			// Refresh events list
 			events = await pb.collection('events').getFullList({
 				sort: 'start_date'
@@ -74,72 +77,63 @@
 		<form on:submit|preventDefault={createEvent}>
 			<div class="form-group">
 				<label for="title">Title *</label>
-				<input 
-					type="text" 
+				<input
+					type="text"
 					id="title"
-					bind:value={newEventTitle} 
-					placeholder="Event Title" 
-					required 
+					bind:value={newEventTitle}
+					placeholder="Event Title"
+					required
 					disabled={isSubmitting}
 				/>
 			</div>
-			
+
 			<div class="form-group">
 				<label for="location">Location</label>
-				<input 
-					type="text" 
+				<input
+					type="text"
 					id="location"
-					bind:value={newEventLocation} 
-					placeholder="Location (optional)" 
+					bind:value={newEventLocation}
+					placeholder="Location (optional)"
 					disabled={isSubmitting}
 				/>
 			</div>
-			
+
 			<div class="form-group">
 				<label for="description">Description</label>
-				<textarea 
+				<textarea
 					id="description"
-					bind:value={newEventDescription} 
-					placeholder="Description (optional)" 
+					bind:value={newEventDescription}
+					placeholder="Description (optional)"
 					rows="3"
 					disabled={isSubmitting}
 				></textarea>
 			</div>
-			
+
 			<div class="form-row">
 				<div class="form-group">
 					<label for="startDate">Start Date *</label>
-					<input 
-						type="date" 
+					<input
+						type="date"
 						id="startDate"
-						bind:value={newEventStartDate} 
-						required 
+						bind:value={newEventStartDate}
+						required
 						disabled={isSubmitting}
 					/>
 				</div>
-				
+
 				<div class="form-group">
 					<label for="endDate">End Date</label>
-					<input 
-						type="date" 
-						id="endDate"
-						bind:value={newEventEndDate} 
-						disabled={isSubmitting}
-					/>
+					<input type="date" id="endDate" bind:value={newEventEndDate} disabled={isSubmitting} />
 				</div>
 			</div>
-			
+
 			<div class="form-group">
 				<label class="checkbox-label">
-					<input 
-						type="checkbox" 
-						bind:checked={newEventAllDay} 
-						disabled={isSubmitting}
-					/>
+					<input type="checkbox" bind:checked={newEventAllDay} disabled={isSubmitting} />
 					All Day Event
 				</label>
 			</div>
-			
+
 			<button type="submit" disabled={isSubmitting || !newEventTitle || !newEventStartDate}>
 				{isSubmitting ? 'Creating...' : 'Create Event'}
 			</button>
@@ -148,28 +142,28 @@
 
 	<div class="events-list">
 		<h2>Existing Events</h2>
-		{#each events as event}
+		{#each events as event (event.id)}
 			<div class="event-item">
 				<div class="event-header">
 					<h3>{event.location ? `${event.title} / ${event.location}` : event.title}</h3>
 					<div class="event-actions">
-						<a href="/events/{event.id}" class="edit-link">Edit</a>
+						<a href={resolve(`/events/${event.id}`)} class="edit-link">Edit</a>
 					</div>
 				</div>
 				{#if event.description}
 					<p class="event-description">{event.description}</p>
 				{/if}
 				<p class="event-date">
-					{formatDateInHelsinki(event.start_date, event.all_day)} 
+					{formatDateInHelsinki(event.start_date, event.all_day)}
 					{#if event.end_date && event.end_date !== event.start_date}
 						- {formatDateInHelsinki(event.end_date, event.all_day)}
-					{/if} 
+					{/if}
 					{event.all_day ? '(All Day)' : ''}
 				</p>
-	<p class="event-status">Status: {event.state}</p>
+				<p class="event-status">Status: {event.state}</p>
+			</div>
+		{/each}
 	</div>
-{/each}
-</div>
 {/if}
 
 <style>
@@ -206,8 +200,8 @@
 		color: #555;
 	}
 
-	input[type="text"],
-	input[type="date"],
+	input[type='text'],
+	input[type='date'],
 	textarea {
 		width: 100%;
 		padding: 0.75rem;
@@ -217,8 +211,8 @@
 		box-sizing: border-box;
 	}
 
-	input[type="text"]:focus,
-	input[type="date"]:focus,
+	input[type='text']:focus,
+	input[type='date']:focus,
 	textarea:focus {
 		outline: none;
 		border-color: var(--color-theme);
@@ -233,7 +227,7 @@
 		cursor: pointer;
 	}
 
-	button[type="submit"] {
+	button[type='submit'] {
 		background-color: var(--color-theme);
 		color: white;
 		border: none;
@@ -244,11 +238,11 @@
 		transition: background-color 0.2s;
 	}
 
-	button[type="submit"]:hover:not(:disabled) {
+	button[type='submit']:hover:not(:disabled) {
 		background-color: #004080;
 	}
 
-	button[type="submit"]:disabled {
+	button[type='submit']:disabled {
 		background-color: #ccc;
 		cursor: not-allowed;
 	}
