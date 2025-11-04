@@ -46,7 +46,7 @@
 	}
 
 	.logo {
-		height: 6em;
+		height: 4.5em;
 		width: auto;
 		position: absolute;
 		top: 0.5em;
