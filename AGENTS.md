@@ -1,12 +1,31 @@
-AGENTS.md is an open format designed to guide AI coding agents, functioning similarly to a README file but specifically tailored for agents.[1] It provides context and instructions to help AI coding agents work on a project and is used by over 20,000 open-source projects.[1]
+# AGENTS.md
 
-Key aspects of AGENTS.md include:
+This file provides instructions for AI coding agents on how to work with this project.
 
-- **Purpose**: It offers a dedicated and predictable place for build steps, tests, and conventions that might otherwise clutter a `README.md` file or be irrelevant to human contributors.[1]
-- **Content**: It can include sections for setup commands (e.g., `pnpm install`, `pnpm dev`, `pnpm test`), code style guidelines (e.g., TypeScript strict mode, single quotes, functional patterns), and testing instructions.[1]
-- **Usage**: To use it, you create an `AGENTS.md` file at the root of your repository and add sections that help an agent work effectively with your project, such as project overview, build/test commands, code style, and security considerations.[1]
-- **Monorepos**: For large monorepos, nested `AGENTS.md` files can be used for subprojects, with the nearest file in the directory tree taking precedence.[1]
-- **Compatibility**: It is compatible with a growing ecosystem of AI coding agents and tools, including Semgrep, Ona, GitHub Copilot, Jules from Google, Kilo Code, Factory, Phoenix, Coded Agents from UiPath, Aider, Gemini CLI from Google, Zed, Codex from OpenAI, RooCode, Cursor, Warp, opencode, Amp, VS Code, and Devin from Cognition.[1]
+## Project Overview
 
-Sources:
-[1] AGENTS.md (https://agents.md/)
+This is a SvelteKit application for an event calendar. It uses TypeScript, Prettier, and ESLint for code quality, and Tailwind CSS for styling. The backend is powered by PocketBase.
+
+## Build and Test Commands
+
+This project uses `pnpm` as the package manager.
+
+- **Install dependencies:** `pnpm install`
+- **Run development server:** `pnpm dev`
+- **Build for production:** `pnpm build`
+- **Lint and format:** `pnpm lint`
+- **Check for type errors:** `pnpm check`
+
+## Code Style
+
+- **Tabs:** Use tabs for indentation.
+- **Quotes:** Use single quotes.
+- **Trailing Comma:** No trailing commas.
+- **Print Width:** 100 characters.
+- **Formatting:** Use `pnpm format` to format the code.
+
+## Security Considerations
+
+- The application uses PocketBase for the backend, which is hosted at `https://data.suomenpalikkayhteiso.fi`. Ensure that the PocketBase security rules are properly configured to prevent unauthorized access to data.
+- Authentication is handled via OAuth2 with an OIDC provider. The authentication logic is in `src/lib/auth.ts`.
+- When making changes to the authentication or data access logic, be sure to test thoroughly to prevent security vulnerabilities.
