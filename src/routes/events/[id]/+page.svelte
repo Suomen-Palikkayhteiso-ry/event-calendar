@@ -100,7 +100,11 @@
 			</p>
 		{/if}
 		{#if event.image}
-			<img src={pb.files.getUrl(event, event.image)} alt={event.image_description || event.title} class="event-image" />
+			<img
+				src={pb.files.getUrl(event, event.image)}
+				alt={event.image_description || event.title}
+				class="event-image"
+			/>
 		{/if}
 		{#if event.image_description}
 			<p>{event.image_description}</p>
@@ -108,7 +112,9 @@
 	</div>
 
 	<div class="navigation">
-		<button class="btn-secondary" on:click={() => goto(resolve('/'))}>{$_('back_to_calendar_detail')}</button>
+		<button class="btn-secondary" on:click={() => goto(resolve('/'))}
+			>{$_('back_to_calendar_detail')}</button
+		>
 	</div>
 {:else}
 	<p>{$_('loading_event')}</p>

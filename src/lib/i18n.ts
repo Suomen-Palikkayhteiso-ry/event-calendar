@@ -46,7 +46,8 @@ addMessages('fi', {
 	next_button: 'Seuraava',
 	failed_create_event: 'Tapahtuman luonti epäonnistui. Yritä uudelleen.',
 	// Event detail
-	confirm_delete: 'Oletko varma, että haluat poistaa tämän tapahtuman? Tätä toimintoa ei voi peruuttaa.',
+	confirm_delete:
+		'Oletko varma, että haluat poistaa tämän tapahtuman? Tätä toimintoa ei voi peruuttaa.',
 	deleting: 'Poistetaan...',
 	delete: 'Poista',
 	back_to_calendar_detail: 'Takaisin kalenteriin',

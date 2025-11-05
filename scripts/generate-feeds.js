@@ -14,7 +14,8 @@ async function generateFeeds() {
 	// Generate RSS feed
 	const feed = new Feed({
 		title: 'Suomen Palikkayhteisön tapahtumakalenteri',
-		description: 'Suomen Palikkayhteisön tapahtumakalenteri - tapahtumat, näyttelyt ja kokoontumiset',
+		description:
+			'Suomen Palikkayhteisön tapahtumakalenteri - tapahtumat, näyttelyt ja kokoontumiset',
 		id: 'https://kalenteri.suomenpalikkayhteiso.fi/',
 		link: 'https://kalenteri.suomenpalikkayhteiso.fi/',
 		language: 'fi',
@@ -45,9 +46,11 @@ async function generateFeeds() {
 			link: `https://kalenteri.suomenpalikkayhteiso.fi/#/events/${event.id}`,
 			description: content,
 			date: eventDate,
-			author: [{
-				name: 'Event Calendar'
-			}]
+			author: [
+				{
+					name: 'Event Calendar'
+				}
+			]
 		});
 	});
 

@@ -11,23 +11,23 @@ function getHelsinkiOffset(date: Date): string {
 	const year = date.getFullYear();
 	const march = new Date(year, 2, 31); // Last day of March
 	const october = new Date(year, 9, 31); // Last day of October
-	
+
 	// Find last Sunday in March
 	while (march.getDay() !== 0) {
 		march.setDate(march.getDate() - 1);
 	}
 	const dstStart = new Date(march);
 	dstStart.setHours(3, 0, 0, 0); // 03:00
-	
+
 	// Find last Sunday in October
 	while (october.getDay() !== 0) {
 		october.setDate(october.getDate() - 1);
 	}
 	const dstEnd = new Date(october);
 	dstEnd.setHours(4, 0, 0, 0); // 04:00
-	
+
 	// Check if date is between dstStart and dstEnd
-	return (date >= dstStart && date < dstEnd) ? '+03:00' : '+02:00';
+	return date >= dstStart && date < dstEnd ? '+03:00' : '+02:00';
 }
 
 /**
@@ -70,7 +70,9 @@ export function formatDateInHelsinki(utcString: string, allDay: boolean = false)
  */
 export function localDateToUTC(localDateString: string): string {
 	// Create a date in Helsinki timezone (assume it's midnight Helsinki time)
-	const helsinkiDate = new Date(localDateString + 'T00:00:00' + getHelsinkiOffset(new Date(localDateString + 'T00:00:00')));
+	const helsinkiDate = new Date(
+		localDateString + 'T00:00:00' + getHelsinkiOffset(new Date(localDateString + 'T00:00:00'))
+	);
 	// Convert to UTC
 	return helsinkiDate.toISOString();
 }
@@ -81,7 +83,9 @@ export function localDateToUTC(localDateString: string): string {
  */
 export function localDateTimeToUTC(localDateTimeString: string): string {
 	// Assume the input is in Helsinki timezone and convert to UTC
-	const helsinkiDate = new Date(localDateTimeString + ':00' + getHelsinkiOffset(new Date(localDateTimeString + ':00')));
+	const helsinkiDate = new Date(
+		localDateTimeString + ':00' + getHelsinkiOffset(new Date(localDateTimeString + ':00'))
+	);
 	return helsinkiDate.toISOString();
 }
 
@@ -100,11 +104,11 @@ export function utcToHelsinkiDateTimeLocal(utcString: string): string {
 		minute: '2-digit'
 	});
 	const parts = helsinkiFormatter.formatToParts(date);
-	const year = parts.find(p => p.type === 'year')?.value;
-	const month = parts.find(p => p.type === 'month')?.value;
-	const day = parts.find(p => p.type === 'day')?.value;
-	const hour = parts.find(p => p.type === 'hour')?.value;
-	const minute = parts.find(p => p.type === 'minute')?.value;
+	const year = parts.find((p) => p.type === 'year')?.value;
+	const month = parts.find((p) => p.type === 'month')?.value;
+	const day = parts.find((p) => p.type === 'day')?.value;
+	const hour = parts.find((p) => p.type === 'hour')?.value;
+	const minute = parts.find((p) => p.type === 'minute')?.value;
 	return `${year}-${month}-${day}T${hour}:${minute}`;
 }
 
@@ -120,8 +124,8 @@ export function utcToHelsinkiDate(utcString: string): string {
 		day: '2-digit'
 	});
 	const parts = helsinkiFormatter.formatToParts(date);
-	const year = parts.find(p => p.type === 'year')?.value;
-	const month = parts.find(p => p.type === 'month')?.value;
-	const day = parts.find(p => p.type === 'day')?.value;
+	const year = parts.find((p) => p.type === 'year')?.value;
+	const month = parts.find((p) => p.type === 'month')?.value;
+	const day = parts.find((p) => p.type === 'day')?.value;
 	return `${year}-${month}-${day}`;
 }

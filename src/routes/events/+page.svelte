@@ -34,12 +34,14 @@
 
 	// String values for Timepicker components
 	let startTimeString = $derived(
-		String(startTimeObj.getHours()).padStart(2, '0') + ':' + 
-		String(startTimeObj.getMinutes()).padStart(2, '0')
+		String(startTimeObj.getHours()).padStart(2, '0') +
+			':' +
+			String(startTimeObj.getMinutes()).padStart(2, '0')
 	);
 	let endTimeString = $derived(
-		String(endTimeObj.getHours()).padStart(2, '0') + ':' + 
-		String(endTimeObj.getMinutes()).padStart(2, '0')
+		String(endTimeObj.getHours()).padStart(2, '0') +
+			':' +
+			String(endTimeObj.getMinutes()).padStart(2, '0')
 	);
 
 	// Helper function to format Date objects for API
@@ -48,8 +50,10 @@
 		const month = String(dateObj.getMonth() + 1).padStart(2, '0');
 		const day = String(dateObj.getDate()).padStart(2, '0');
 		const date = `${year}-${month}-${day}`;
-		const time = String(timeObj.getHours()).padStart(2, '0') + ':' + 
-		             String(timeObj.getMinutes()).padStart(2, '0');
+		const time =
+			String(timeObj.getHours()).padStart(2, '0') +
+			':' +
+			String(timeObj.getMinutes()).padStart(2, '0');
 		return date + 'T' + time;
 	}
 
@@ -106,7 +110,8 @@
 
 	onMount(async () => {
 		await fetchEvents();
-	});	async function createEvent() {
+	});
+	async function createEvent() {
 		if (!$user) return;
 
 		isSubmitting = true;
@@ -115,11 +120,26 @@
 			submitData.append('title', formData.title);
 			if (formData.location) submitData.append('location', formData.location);
 			if (formData.description) submitData.append('description', formData.description);
-			submitData.append('start_date', formData.all_day ? localDateToUTC(formData.start_date.split('T')[0]) : localDateTimeToUTC(formData.start_date));
-			submitData.append('end_date', formData.end_date ? (formData.all_day ? localDateToUTC(formData.end_date.split('T')[0]) : localDateTimeToUTC(formData.end_date)) : (formData.all_day ? localDateToUTC(formData.start_date.split('T')[0]) : localDateTimeToUTC(formData.start_date)));
+			submitData.append(
+				'start_date',
+				formData.all_day
+					? localDateToUTC(formData.start_date.split('T')[0])
+					: localDateTimeToUTC(formData.start_date)
+			);
+			submitData.append(
+				'end_date',
+				formData.end_date
+					? formData.all_day
+						? localDateToUTC(formData.end_date.split('T')[0])
+						: localDateTimeToUTC(formData.end_date)
+					: formData.all_day
+						? localDateToUTC(formData.start_date.split('T')[0])
+						: localDateTimeToUTC(formData.start_date)
+			);
 			submitData.append('all_day', formData.all_day.toString());
 			if (formData.image) submitData.append('image', formData.image);
-			if (formData.image_description) submitData.append('image_description', formData.image_description);
+			if (formData.image_description)
+				submitData.append('image_description', formData.image_description);
 			submitData.append('state', 'submitted');
 
 			await pb.collection('events').create(submitData);
@@ -240,37 +260,29 @@
 			<div class="form-row">
 				<div class="form-group">
 					<label for="startDate">{$_('start_date_required')}</label>
-					<Datepicker 
-						id="startDate" 
-						bind:value={startDateObj} 
-						locale="fi" 
+					<Datepicker
+						id="startDate"
+						bind:value={startDateObj}
+						locale="fi"
 						firstDayOfWeek={1}
 						disabled={isSubmitting}
 					/>
 					{#if !formData.all_day}
-						<Timepicker 
-							id="startTime"
-							bind:value={startTimeString}
-							disabled={isSubmitting}
-						/>
+						<Timepicker id="startTime" bind:value={startTimeString} disabled={isSubmitting} />
 					{/if}
 				</div>
 
 				<div class="form-group">
 					<label for="endDate">{$_('end_date')}</label>
-					<Datepicker 
-						id="endDate" 
-						bind:value={endDateObj} 
-						locale="fi" 
+					<Datepicker
+						id="endDate"
+						bind:value={endDateObj}
+						locale="fi"
 						firstDayOfWeek={1}
-						disabled={isSubmitting || !formData.all_day} 
+						disabled={isSubmitting || !formData.all_day}
 					/>
 					{#if !formData.all_day}
-						<Timepicker 
-							id="endTime"
-							bind:value={endTimeString}
-							disabled={isSubmitting}
-						/>
+						<Timepicker id="endTime" bind:value={endTimeString} disabled={isSubmitting} />
 					{/if}
 				</div>
 			</div>
@@ -319,22 +331,22 @@
 
 		{#if totalEvents > pageSize}
 			<div class="pagination">
-				<button 
-					class="pagination-btn" 
-					disabled={currentPage === 1} 
-					on:click={prevPage}
-				>
+				<button class="pagination-btn" disabled={currentPage === 1} on:click={prevPage}>
 					{$_('previous')}
 				</button>
-				
+
 				<span class="pagination-info">
-					{$_('page')} {currentPage} {$_('of')} {Math.ceil(totalEvents / pageSize)} 
-					({totalEvents} {$_('total_events')})
+					{$_('page')}
+					{currentPage}
+					{$_('of')}
+					{Math.ceil(totalEvents / pageSize)}
+					({totalEvents}
+					{$_('total_events')})
 				</span>
-				
-				<button 
-					class="pagination-btn" 
-					disabled={currentPage === Math.ceil(totalEvents / pageSize)} 
+
+				<button
+					class="pagination-btn"
+					disabled={currentPage === Math.ceil(totalEvents / pageSize)}
 					on:click={nextPage}
 				>
 					{$_('next_button')}
@@ -419,7 +431,7 @@
 	input[type='time']::-webkit-datetime-edit-ampm-field {
 		display: none;
 	}
-	
+
 	input[type='time']::-webkit-datetime-edit-fields-wrapper {
 		padding: 0;
 	}

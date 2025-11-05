@@ -5,7 +5,13 @@
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import { localDateToUTC, parseUTCDate, localDateTimeToUTC, utcToHelsinkiDateTimeLocal, utcToHelsinkiDate } from '$lib/date-utils';
+	import {
+		localDateToUTC,
+		parseUTCDate,
+		localDateTimeToUTC,
+		utcToHelsinkiDateTimeLocal,
+		utcToHelsinkiDate
+	} from '$lib/date-utils';
 	import { user } from '$lib/auth';
 	import { Datepicker, Timepicker } from 'flowbite-svelte';
 	import { _ } from 'svelte-i18n';
@@ -34,12 +40,14 @@
 
 	// String values for Timepicker components
 	let startTimeString = $derived(
-		String(startTimeObj.getHours()).padStart(2, '0') + ':' + 
-		String(startTimeObj.getMinutes()).padStart(2, '0')
+		String(startTimeObj.getHours()).padStart(2, '0') +
+			':' +
+			String(startTimeObj.getMinutes()).padStart(2, '0')
 	);
 	let endTimeString = $derived(
-		String(endTimeObj.getHours()).padStart(2, '0') + ':' + 
-		String(endTimeObj.getMinutes()).padStart(2, '0')
+		String(endTimeObj.getHours()).padStart(2, '0') +
+			':' +
+			String(endTimeObj.getMinutes()).padStart(2, '0')
 	);
 
 	// Helper function to format Date objects for API
@@ -48,8 +56,10 @@
 		const month = String(dateObj.getMonth() + 1).padStart(2, '0');
 		const day = String(dateObj.getDate()).padStart(2, '0');
 		const date = `${year}-${month}-${day}`;
-		const time = String(timeObj.getHours()).padStart(2, '0') + ':' + 
-		             String(timeObj.getMinutes()).padStart(2, '0');
+		const time =
+			String(timeObj.getHours()).padStart(2, '0') +
+			':' +
+			String(timeObj.getMinutes()).padStart(2, '0');
 		return date + 'T' + time;
 	}
 
@@ -136,7 +146,7 @@
 			console.log('Edit form: No event to initialize');
 			return;
 		}
-		
+
 		try {
 			console.log('Edit form: Initializing form data...');
 			formData.title = event.title;
@@ -144,10 +154,10 @@
 			formData.description = event.description || '';
 			formData.image = null; // Don't pre-populate file input
 			formData.image_description = event.image_description || '';
-			
+
 			// Set Date objects for components
 			console.log('Edit form: Parsing dates...');
-			const startDateTime = event.all_day 
+			const startDateTime = event.all_day
 				? parseUTCDate(event.start_date)
 				: parseUTCDate(event.start_date);
 			console.log('Edit form: Start date time:', startDateTime);
@@ -156,12 +166,16 @@
 				const helsinkiDateStr = utcToHelsinkiDate(event.start_date);
 				startDateObj = new Date(helsinkiDateStr + 'T00:00:00');
 			} else {
-				startDateObj = new Date(startDateTime.getFullYear(), startDateTime.getMonth(), startDateTime.getDate());
+				startDateObj = new Date(
+					startDateTime.getFullYear(),
+					startDateTime.getMonth(),
+					startDateTime.getDate()
+				);
 			}
 			startTimeObj = new Date(1970, 0, 1, startDateTime.getHours(), startDateTime.getMinutes());
-			
+
 			if (event.end_date) {
-				const endDateTime = event.all_day 
+				const endDateTime = event.all_day
 					? parseUTCDate(event.end_date)
 					: parseUTCDate(event.end_date);
 				console.log('Edit form: End date time:', endDateTime);
@@ -170,7 +184,11 @@
 					const helsinkiEndDateStr = utcToHelsinkiDate(event.end_date);
 					endDateObj = new Date(helsinkiEndDateStr + 'T00:00:00');
 				} else {
-					endDateObj = new Date(endDateTime.getFullYear(), endDateTime.getMonth(), endDateTime.getDate());
+					endDateObj = new Date(
+						endDateTime.getFullYear(),
+						endDateTime.getMonth(),
+						endDateTime.getDate()
+					);
 				}
 				endTimeObj = new Date(1970, 0, 1, endDateTime.getHours(), endDateTime.getMinutes());
 			} else {
@@ -178,11 +196,15 @@
 				if (event.all_day) {
 					endDateObj = new Date(startDateObj);
 				} else {
-					endDateObj = new Date(startDateTime.getFullYear(), startDateTime.getMonth(), startDateTime.getDate());
+					endDateObj = new Date(
+						startDateTime.getFullYear(),
+						startDateTime.getMonth(),
+						startDateTime.getDate()
+					);
 				}
 				endTimeObj = new Date(1970, 0, 1, startDateTime.getHours(), startDateTime.getMinutes());
 			}
-			
+
 			formData.all_day = event.all_day;
 			formData.state = event.state;
 			console.log('Edit form: Initialization complete, formData:', formData);
@@ -209,9 +231,24 @@
 			if (formData.location) submitData.append('location', formData.location);
 			if (formData.description) submitData.append('description', formData.description);
 			if (formData.image) submitData.append('image', formData.image);
-			if (formData.image_description) submitData.append('image_description', formData.image_description);
-			submitData.append('start_date', formData.all_day ? localDateToUTC(formData.start_date.split('T')[0]) : localDateTimeToUTC(formData.start_date));
-			submitData.append('end_date', formData.end_date ? (formData.all_day ? localDateToUTC(formData.end_date.split('T')[0]) : localDateTimeToUTC(formData.end_date)) : (formData.all_day ? localDateToUTC(formData.start_date.split('T')[0]) : localDateTimeToUTC(formData.start_date)));
+			if (formData.image_description)
+				submitData.append('image_description', formData.image_description);
+			submitData.append(
+				'start_date',
+				formData.all_day
+					? localDateToUTC(formData.start_date.split('T')[0])
+					: localDateTimeToUTC(formData.start_date)
+			);
+			submitData.append(
+				'end_date',
+				formData.end_date
+					? formData.all_day
+						? localDateToUTC(formData.end_date.split('T')[0])
+						: localDateTimeToUTC(formData.end_date)
+					: formData.all_day
+						? localDateToUTC(formData.start_date.split('T')[0])
+						: localDateTimeToUTC(formData.start_date)
+			);
 			submitData.append('all_day', formData.all_day.toString());
 			submitData.append('state', formData.state);
 
@@ -237,17 +274,32 @@
 		<form on:submit|preventDefault={saveEdit}>
 			<div class="form-group">
 				<label for="editTitle">{$_('title_required')}</label>
-				<input type="text" id="editTitle" bind:value={formData.title} required disabled={isSubmitting} />
+				<input
+					type="text"
+					id="editTitle"
+					bind:value={formData.title}
+					required
+					disabled={isSubmitting}
+				/>
 			</div>
 
 			<div class="form-group">
 				<label for="editLocation">{$_('location_label')}</label>
-				<input type="text" id="editLocation" bind:value={formData.location} disabled={isSubmitting} />
+				<input
+					type="text"
+					id="editLocation"
+					bind:value={formData.location}
+					disabled={isSubmitting}
+				/>
 			</div>
 
 			<div class="form-group">
 				<label for="editDescription">{$_('description_label')}</label>
-				<textarea id="editDescription" bind:value={formData.description} rows="3" disabled={isSubmitting}
+				<textarea
+					id="editDescription"
+					bind:value={formData.description}
+					rows="3"
+					disabled={isSubmitting}
 				></textarea>
 			</div>
 
@@ -282,37 +334,29 @@
 			<div class="form-row">
 				<div class="form-group">
 					<label for="editStartDate">{$_('start_date_required')}</label>
-					<Datepicker 
-						id="editStartDate" 
-						bind:value={startDateObj} 
-						locale="fi" 
+					<Datepicker
+						id="editStartDate"
+						bind:value={startDateObj}
+						locale="fi"
 						firstDayOfWeek={1}
 						disabled={isSubmitting}
 					/>
 					{#if !formData.all_day}
-						<Timepicker 
-							id="editStartTime"
-							bind:value={startTimeString}
-							disabled={isSubmitting}
-						/>
+						<Timepicker id="editStartTime" bind:value={startTimeString} disabled={isSubmitting} />
 					{/if}
 				</div>
 
 				<div class="form-group">
 					<label for="editEndDate">{$_('end_date')}</label>
-					<Datepicker 
-						id="editEndDate" 
-						bind:value={endDateObj} 
-						locale="fi" 
+					<Datepicker
+						id="editEndDate"
+						bind:value={endDateObj}
+						locale="fi"
 						firstDayOfWeek={1}
-						disabled={isSubmitting || !formData.all_day} 
+						disabled={isSubmitting || !formData.all_day}
 					/>
 					{#if !formData.all_day}
-						<Timepicker 
-							id="editEndTime"
-							bind:value={endTimeString}
-							disabled={isSubmitting}
-						/>
+						<Timepicker id="editEndTime" bind:value={endTimeString} disabled={isSubmitting} />
 					{/if}
 				</div>
 			</div>
@@ -468,7 +512,7 @@
 	input[type='time']::-webkit-datetime-edit-ampm-field {
 		display: none;
 	}
-	
+
 	input[type='time']::-webkit-datetime-edit-fields-wrapper {
 		padding: 0;
 	}
