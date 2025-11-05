@@ -51,15 +51,11 @@
 
 	// Reactive statements for date/time synchronization
 	$effect(() => {
-		if (formData.all_day) {
-			// For all-day events, force end date to match start date
+		// For timed events (not all-day), force end date to match start date
+		if (!formData.all_day) {
 			endDateObj = new Date(startDateObj);
-		} else {
-			// For timed events, force end date to match start date but keep existing time
-			const newEndDate = new Date(startDateObj);
-			newEndDate.setHours(endDateObj.getHours(), endDateObj.getMinutes());
-			endDateObj = newEndDate;
 		}
+		// For all-day events, allow different end dates
 	});
 
 	$effect(() => {
@@ -263,7 +259,7 @@
 						bind:value={endDateObj} 
 						locale="fi" 
 						firstDayOfWeek={1}
-						disabled={isSubmitting || formData.all_day} 
+						disabled={isSubmitting || !formData.all_day} 
 					/>
 					{#if !formData.all_day}
 						<Timepicker 

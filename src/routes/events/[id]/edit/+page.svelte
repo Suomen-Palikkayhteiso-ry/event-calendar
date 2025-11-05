@@ -53,11 +53,11 @@
 	$effect(() => {
 		if (!event) return; // Don't run until event is loaded
 
-		if (formData.all_day) {
-			// For all-day events, force end date to match start date
+		// For timed events (not all-day), force end date to match start date
+		if (!formData.all_day) {
 			endDateObj = new Date(startDateObj);
 		}
-		// For timed events, allow different end dates
+		// For all-day events, allow different end dates
 	});
 
 	$effect(() => {
@@ -155,8 +155,13 @@
 					? parseUTCDate(event.end_date)
 					: parseUTCDate(event.end_date);
 				console.log('Edit form: End date time:', endDateTime);
+				// For all-day events, use the actual end date from the event
 				endDateObj = new Date(endDateTime.getFullYear(), endDateTime.getMonth(), endDateTime.getDate());
 				endTimeObj = new Date(1970, 0, 1, endDateTime.getHours(), endDateTime.getMinutes());
+			} else {
+				// No end date, use start date
+				endDateObj = new Date(startDateTime.getFullYear(), startDateTime.getMonth(), startDateTime.getDate());
+				endTimeObj = new Date(1970, 0, 1, startDateTime.getHours(), startDateTime.getMinutes());
 			}
 			
 			formData.all_day = event.all_day;
@@ -281,7 +286,7 @@
 						bind:value={endDateObj} 
 						locale="fi" 
 						firstDayOfWeek={1}
-						disabled={isSubmitting || formData.all_day} 
+						disabled={isSubmitting || !formData.all_day} 
 					/>
 					{#if !formData.all_day}
 						<Timepicker 
@@ -413,6 +418,7 @@
 		border-radius: 4px;
 		font-size: 1rem;
 		box-sizing: border-box;
+		background: red;
 	}
 
 	input[type='text'],
