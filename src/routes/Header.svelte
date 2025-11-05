@@ -10,6 +10,8 @@
 		</a>
 	</div>
 
+	<div class="title">Palikkakalenteri</div>
+
 	{#if $user}
 		<div class="auth">
 			<span>Hello, {$user.name}</span>
@@ -30,6 +32,8 @@
 		padding: 1rem;
 		position: relative;
 		overflow: visible;
+		background-color: #f8f9fa;
+		border-bottom: 1px solid #e9ecef;
 	}
 
 	.corner {
@@ -62,9 +66,9 @@
 
 	.auth button {
 		padding: 0.5rem 1rem;
-		background-color: var(--color-theme);
+		background-color: #0056a3;
 		color: white;
-		border: none;
+		border: 1px solid #004080;
 		border-radius: 0.25rem;
 		cursor: pointer;
 		font-weight: 500;
@@ -72,5 +76,11 @@
 
 	.auth button:hover {
 		background-color: #004080;
+	}
+
+	.title {
+		font-size: 1.25rem;
+		font-weight: 600;
+		color: var(--color-text);
 	}
 </style>

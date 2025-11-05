@@ -83,8 +83,6 @@
 	<meta name="description" content="Hallinnoi ja julkaise tapahtumia kalenterisovelluksellamme" />
 </svelte:head>
 
-<h1>{$_('public_calendar')}</h1>
-
 {#if $user}
 	<div class="management-links">
 		<a href={resolve('/events')} class="manage-link">Manage Events</a>
