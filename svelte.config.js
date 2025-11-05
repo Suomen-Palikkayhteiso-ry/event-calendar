@@ -13,6 +13,9 @@ const config = {
 		paths: {
 			base: ''
 		},
+		router: {
+			type: 'hash'
+		},
 		prerender: {
 			entries: [],
 			handleUnseenRoutes: 'ignore',

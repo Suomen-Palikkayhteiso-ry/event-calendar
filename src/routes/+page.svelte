@@ -36,12 +36,7 @@
 		},
 		eventClick: (info: unknown) => {
 			if ((info as any).event.id === 'selected-day') return;
-			// Save state to hash
-			const dateStr = selectedDate.toISOString().split('T')[0];
-			const view = calendarOptions.view;
-			window.location.hash = `!date=${dateStr}&view=${view}`;
-			// eslint-disable-next-line svelte/no-navigation-without-resolve
-			goto((resolve as any)(`/events/${(info as any).event.id}`));
+			goto(resolve(`/events/${(info as any).event.id}`));
 		}
 	});
 	let selectedDate = $state(new Date());
@@ -50,18 +45,6 @@
 		events = await pb.collection('events').getFullList({
 			sort: 'start_date'
 		});
-		// Restore state from hash
-		if (window.location.hash.startsWith('#!')) {
-			const params = new URLSearchParams(window.location.hash.slice(2));
-			const dateStr = params.get('date');
-			if (dateStr) {
-				selectedDate = new Date(dateStr);
-			}
-			const view = params.get('view');
-			if (view) {
-				calendarOptions.view = view;
-			}
-		}
 		updateCalendarEvents();
 	});
 
