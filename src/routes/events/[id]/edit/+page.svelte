@@ -474,4 +474,15 @@
 		gap: 0.5rem;
 		margin-top: 1.5rem;
 	}
+
+	/* Make datepicker current date visible */
+	:global(.day.today) {
+		background-color: var(--color-theme) !important;
+		color: white !important;
+		border: 2px solid var(--color-theme) !important;
+	}
+	:global(.day.today:not(.selected)) {
+		background-color: white !important;
+		color: var(--color-theme) !important;
+	}
 </style>

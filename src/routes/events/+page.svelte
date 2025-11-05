@@ -571,4 +571,15 @@
 		font-size: 0.9rem;
 		font-weight: 500;
 	}
+
+	/* Make datepicker current date visible */
+	:global(.day.today) {
+		background-color: var(--color-theme) !important;
+		color: white !important;
+		border: 2px solid var(--color-theme) !important;
+	}
+	:global(.day.today:not(.selected)) {
+		background-color: white !important;
+		color: var(--color-theme) !important;
+	}
 </style>
