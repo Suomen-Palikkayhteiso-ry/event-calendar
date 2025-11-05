@@ -7,39 +7,47 @@ const pb = new PocketBase('https://data.suomenpalikkayhteiso.fi');
 
 async function generateFeeds() {
 	const events = await pb.collection('events').getFullList({
-		sort: 'start_date'
+		sort: 'start_date',
+		filter: 'state = "published"'
 	});
 
 	// Generate RSS feed
 	const feed = new Feed({
-		title: 'Event Calendar',
-		description: 'A calendar of upcoming events',
-		id: 'http://localhost:5173/',
-		link: 'http://localhost:5173/',
-		language: 'en',
-		image: 'http://localhost:5173/logo.png',
-		favicon: 'http://localhost:5173/favicon.ico',
-		copyright: 'All rights reserved 2023, Your Name',
+		title: 'Suomen Palikkayhteisön tapahtumakalenteri',
+		description: 'Suomen Palikkayhteisön tapahtumakalenteri - tapahtumat, näyttelyt ja kokoontumiset',
+		id: 'https://kalenteri.suomenpalikkayhteiso.fi/',
+		link: 'https://kalenteri.suomenpalikkayhteiso.fi/',
+		language: 'fi',
+		image: 'https://kalenteri.suomenpalikkayhteiso.fi/logo.png',
+		favicon: 'https://kalenteri.suomenpalikkayhteiso.fi/favicon.ico',
+		copyright: 'All rights reserved 2023, Suomen Palikkayhteisö',
 		updated: new Date(),
-		generator: 'Awesome',
+		generator: 'Event Calendar Generator',
 		feedLinks: {
-			json: 'http://localhost:5173/json',
-			atom: 'http://localhost:5173/atom'
+			rss: 'https://kalenteri.suomenpalikkayhteiso.fi/feed.rss',
+			atom: 'https://kalenteri.suomenpalikkayhteiso.fi/feed.atom'
 		},
 		author: {
-			name: 'Your Name',
-			email: 'your@example.com',
-			link: 'https://example.com/'
+			name: 'Suomen Palikkayhteisö',
+			email: 'info@suomenpalikkayhteiso.fi',
+			link: 'https://kalenteri.suomenpalikkayhteiso.fi/'
 		}
 	});
 
 	events.forEach((event) => {
+		const eventDate = new Date(event.start_date + (event.start_date.includes('Z') ? '' : 'Z')); // Ensure UTC
+		const description = event.description || event.title;
+		const content = event.location ? `${description}\n\nLocation: ${event.location}` : description;
+
 		feed.addItem({
 			title: event.title,
 			id: event.id,
-			link: `http://localhost:5173/events/${event.id}`,
-			description: event.title,
-			date: new Date(event.start_date)
+			link: `https://kalenteri.suomenpalikkayhteiso.fi/events/${event.id}`,
+			description: content,
+			date: eventDate,
+			author: [{
+				name: 'Event Calendar'
+			}]
 		});
 	});
 
@@ -47,18 +55,38 @@ async function generateFeeds() {
 
 	// Generate ICAL feed
 	const calendar = ical({
-		name: 'Event Calendar',
+		name: 'Suomen Palikkayhteisön tapahtumakalenteri',
+		description: 'Suomen Palikkayhteisön tapahtumat, näyttelyt ja kokoontumiset',
 		timezone: 'Europe/Helsinki'
 	});
 
 	events.forEach((event) => {
-		calendar.createEvent({
-			start: new Date(event.start_date),
-			end: new Date(event.end_date || event.start_date),
+		const startDate = new Date(event.start_date + (event.start_date.includes('Z') ? '' : 'Z')); // Ensure UTC
+		const endDate = event.end_date
+			? new Date(event.end_date + (event.end_date.includes('Z') ? '' : 'Z')) // Ensure UTC
+			: new Date(startDate.getTime() + (event.all_day ? 24 * 60 * 60 * 1000 : 60 * 60 * 1000)); // Default 1 day for all_day, 1 hour otherwise
+
+		const description = event.description || event.title;
+
+		const eventData = {
+			id: event.id,
+			start: startDate,
+			end: endDate,
 			summary: event.title,
-			description: event.title,
-			url: `http://localhost:5173/events/${event.id}`
-		});
+			description: description,
+			url: `https://kalenteri.suomenpalikkayhteiso.fi/events/${event.id}`,
+			timezone: 'Europe/Helsinki'
+		};
+
+		if (event.location) {
+			eventData.location = event.location;
+		}
+
+		if (event.all_day) {
+			eventData.allDay = true;
+		}
+
+		calendar.createEvent(eventData);
 	});
 
 	fs.writeFileSync('static/feed.ical', calendar.toString());
