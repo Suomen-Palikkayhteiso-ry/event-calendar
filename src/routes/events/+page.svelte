@@ -383,10 +383,19 @@
 		color: #555;
 	}
 
+	input[type='time'] {
+		width: 100%;
+		min-width: 140px;
+		padding: 0.75rem 2.5rem 0.75rem 0.75rem; /* Extra right padding for clock icon */
+		border: 1px solid #ddd;
+		border-radius: 4px;
+		font-size: 1rem;
+		box-sizing: border-box;
+	}
+
 	input[type='text'],
 	input[type='date'],
 	input[type='datetime-local'],
-	input[type='time'],
 	textarea {
 		width: 100%;
 		padding: 0.75rem;
