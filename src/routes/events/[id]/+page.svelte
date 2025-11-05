@@ -24,12 +24,12 @@
 	let editState: 'submitted' | 'published' = 'submitted';
 
 	// Check authentication
-	$: if (!$user) {
-		goto(resolve('/'));
-	}
+	// $: if (!$user) {
+	// 	goto(resolve('/'));
+	// }
 
 	onMount(() => {
-		if (!$user) return;
+		// if (!$user) return;
 
 		const eventId = $page.params.id;
 		if (!eventId) return;
@@ -136,7 +136,7 @@
 		{/if}
 
 		<div class="event-actions">
-			{#if !isEditing}
+			{#if !isEditing && $user}
 				<button class="btn-secondary" on:click={startEdit}>Edit</button>
 				<button class="btn-danger" on:click={deleteEvent} disabled={isDeleting}>
 					{isDeleting ? 'Deleting...' : 'Delete'}
