@@ -8,6 +8,8 @@ export interface Event {
 	url?: string;
 	location?: string; // Optional location
 	state: 'submitted' | 'published'; // Event state
+	image?: string; // Optional PocketBase file field for event image
+	image_description?: string; // Optional description for the image
 	created: string; // Record creation datetime
 	updated: string; // Record last update datetime
 }

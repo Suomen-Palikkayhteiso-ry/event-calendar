@@ -14,6 +14,8 @@
 	let newEventAllDay = false;
 	let newEventLocation = '';
 	let newEventDescription = '';
+	let newEventImage: File | null = null;
+	let newEventImageDescription = '';
 	let isSubmitting = false;
 
 	// Check authentication
@@ -34,22 +36,25 @@
 
 		isSubmitting = true;
 		try {
-			await pb.collection('events').create({
-				title: newEventTitle,
-				location: newEventLocation || undefined,
-				description: newEventDescription || undefined,
-				start_date: localDateToUTC(newEventStartDate),
-				end_date: newEventEndDate
-					? localDateToUTC(newEventEndDate)
-					: localDateToUTC(newEventStartDate),
-				all_day: newEventAllDay,
-				state: 'submitted' // Default state for new events
-			});
+			const formData = new FormData();
+			formData.append('title', newEventTitle);
+			if (newEventLocation) formData.append('location', newEventLocation);
+			if (newEventDescription) formData.append('description', newEventDescription);
+			formData.append('start_date', localDateToUTC(newEventStartDate));
+			formData.append('end_date', newEventEndDate ? localDateToUTC(newEventEndDate) : localDateToUTC(newEventStartDate));
+			formData.append('all_day', newEventAllDay.toString());
+			if (newEventImage) formData.append('image', newEventImage);
+			if (newEventImageDescription) formData.append('image_description', newEventImageDescription);
+			formData.append('state', 'submitted');
+
+			await pb.collection('events').create(formData);
 
 			// Reset form
 			newEventTitle = '';
 			newEventLocation = '';
 			newEventDescription = '';
+			newEventImage = null;
+			newEventImageDescription = '';
 			newEventStartDate = '';
 			newEventEndDate = '';
 			newEventAllDay = false;
@@ -67,7 +72,7 @@
 	}
 </script>
 
-<h1>Manage Events</h1>
+<h1>Add new event</h1>
 
 {#if !$user}
 	<p>You must be logged in to manage events.</p>
@@ -107,6 +112,31 @@
 					rows="3"
 					disabled={isSubmitting}
 				></textarea>
+			</div>
+
+			<div class="form-group">
+				<label for="image">Image</label>
+				<input
+					type="file"
+					id="image"
+					accept="image/*"
+					disabled={isSubmitting}
+					on:change={(e) => {
+						const target = e.target as HTMLInputElement;
+						newEventImage = target.files?.[0] || null;
+					}}
+				/>
+			</div>
+
+			<div class="form-group">
+				<label for="imageDescription">Image Description</label>
+				<input
+					type="text"
+					id="imageDescription"
+					bind:value={newEventImageDescription}
+					placeholder="Image description (optional)"
+					disabled={isSubmitting}
+				/>
 			</div>
 
 			<div class="form-row">

@@ -83,6 +83,9 @@
 	</div>
 
 	<div class="event-details">
+		{#if event.description}
+			<p class="event-description">{event.description}</p>
+		{/if}
 		{#if event.location}
 			<p><strong>{$_('location')}</strong> {event.location}</p>
 		{/if}
@@ -96,14 +99,12 @@
 				{formatDateInHelsinki(event.end_date, event.all_day)}
 			</p>
 		{/if}
-		{#if event.all_day}
-			<p><em>{$_('all_day_event')}</em></p>
+		{#if event.image}
+			<img src={pb.files.getUrl(event, event.image)} alt={event.image_description || event.title} class="event-image" />
 		{/if}
-		{#if event.description}
-			<p><strong>{$_('description')}</strong></p>
-			<p>{event.description}</p>
+		{#if event.image_description}
+			<p>{event.image_description}</p>
 		{/if}
-		<p><strong>Status:</strong> {event.state}</p>
 	</div>
 
 	<div class="navigation">
@@ -118,7 +119,7 @@
 		display: flex;
 		justify-content: space-between;
 		align-items: flex-start;
-		margin-bottom: 2rem;
+		margin: 2rem 0;
 	}
 
 	.event-header h1 {
@@ -175,17 +176,39 @@
 		background: white;
 		padding: 2rem;
 		border-radius: 8px;
-		border: 1px solid #ddd;
 		margin-bottom: 2rem;
 	}
 
+	.event-details > * {
+		margin: 0.75rem 0;
+	}
+
+	.event-details > *:first-child {
+		margin-top: 0;
+	}
+
+	.event-details > *:last-child {
+		margin-bottom: 0;
+	}
+
 	.event-details p {
-		margin: 0.5rem 0;
 		line-height: 1.4;
 	}
 
 	.event-details strong {
 		color: #333;
+	}
+
+	.event-description {
+		font-size: 1.2em;
+		line-height: 1.5;
+	}
+
+	.event-image {
+		max-width: 100%;
+		height: auto;
+		border-radius: 8px;
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 	}
 
 	.navigation {

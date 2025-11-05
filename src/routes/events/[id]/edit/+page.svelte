@@ -15,6 +15,8 @@
 	let editTitle = '';
 	let editLocation = '';
 	let editDescription = '';
+	let editImage: File | null = null;
+	let editImageDescription = '';
 	let editStartDate = '';
 	let editEndDate = '';
 	let editAllDay = false;
@@ -59,6 +61,8 @@
 		editTitle = event.title;
 		editLocation = event.location || '';
 		editDescription = event.description || '';
+		editImage = null; // Don't pre-populate file input
+		editImageDescription = event.image_description || '';
 		editStartDate = parseUTCDate(event.start_date).toISOString().split('T')[0];
 		editEndDate = event.end_date ? parseUTCDate(event.end_date).toISOString().split('T')[0] : '';
 		editAllDay = event.all_day;
@@ -74,15 +78,18 @@
 
 		isSubmitting = true;
 		try {
-			await pb.collection('events').update(event.id, {
-				title: editTitle,
-				location: editLocation || undefined,
-				description: editDescription || undefined,
-				start_date: localDateToUTC(editStartDate),
-				end_date: editEndDate ? localDateToUTC(editEndDate) : localDateToUTC(editStartDate),
-				all_day: editAllDay,
-				state: editState
-			});
+			const formData = new FormData();
+			formData.append('title', editTitle);
+			if (editLocation) formData.append('location', editLocation);
+			if (editDescription) formData.append('description', editDescription);
+			if (editImage) formData.append('image', editImage);
+			if (editImageDescription) formData.append('image_description', editImageDescription);
+			formData.append('start_date', localDateToUTC(editStartDate));
+			formData.append('end_date', editEndDate ? localDateToUTC(editEndDate) : localDateToUTC(editStartDate));
+			formData.append('all_day', editAllDay.toString());
+			formData.append('state', editState);
+
+			await pb.collection('events').update(event.id, formData);
 
 			// Redirect back to view
 			goto(resolve(`/events/${event.id}`));
@@ -116,6 +123,34 @@
 				<label for="editDescription">Description</label>
 				<textarea id="editDescription" bind:value={editDescription} rows="3" disabled={isSubmitting}
 				></textarea>
+			</div>
+
+			<div class="form-group">
+				<label for="editImage">Image</label>
+				<input
+					type="file"
+					id="editImage"
+					accept="image/*"
+					disabled={isSubmitting}
+					on:change={(e) => {
+						const target = e.target as HTMLInputElement;
+						editImage = target.files?.[0] || null;
+					}}
+				/>
+				{#if event.image}
+					<p class="current-image">Current image: {event.image}</p>
+				{/if}
+			</div>
+
+			<div class="form-group">
+				<label for="editImageDescription">Image Description</label>
+				<input
+					type="text"
+					id="editImageDescription"
+					bind:value={editImageDescription}
+					placeholder="Image description (optional)"
+					disabled={isSubmitting}
+				/>
 			</div>
 
 			<div class="form-row">
