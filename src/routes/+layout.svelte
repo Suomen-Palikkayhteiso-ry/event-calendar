@@ -3,6 +3,7 @@
 	import '../app.css';
 	import 'flowbite/dist/flowbite.min.css';
 	import '../lib/i18n';
+	import { _ } from 'svelte-i18n';
 
 	let { children } = $props();
 </script>
@@ -18,9 +19,9 @@
 		<div class="footer-content">
 			<p>
 				<!-- eslint-disable-next-line svelte/no-navigation-without-resolve --><!--These are external links, so resolve is not needed.-->
-				<a href="/feed.rss" target="_blank">RSS Feed</a> |
+				<a href="/feed.rss" target="_blank">{$_('rss_feed')}</a> |
 				<!-- eslint-disable-next-line svelte/no-navigation-without-resolve --><!--These are external links, so resolve is not needed.-->
-				<a href="/feed.ical" target="_blank">iCal Feed</a>
+				<a href="/feed.ical" target="_blank">{$_('ical_feed')}</a>
 			</p>
 		</div>
 	</footer>

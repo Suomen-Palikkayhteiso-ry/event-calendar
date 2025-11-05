@@ -8,7 +8,70 @@ addMessages('fi', {
 	start: 'Alkaa:',
 	end: 'Päättyy:',
 	all_day_event: 'Koko päivän tapahtuma',
-	description: 'Kuvaus:'
+	description: 'Kuvaus:',
+	// Calendar navigation
+	today: 'Tänään',
+	prev: 'Edellinen',
+	next: 'Seuraava',
+	// Page titles
+	event_calendar: 'Tapahtumakalenteri',
+	event_calendar_description: 'Hallinnoi ja julkaise tapahtumia kalenterisovelluksellamme',
+	// Events management
+	add_new_event: 'Lisää uusi tapahtuma',
+	login_required: 'Sinun täytyy kirjautua sisään hallitaksesi tapahtumia.',
+	create_new_event: 'Luo uusi tapahtuma',
+	title_required: 'Otsikko *',
+	event_title: 'Tapahtuman otsikko',
+	location_label: 'Paikka',
+	location_optional: 'Paikka (valinnainen)',
+	description_label: 'Kuvaus',
+	description_optional: 'Kuvaus (valinnainen)',
+	image_label: 'Kuva',
+	image_description_label: 'Kuvan kuvaus',
+	image_description_optional: 'Kuvan kuvaus (valinnainen)',
+	start_date_required: 'Aloituspäivä *',
+	end_date: 'Lopetuspäivä',
+	all_day_event_label: 'Koko päivän tapahtuma',
+	creating: 'Luodaan...',
+	create_event: 'Luo tapahtuma',
+	cancel: 'Peruuta',
+	existing_events: 'Olemassa olevat tapahtumat',
+	edit: 'Muokkaa',
+	all_day: '(Koko päivä)',
+	status: 'Tila:',
+	previous: 'Edellinen',
+	page: 'Sivu',
+	of: '/',
+	total_events: 'tapahtumaa yhteensä',
+	next_button: 'Seuraava',
+	failed_create_event: 'Tapahtuman luonti epäonnistui. Yritä uudelleen.',
+	// Event detail
+	confirm_delete: 'Oletko varma, että haluat poistaa tämän tapahtuman? Tätä toimintoa ei voi peruuttaa.',
+	deleting: 'Poistetaan...',
+	delete: 'Poista',
+	back_to_calendar_detail: 'Takaisin kalenteriin',
+	loading_event: 'Ladataan tapahtumaa...',
+	failed_delete_event: 'Tapahtuman poistaminen epäonnistui. Yritä uudelleen.',
+	// Event edit
+	edit_event: 'Muokkaa tapahtumaa',
+	current_image: 'Nykyinen kuva:',
+	saving: 'Tallennetaan...',
+	save_changes: 'Tallenna muutokset',
+	failed_update_event: 'Tapahtuman päivitys epäonnistui. Yritä uudelleen.',
+	// Status options
+	submitted: 'Lähetetty',
+	published: 'Julkaistu',
+	// Header
+	organization_alt: 'Suomen Palikkayhteisö ry',
+	calendar_title: 'Palikkakalenteri',
+	hello: 'Hei,',
+	logout: 'Kirjaudu ulos',
+	login: 'Kirjaudu sisään',
+	// Layout
+	rss_feed: 'RSS-syöte',
+	ical_feed: 'iCal-syöte',
+	// Callback
+	completing_login: 'Viimeistellään kirjautumista...'
 });
 
 init({

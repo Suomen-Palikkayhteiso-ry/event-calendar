@@ -1,25 +1,26 @@
 <script lang="ts">
 	import { user, login, logout } from '$lib/auth';
 	import { resolve } from '$app/paths';
+	import { _ } from 'svelte-i18n';
 </script>
 
 <header>
 	<div class="corner">
 		<a href={resolve('/')}>
-			<img src="/logo.svg" alt="Suomen Palikkayhteisö ry" class="logo" />
+			<img src="/logo.svg" alt={$_('organization_alt')} class="logo" />
 		</a>
 	</div>
 
-	<div class="title">Palikkakalenteri</div>
+	<div class="title">{$_('calendar_title')}</div>
 
 	{#if $user}
 		<div class="auth">
-			<span>Hello, {$user.name}</span>
-			<button on:click={logout}>Logout</button>
+			<span>{$_('hello')} {$user.name}</span>
+			<button on:click={logout}>{$_('logout')}</button>
 		</div>
 	{:else}
 		<div class="auth">
-			<button on:click={login}>Login</button>
+			<button on:click={login}>{$_('login')}</button>
 		</div>
 	{/if}
 </header>

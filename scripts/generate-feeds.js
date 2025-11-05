@@ -42,7 +42,7 @@ async function generateFeeds() {
 		feed.addItem({
 			title: event.title,
 			id: event.id,
-			link: `https://kalenteri.suomenpalikkayhteiso.fi/events/${event.id}`,
+			link: `https://kalenteri.suomenpalikkayhteiso.fi/#/events/${event.id}`,
 			description: content,
 			date: eventDate,
 			author: [{
@@ -74,7 +74,7 @@ async function generateFeeds() {
 			end: endDate,
 			summary: event.title,
 			description: description,
-			url: `https://kalenteri.suomenpalikkayhteiso.fi/events/${event.id}`,
+			url: `https://kalenteri.suomenpalikkayhteiso.fi/#/events/${event.id}`,
 			timezone: 'Europe/Helsinki'
 		};
 

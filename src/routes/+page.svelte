@@ -21,9 +21,9 @@
 		locale: 'fi',
 		firstDay: 1,
 		buttonText: {
-			today: 'Tänään',
-			prev: 'Edellinen',
-			next: 'Seuraava'
+			today: $_('today'),
+			prev: $_('prev'),
+			next: $_('next_button')
 		},
 		eventDidMount: (info: unknown) => {
 			if ((info as any).event.extendedProps.description) {
@@ -87,8 +87,8 @@
 </script>
 
 <svelte:head>
-	<title>Tapahtumakalenteri</title>
-	<meta name="description" content="Hallinnoi ja julkaise tapahtumia kalenterisovelluksellamme" />
+	<title>{$_('event_calendar')}</title>
+	<meta name="description" content={$_('event_calendar_description')} />
 </svelte:head>
 
 {#if $user}

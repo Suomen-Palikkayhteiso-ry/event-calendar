@@ -8,6 +8,7 @@
 	import { localDateToUTC, parseUTCDate, localDateTimeToUTC, utcToHelsinkiDateTimeLocal, utcToHelsinkiDate } from '$lib/date-utils';
 	import { user } from '$lib/auth';
 	import { Datepicker, Timepicker } from 'flowbite-svelte';
+	import { _ } from 'svelte-i18n';
 
 	let event = $state<Event | null>(null);
 	let isSubmitting = $state(false);
@@ -220,7 +221,7 @@
 			goto(resolve(`/events/${event.id}`));
 		} catch (error) {
 			console.error('Error updating event:', error);
-			alert('Failed to update event. Please try again.');
+			alert($_('failed_update_event'));
 		} finally {
 			isSubmitting = false;
 		}
@@ -229,29 +230,29 @@
 
 {#if event}
 	<div class="event-header">
-		<h1>Edit Event</h1>
+		<h1>{$_('edit_event')}</h1>
 	</div>
 
 	<div class="edit-form">
 		<form on:submit|preventDefault={saveEdit}>
 			<div class="form-group">
-				<label for="editTitle">Title *</label>
+				<label for="editTitle">{$_('title_required')}</label>
 				<input type="text" id="editTitle" bind:value={formData.title} required disabled={isSubmitting} />
 			</div>
 
 			<div class="form-group">
-				<label for="editLocation">Location</label>
+				<label for="editLocation">{$_('location_label')}</label>
 				<input type="text" id="editLocation" bind:value={formData.location} disabled={isSubmitting} />
 			</div>
 
 			<div class="form-group">
-				<label for="editDescription">Description</label>
+				<label for="editDescription">{$_('description_label')}</label>
 				<textarea id="editDescription" bind:value={formData.description} rows="3" disabled={isSubmitting}
 				></textarea>
 			</div>
 
 			<div class="form-group">
-				<label for="editImage">Image</label>
+				<label for="editImage">{$_('image_label')}</label>
 				<input
 					type="file"
 					id="editImage"
@@ -263,24 +264,24 @@
 					}}
 				/>
 				{#if event.image}
-					<p class="current-image">Current image: {event.image}</p>
+					<p class="current-image">{$_('current_image')} {event.image}</p>
 				{/if}
 			</div>
 
 			<div class="form-group">
-				<label for="editImageDescription">Image Description</label>
+				<label for="editImageDescription">{$_('image_description_label')}</label>
 				<input
 					type="text"
 					id="editImageDescription"
 					bind:value={formData.image_description}
-					placeholder="Image description (optional)"
+					placeholder={$_('image_description_optional')}
 					disabled={isSubmitting}
 				/>
 			</div>
 
 			<div class="form-row">
 				<div class="form-group">
-					<label for="editStartDate">Start Date *</label>
+					<label for="editStartDate">{$_('start_date_required')}</label>
 					<Datepicker 
 						id="editStartDate" 
 						bind:value={startDateObj} 
@@ -298,7 +299,7 @@
 				</div>
 
 				<div class="form-group">
-					<label for="editEndDate">End Date</label>
+					<label for="editEndDate">{$_('end_date')}</label>
 					<Datepicker 
 						id="editEndDate" 
 						bind:value={endDateObj} 
@@ -319,15 +320,15 @@
 			<div class="form-group">
 				<label class="checkbox-label">
 					<input type="checkbox" bind:checked={formData.all_day} disabled={isSubmitting} />
-					All Day Event
+					{$_('all_day_event_label')}
 				</label>
 			</div>
 
 			<div class="form-group">
-				<label for="editState">Status</label>
+				<label for="editState">{$_('status')}</label>
 				<select id="editState" bind:value={formData.state} disabled={isSubmitting}>
-					<option value="submitted">Submitted</option>
-					<option value="published">Published</option>
+					<option value="submitted">{$_('submitted')}</option>
+					<option value="published">{$_('published')}</option>
 				</select>
 			</div>
 
@@ -337,16 +338,16 @@
 					class="save-btn"
 					disabled={isSubmitting || !formData.title || !formData.start_date}
 				>
-					{isSubmitting ? 'Saving...' : 'Save Changes'}
+					{isSubmitting ? $_('saving') : $_('save_changes')}
 				</button>
 				<button type="button" class="btn-secondary" on:click={cancelEdit} disabled={isSubmitting}>
-					Cancel
+					{$_('cancel')}
 				</button>
 			</div>
 		</form>
 	</div>
 {:else}
-	<p>Loading event...</p>
+	<p>{$_('loading_event')}</p>
 {/if}
 
 <style>

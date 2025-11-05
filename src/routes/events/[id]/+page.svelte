@@ -49,7 +49,7 @@
 	async function deleteEvent() {
 		if (!$user || !event) return;
 
-		if (!confirm('Are you sure you want to delete this event? This action cannot be undone.')) {
+		if (!confirm($_('confirm_delete'))) {
 			return;
 		}
 
@@ -59,7 +59,7 @@
 			goto(resolve('/events'));
 		} catch (error) {
 			console.error('Error deleting event:', error);
-			alert('Failed to delete event. Please try again.');
+			alert($_('failed_delete_event'));
 		} finally {
 			isDeleting = false;
 		}
@@ -73,10 +73,10 @@
 		<div class="event-actions">
 			{#if $user}
 				<button class="btn-secondary" on:click={() => goto(resolve(`/events/${event.id}/edit`))}
-					>Edit</button
+					>{$_('edit')}</button
 				>
 				<button class="btn-danger" on:click={deleteEvent} disabled={isDeleting}>
-					{isDeleting ? 'Deleting...' : 'Delete'}
+					{isDeleting ? $_('deleting') : $_('delete')}
 				</button>
 			{/if}
 		</div>
@@ -108,10 +108,10 @@
 	</div>
 
 	<div class="navigation">
-		<button class="btn-secondary" on:click={() => goto(resolve('/'))}>Back to Calendar</button>
+		<button class="btn-secondary" on:click={() => goto(resolve('/'))}>{$_('back_to_calendar_detail')}</button>
 	</div>
 {:else}
-	<p>Loading event...</p>
+	<p>{$_('loading_event')}</p>
 {/if}
 
 <style>

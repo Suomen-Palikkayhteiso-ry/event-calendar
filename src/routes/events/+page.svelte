@@ -7,6 +7,7 @@
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { Datepicker, Timepicker } from 'flowbite-svelte';
+	import { _ } from 'svelte-i18n';
 
 	let events: Event[] = [];
 	let currentPage = 1;
@@ -139,7 +140,7 @@
 			await fetchEvents(currentPage);
 		} catch (error) {
 			console.error('Error creating event:', error);
-			alert('Failed to create event. Please try again.');
+			alert($_('failed_create_event'));
 		} finally {
 			isSubmitting = false;
 		}
@@ -169,50 +170,50 @@
 	}
 </script>
 
-<h1>Add New Event</h1>
+<h1>{$_('add_new_event')}</h1>
 
 {#if !$user}
-	<p>You must be logged in to manage events.</p>
+	<p>{$_('login_required')}</p>
 {:else}
 	<div class="create-form">
-		<h2>Create New Event</h2>
+		<h2>{$_('create_new_event')}</h2>
 		<form on:submit|preventDefault={createEvent}>
 			<div class="form-group">
-				<label for="title">Title *</label>
+				<label for="title">{$_('title_required')}</label>
 				<input
 					type="text"
 					id="title"
 					bind:value={formData.title}
-					placeholder="Event Title"
+					placeholder={$_('event_title')}
 					required
 					disabled={isSubmitting}
 				/>
 			</div>
 
 			<div class="form-group">
-				<label for="location">Location</label>
+				<label for="location">{$_('location_label')}</label>
 				<input
 					type="text"
 					id="location"
 					bind:value={formData.location}
-					placeholder="Location (optional)"
+					placeholder={$_('location_optional')}
 					disabled={isSubmitting}
 				/>
 			</div>
 
 			<div class="form-group">
-				<label for="description">Description</label>
+				<label for="description">{$_('description_label')}</label>
 				<textarea
 					id="description"
 					bind:value={formData.description}
-					placeholder="Description (optional)"
+					placeholder={$_('description_optional')}
 					rows="3"
 					disabled={isSubmitting}
 				></textarea>
 			</div>
 
 			<div class="form-group">
-				<label for="image">Image</label>
+				<label for="image">{$_('image_label')}</label>
 				<input
 					type="file"
 					id="image"
@@ -226,19 +227,19 @@
 			</div>
 
 			<div class="form-group">
-				<label for="imageDescription">Image Description</label>
+				<label for="imageDescription">{$_('image_description_label')}</label>
 				<input
 					type="text"
 					id="imageDescription"
 					bind:value={formData.image_description}
-					placeholder="Image description (optional)"
+					placeholder={$_('image_description_optional')}
 					disabled={isSubmitting}
 				/>
 			</div>
 
 			<div class="form-row">
 				<div class="form-group">
-					<label for="startDate">Start Date *</label>
+					<label for="startDate">{$_('start_date_required')}</label>
 					<Datepicker 
 						id="startDate" 
 						bind:value={startDateObj} 
@@ -256,7 +257,7 @@
 				</div>
 
 				<div class="form-group">
-					<label for="endDate">End Date</label>
+					<label for="endDate">{$_('end_date')}</label>
 					<Datepicker 
 						id="endDate" 
 						bind:value={endDateObj} 
@@ -277,29 +278,29 @@
 			<div class="form-group">
 				<label class="checkbox-label">
 					<input type="checkbox" bind:checked={formData.all_day} disabled={isSubmitting} />
-					All Day Event
+					{$_('all_day_event_label')}
 				</label>
 			</div>
 
 			<div class="form-actions">
 				<button type="submit" disabled={isSubmitting || !formData.title || !formData.start_date}>
-					{isSubmitting ? 'Creating...' : 'Create Event'}
+					{isSubmitting ? $_('creating') : $_('create_event')}
 				</button>
 				<button type="button" class="btn-secondary" on:click={cancelAdd} disabled={isSubmitting}>
-					Cancel
+					{$_('cancel')}
 				</button>
 			</div>
 		</form>
 	</div>
 
 	<div class="events-list">
-		<h2>Existing Events</h2>
+		<h2>{$_('existing_events')}</h2>
 		{#each events as event (event.id)}
 			<div class="event-item">
 				<div class="event-header">
 					<h3>{event.location ? `${event.title} / ${event.location}` : event.title}</h3>
 					<div class="event-actions">
-						<a href={resolve(`/events/${event.id}`)} class="edit-link">Edit</a>
+						<a href={resolve(`/events/${event.id}`)} class="edit-link">{$_('edit')}</a>
 					</div>
 				</div>
 				{#if event.description}
@@ -310,9 +311,9 @@
 					{#if event.end_date && event.end_date !== event.start_date}
 						- {formatDateInHelsinki(event.end_date, event.all_day)}
 					{/if}
-					{event.all_day ? '(All Day)' : ''}
+					{event.all_day ? $_('all_day') : ''}
 				</p>
-				<p class="event-status">Status: {event.state}</p>
+				<p class="event-status">{$_('status')} {event.state}</p>
 			</div>
 		{/each}
 
@@ -323,12 +324,12 @@
 					disabled={currentPage === 1} 
 					on:click={prevPage}
 				>
-					Previous
+					{$_('previous')}
 				</button>
 				
 				<span class="pagination-info">
-					Page {currentPage} of {Math.ceil(totalEvents / pageSize)} 
-					({totalEvents} total events)
+					{$_('page')} {currentPage} {$_('of')} {Math.ceil(totalEvents / pageSize)} 
+					({totalEvents} {$_('total_events')})
 				</span>
 				
 				<button 
@@ -336,7 +337,7 @@
 					disabled={currentPage === Math.ceil(totalEvents / pageSize)} 
 					on:click={nextPage}
 				>
-					Next
+					{$_('next_button')}
 				</button>
 			</div>
 		{/if}
