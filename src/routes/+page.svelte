@@ -32,6 +32,13 @@
 			// Make events clickable with pointer cursor
 			if ((info as any).event.id !== 'selected-day') {
 				(info as any).el.style.cursor = 'pointer';
+				(info as any).el.tabIndex = (info as any).event.extendedProps.order;
+				(info as any).el.addEventListener('keydown', (e: KeyboardEvent) => {
+					if (e.key === 'Enter' || e.key === ' ') {
+						e.preventDefault();
+						(info as any).el.click();
+					}
+				});
 			}
 		},
 		eventClick: (info: unknown) => {
@@ -50,7 +57,7 @@
 
 	function updateCalendarEvents() {
 		calendarOptions.events = [
-			...events.map((event) => ({
+			...events.map((event, index) => ({
 				id: event.id,
 				title: event.location ? `${event.title} / ${event.location}` : event.title,
 				start: parseUTCDate(event.start_date),
@@ -58,7 +65,8 @@
 				allDay: event.all_day,
 				display: event.all_day ? 'block' : 'auto',
 				extendedProps: {
-					description: event.description || ''
+					description: event.description || '',
+					order: index + 1
 				}
 			})),
 			{
@@ -89,9 +97,9 @@
 			<label for="datepicker" class="block text-sm font-medium text-gray-700"
 				>{$_('select_date')}</label
 			>
-			<Datepicker id="datepicker" bind:value={selectedDate} locale="fi" firstDayOfWeek={1} />
+			<Datepicker id="datepicker" bind:value={selectedDate} locale="fi" firstDayOfWeek={1} tabindex="-1" />
 		</div>
-		<button class="add-event-btn" onclick={() => goto(resolve('/events'))} title="Manage Events">
+		<button class="add-event-btn" onclick={() => goto(resolve('/events'))} title="Manage Events" tabindex="-1">
 			+
 		</button>
 	</div>
@@ -100,7 +108,7 @@
 		<label for="datepicker" class="block text-sm font-medium text-gray-700"
 			>{$_('select_date')}</label
 		>
-		<Datepicker id="datepicker" bind:value={selectedDate} locale="fi" firstDayOfWeek={1} />
+		<Datepicker id="datepicker" bind:value={selectedDate} locale="fi" firstDayOfWeek={1} tabindex="-1" />
 	</div>
 {/if}
 
