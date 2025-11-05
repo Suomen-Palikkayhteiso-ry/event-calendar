@@ -3,6 +3,34 @@
  */
 
 /**
+ * Get the timezone offset for Helsinki at a given date (+02:00 or +03:00)
+ */
+function getHelsinkiOffset(date: Date): string {
+	// Helsinki is EET (+02:00) or EEST (+03:00) during DST
+	// DST starts last Sunday in March, ends last Sunday in October
+	const year = date.getFullYear();
+	const march = new Date(year, 2, 31); // Last day of March
+	const october = new Date(year, 9, 31); // Last day of October
+	
+	// Find last Sunday in March
+	while (march.getDay() !== 0) {
+		march.setDate(march.getDate() - 1);
+	}
+	const dstStart = new Date(march);
+	dstStart.setHours(3, 0, 0, 0); // 03:00
+	
+	// Find last Sunday in October
+	while (october.getDay() !== 0) {
+		october.setDate(october.getDate() - 1);
+	}
+	const dstEnd = new Date(october);
+	dstEnd.setHours(4, 0, 0, 0); // 04:00
+	
+	// Check if date is between dstStart and dstEnd
+	return (date >= dstStart && date < dstEnd) ? '+03:00' : '+02:00';
+}
+
+/**
  * Parse a UTC ISO string from API and return a Date object representing that UTC time
  */
 export function parseUTCDate(utcString: string): Date {
@@ -42,7 +70,7 @@ export function formatDateInHelsinki(utcString: string, allDay: boolean = false)
  */
 export function localDateToUTC(localDateString: string): string {
 	// Create a date in Helsinki timezone (assume it's midnight Helsinki time)
-	const helsinkiDate = new Date(localDateString + 'T00:00:00+02:00'); // +02:00 for EET
+	const helsinkiDate = new Date(localDateString + 'T00:00:00' + getHelsinkiOffset(new Date(localDateString + 'T00:00:00')));
 	// Convert to UTC
 	return helsinkiDate.toISOString();
 }
@@ -53,7 +81,7 @@ export function localDateToUTC(localDateString: string): string {
  */
 export function localDateTimeToUTC(localDateTimeString: string): string {
 	// Assume the input is in Helsinki timezone and convert to UTC
-	const helsinkiDate = new Date(localDateTimeString + ':00+02:00'); // Add seconds and timezone offset
+	const helsinkiDate = new Date(localDateTimeString + ':00' + getHelsinkiOffset(new Date(localDateTimeString + ':00')));
 	return helsinkiDate.toISOString();
 }
 

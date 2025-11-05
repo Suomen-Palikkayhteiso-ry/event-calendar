@@ -43,7 +43,10 @@
 
 	// Helper function to format Date objects for API
 	function formatDateTimeForAPI(dateObj: Date, timeObj: Date): string {
-		const date = dateObj.toISOString().split('T')[0];
+		const year = dateObj.getFullYear();
+		const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+		const day = String(dateObj.getDate()).padStart(2, '0');
+		const date = `${year}-${month}-${day}`;
 		const time = String(timeObj.getHours()).padStart(2, '0') + ':' + 
 		             String(timeObj.getMinutes()).padStart(2, '0');
 		return date + 'T' + time;
@@ -147,7 +150,13 @@
 				? parseUTCDate(event.start_date)
 				: parseUTCDate(event.start_date);
 			console.log('Edit form: Start date time:', startDateTime);
-			startDateObj = new Date(startDateTime.getFullYear(), startDateTime.getMonth(), startDateTime.getDate());
+			// For all-day events, use the Helsinki date
+			if (event.all_day) {
+				const helsinkiDateStr = utcToHelsinkiDate(event.start_date);
+				startDateObj = new Date(helsinkiDateStr + 'T00:00:00');
+			} else {
+				startDateObj = new Date(startDateTime.getFullYear(), startDateTime.getMonth(), startDateTime.getDate());
+			}
 			startTimeObj = new Date(1970, 0, 1, startDateTime.getHours(), startDateTime.getMinutes());
 			
 			if (event.end_date) {
@@ -155,12 +164,21 @@
 					? parseUTCDate(event.end_date)
 					: parseUTCDate(event.end_date);
 				console.log('Edit form: End date time:', endDateTime);
-				// For all-day events, use the actual end date from the event
-				endDateObj = new Date(endDateTime.getFullYear(), endDateTime.getMonth(), endDateTime.getDate());
+				// For all-day events, use the Helsinki end date
+				if (event.all_day) {
+					const helsinkiEndDateStr = utcToHelsinkiDate(event.end_date);
+					endDateObj = new Date(helsinkiEndDateStr + 'T00:00:00');
+				} else {
+					endDateObj = new Date(endDateTime.getFullYear(), endDateTime.getMonth(), endDateTime.getDate());
+				}
 				endTimeObj = new Date(1970, 0, 1, endDateTime.getHours(), endDateTime.getMinutes());
 			} else {
 				// No end date, use start date
-				endDateObj = new Date(startDateTime.getFullYear(), startDateTime.getMonth(), startDateTime.getDate());
+				if (event.all_day) {
+					endDateObj = new Date(startDateObj);
+				} else {
+					endDateObj = new Date(startDateTime.getFullYear(), startDateTime.getMonth(), startDateTime.getDate());
+				}
 				endTimeObj = new Date(1970, 0, 1, startDateTime.getHours(), startDateTime.getMinutes());
 			}
 			
@@ -191,8 +209,8 @@
 			if (formData.description) submitData.append('description', formData.description);
 			if (formData.image) submitData.append('image', formData.image);
 			if (formData.image_description) submitData.append('image_description', formData.image_description);
-			submitData.append('start_date', formData.all_day ? localDateToUTC(formData.start_date) : localDateTimeToUTC(formData.start_date));
-			submitData.append('end_date', formData.end_date ? (formData.all_day ? localDateToUTC(formData.end_date) : localDateTimeToUTC(formData.end_date)) : (formData.all_day ? localDateToUTC(formData.start_date) : localDateTimeToUTC(formData.start_date)));
+			submitData.append('start_date', formData.all_day ? localDateToUTC(formData.start_date.split('T')[0]) : localDateTimeToUTC(formData.start_date));
+			submitData.append('end_date', formData.end_date ? (formData.all_day ? localDateToUTC(formData.end_date.split('T')[0]) : localDateTimeToUTC(formData.end_date)) : (formData.all_day ? localDateToUTC(formData.start_date.split('T')[0]) : localDateTimeToUTC(formData.start_date)));
 			submitData.append('all_day', formData.all_day.toString());
 			submitData.append('state', formData.state);
 

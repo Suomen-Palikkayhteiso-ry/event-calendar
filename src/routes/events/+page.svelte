@@ -43,7 +43,10 @@
 
 	// Helper function to format Date objects for API
 	function formatDateTimeForAPI(dateObj: Date, timeObj: Date): string {
-		const date = dateObj.toISOString().split('T')[0];
+		const year = dateObj.getFullYear();
+		const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+		const day = String(dateObj.getDate()).padStart(2, '0');
+		const date = `${year}-${month}-${day}`;
 		const time = String(timeObj.getHours()).padStart(2, '0') + ':' + 
 		             String(timeObj.getMinutes()).padStart(2, '0');
 		return date + 'T' + time;
@@ -111,8 +114,8 @@
 			submitData.append('title', formData.title);
 			if (formData.location) submitData.append('location', formData.location);
 			if (formData.description) submitData.append('description', formData.description);
-			submitData.append('start_date', formData.all_day ? localDateToUTC(formData.start_date) : localDateTimeToUTC(formData.start_date));
-			submitData.append('end_date', formData.end_date ? (formData.all_day ? localDateToUTC(formData.end_date) : localDateTimeToUTC(formData.end_date)) : (formData.all_day ? localDateToUTC(formData.start_date) : localDateTimeToUTC(formData.start_date)));
+			submitData.append('start_date', formData.all_day ? localDateToUTC(formData.start_date.split('T')[0]) : localDateTimeToUTC(formData.start_date));
+			submitData.append('end_date', formData.end_date ? (formData.all_day ? localDateToUTC(formData.end_date.split('T')[0]) : localDateTimeToUTC(formData.end_date)) : (formData.all_day ? localDateToUTC(formData.start_date.split('T')[0]) : localDateTimeToUTC(formData.start_date)));
 			submitData.append('all_day', formData.all_day.toString());
 			if (formData.image) submitData.append('image', formData.image);
 			if (formData.image_description) submitData.append('image_description', formData.image_description);
