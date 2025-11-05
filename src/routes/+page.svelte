@@ -84,37 +84,47 @@
 </svelte:head>
 
 {#if $user}
-	<div class="management-links">
-		<a href={resolve('/events')} class="manage-link">Manage Events</a>
+	<div class="mb-4 flex items-end gap-4">
+		<div class="flex-1">
+			<label for="datepicker" class="block text-sm font-medium text-gray-700"
+				>{$_('select_date')}</label
+			>
+			<Datepicker id="datepicker" bind:value={selectedDate} locale="fi" firstDayOfWeek={1} />
+		</div>
+		<button class="add-event-btn" onclick={() => goto(resolve('/events'))} title="Manage Events">
+			+
+		</button>
+	</div>
+{:else}
+	<div class="mb-4">
+		<label for="datepicker" class="block text-sm font-medium text-gray-700"
+			>{$_('select_date')}</label
+		>
+		<Datepicker id="datepicker" bind:value={selectedDate} locale="fi" firstDayOfWeek={1} />
 	</div>
 {/if}
-
-<div class="mb-4">
-	<label for="datepicker" class="block text-sm font-medium text-gray-700">{$_('select_date')}</label
-	>
-	<Datepicker id="datepicker" bind:value={selectedDate} locale="fi" firstDayOfWeek={1} />
-</div>
 
 <Calendar plugins={[DayGrid]} options={calendarOptions} />
 
 <style>
-	.management-links {
-		margin-bottom: 2rem;
-		text-align: center;
-	}
-
-	.manage-link {
-		display: inline-block;
-		background-color: var(--color-theme);
+	.add-event-btn {
+		background-color: #0056a3;
 		color: white;
-		padding: 0.75rem 1.5rem;
-		text-decoration: none;
-		border-radius: 4px;
-		font-weight: 500;
+		border: none;
+		width: 3rem;
+		height: 3rem;
+		border-radius: 50%;
+		font-size: 1.5rem;
+		font-weight: bold;
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 		transition: background-color 0.2s;
+		flex-shrink: 0;
 	}
 
-	.manage-link:hover {
+	.add-event-btn:hover {
 		background-color: #004080;
 	}
 </style>
