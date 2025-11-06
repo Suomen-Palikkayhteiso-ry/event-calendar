@@ -8,6 +8,7 @@
 	import { _ } from 'svelte-i18n';
 	import { formatDateInHelsinki } from '$lib/date-utils';
 	import { user } from '$lib/auth';
+	import { toast } from '@zerodevx/svelte-toast';
 
 	let event: Event;
 	let isDeleting = false;
@@ -49,17 +50,16 @@
 	async function deleteEvent() {
 		if (!$user || !event) return;
 
-		if (confirm($_('confirm_delete_event'))) {
-			isDeleting = true;
-			try {
-				await pb.collection('events').delete(event.id);
-				goto(resolve('/'));
-			} catch (error) {
-				console.error('Error deleting event:', error);
-				alert($_('failed_delete_event'));
-			} finally {
-				isDeleting = false;
-			}
+		isDeleting = true;
+		try {
+			await pb.collection('events').delete(event.id);
+			toast.push($_('event_deleted_successfully'));
+			goto(resolve('/'));
+		} catch (error) {
+			console.error('Error deleting event:', error);
+			toast.push($_('failed_delete_event'));
+		} finally {
+			isDeleting = false;
 		}
 	}
 </script>
