@@ -4,7 +4,7 @@
 	import { pb } from '$lib/pocketbase';
 	import type { Event } from '$lib/types';
 	// @ts-expect-error Calendar library types not available
-	import { Calendar, DayGrid } from '@event-calendar/core';
+	import { Calendar, DayGrid, List } from '@event-calendar/core';
 	import '@event-calendar/core/index.css';
 	import { Datepicker } from 'flowbite-svelte';
 	import { _ } from 'svelte-i18n';
@@ -22,13 +22,25 @@
 		locale: 'fi',
 		firstDay: 1,
 		buttonText: {
+			listMonth: $_('list'),
+			dayGridMonth: $_('calendar'),
 			today: $_('today'),
 			prev: $_('prev'),
 			next: $_('next_button')
 		},
+		headerToolbar: {start: 'title', center: '', end: 'dayGridMonth,listMonth today prev,next'},
 		eventDidMount: (info: unknown) => {
 			if ((info as any).event.extendedProps.description) {
 				(info as any).el.title = (info as any).event.extendedProps.description;
+			}
+			if ((info as any).event.allDay) {
+				(info as any).el.style.backgroundColor = 'var(--color-brand-accent)';
+				(info as any).el.style.color = 'var(--color-brand-primary)';
+				(info as any).el.style.border = '1px solid var(--color-brand-primary)';
+			} else {
+				(info as any).el.style.backgroundColor = 'var(--color-brand-primary)';
+				(info as any).el.style.color = 'var(--color-white)';
+				(info as any).el.style.border = '1px solid var(--color-brand-primary)';
 			}
 			// Make events clickable with pointer cursor
 			if ((info as any).event.id !== 'selected-day') {
@@ -122,25 +134,13 @@
 {/if}
 
 <div bind:this={calendarWrapper}>
-	<Calendar plugins={[DayGrid]} options={calendarOptions} />
+	<Calendar plugins={[List, DayGrid]} options={calendarOptions} />
 </div>
 
 <style>
-	/* Make datepicker current date visible */
-	:global(.day.today) {
-		background-color: var(--color-brand-accent) !important;
-		color: white !important;
-		border: 2px solid var(--color-brand-accent) !important;
-	}
-	:global(.day.today:not(.selected)) {
-		background-color: white !important;
-		color: var(--color-brand-accent) !important;
-	}
-
-	/* Style calendar events */
 	:global(.ec-event) {
-		background-color: var(--color-brand-primary) !important;
-		border-color: var(--color-brand-primary) !important;
-		color: white !important;
+		background-color: var(--color-brand-primary);
+		border-color: var(--color-brand-primary);
+		color: white;
 	}
 </style>

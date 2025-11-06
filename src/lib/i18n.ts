@@ -1,6 +1,8 @@
 import { addMessages, init } from 'svelte-i18n';
 
 addMessages('fi', {
+	calendar: 'kalenteri',
+	list: 'lista',
 	public_calendar: 'Palikkakalenteri',
 	select_date: 'Päivä:',
 	back_to_calendar: 'Takaisin kalenteriin',
@@ -10,7 +12,7 @@ addMessages('fi', {
 	all_day_event: 'Koko päivän tapahtuma',
 	description: 'Kuvaus:',
 	// Calendar navigation
-	today: 'Tänään',
+	today: 'tänään',
 	prev: 'Edellinen',
 	next: 'Seuraava',
 	// Page titles
