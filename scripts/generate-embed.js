@@ -63,12 +63,12 @@ async function generateEmbed() {
 	--color-brand-accent: #000000; /*#52d3d8*/
 }
 body { font-family: Arial, sans-serif; margin: 20px; }
-.month-header { font-size: 1.5em; font-weight: bold; color: var(--color-brand-primary); margin: 30px 0 10px 0; border-bottom: 2px solid var(--color-brand-accent); padding-bottom: 5px; }
-.event { display: flex; margin-bottom: 20px; border-left: 3px solid var(--color-brand-accent); padding-left: 15px; }
+.month-header { font-size: 1.5em; font-weight: bold; color: var(--color-brand-primary); margin: 3ex 0 1.5ex 0; border-bottom: 2px solid var(--color-brand-accent); padding-bottom: 5px; }
+.event { display: flex; margin-top: 0.5ex; margin-bottom: 20px; border-left: 3px solid var(--color-brand-accent); padding-left: 15px; }
 .date-column { flex: 0 0 200px; font-weight: bold; color: var(--color-brand-primary); }
 .details-column { flex: 1; }
-.details-column h2 { margin-top: 0; }
-.details-column p { margin: 5px 0; }
+.details-column h2 { margin-top: -0.5ex; margin-bottom: 0; }
+.details-column p { margin: 1ex 0 1.5ex 0; }
 </style>
 </head>
 <body>
@@ -138,10 +138,9 @@ body { font-family: Arial, sans-serif; margin: 20px; }
 			}		html += `<div class="event">
 <div class="date-column">${dateStr}</div>
 <div class="details-column">
-<h2>${event.title}</h2>
-${event.location ? `<p><strong>Sijainti:</strong> ${event.location}</p>` : ''}
+<h2>${event.title}${event.location ? ` | ${event.location}` : ''}</h2>
 <p>${event.description || ''}</p>
-${event.url ? `<p><a href="${event.url}" target="_blank">Lisätietoja</a></p>` : ''}
+${event.url ? `<p><a href="${event.url}" target="_blank">Tapahtuman verkkosivut</a></p>` : ''}
 </div>
 </div>
 `;
