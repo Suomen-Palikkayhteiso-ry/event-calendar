@@ -88,8 +88,8 @@ async function generateFeeds() {
 		feed.addItem(feedItem);
 	});
 
-	fs.writeFileSync('static/feed.rss', feed.rss2());
-	fs.writeFileSync('static/feed.atom', feed.atom1());
+	fs.writeFileSync('static/kalenteri.rss', feed.rss2());
+	fs.writeFileSync('static/kalenteri.atom', feed.atom1());
 
 	// Generate ICAL feed
 	const calendar = ical({
@@ -128,7 +128,7 @@ async function generateFeeds() {
 		calendar.createEvent(eventData);
 	});
 
-	fs.writeFileSync('static/feed.ical', calendar.toString());
+	fs.writeFileSync('static/kalenteri.ical', calendar.toString());
 }
 
 generateFeeds();

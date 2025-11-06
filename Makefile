@@ -1,4 +1,4 @@
-.PHONY: watch format check
+.PHONY: watch format check embed
 
 watch:
 	pnpm dev
@@ -8,3 +8,6 @@ format:
 
 check:
 	pnpm check
+
+embed:
+	pnpm run generate-embed

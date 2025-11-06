@@ -76,6 +76,7 @@ addMessages('fi', {
 	login: 'Kirjaudu sisään',
 	// Layout
 	rss_feed: 'RSS-syöte',
+	html_feed: 'HTML-syöte',
 	ical_feed: 'iCal-syöte',
 	atom_feed: 'ATOM-syöte',
 	// Callback

@@ -30,3 +30,6 @@ jobs:
 
       - name: Generate RSS and ICAL
         run: node scripts/generate-feeds.js
+
+      - name: Generate embed
+        run: node scripts/generate-embed.js

@@ -22,23 +22,30 @@
 			<p>
 				<!-- eslint-disable-next-line svelte/no-navigation-without-resolve --><!--These are external links, so resolve is not needed.-->
 				<a
-					href="/feed.rss"
+					href="/kalenteri.html"
 					target="_blank"
-					class="mx-2 text-brand-primary no-underline hover:underline">{$_('rss_feed')}</a
+					class="mx-2 text-brand-primary no-underline hover:underline">{$_('html_feed')}</a
 				>
 				|
 				<!-- eslint-disable-next-line svelte/no-navigation-without-resolve --><!--These are external links, so resolve is not needed.-->
 				<a
-					href="/feed.ical"
+					href="/kalenteri.ical"
 					target="_blank"
 					class="mx-2 text-brand-primary no-underline hover:underline">{$_('ical_feed')}</a
 				>
 				|
 				<!-- eslint-disable-next-line svelte/no-navigation-without-resolve --><!--These are external links, so resolve is not needed.-->
 				<a
-					href="/feed.atom"
+					href="/kalenteri.atom"
 					target="_blank"
 					class="mx-2 text-brand-primary no-underline hover:underline">{$_('atom_feed')}</a
+				>
+				|
+				<!-- eslint-disable-next-line svelte/no-navigation-without-resolve --><!--These are external links, so resolve is not needed.-->
+				<a
+					href="/kalenteri.rss"
+					target="_blank"
+					class="mx-2 text-brand-primary no-underline hover:underline">{$_('rss_feed')}</a
 				>
 			</p>
 		</div>
