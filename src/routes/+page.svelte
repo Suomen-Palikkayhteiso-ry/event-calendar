@@ -29,7 +29,7 @@
 			prev: $_('prev'),
 			next: $_('next_button')
 		},
-		headerToolbar: { start: 'title', center: '', end: 'dayGridMonth,listMonth prev,next' },
+		headerToolbar: { start: 'title', center: '', end: 'prev,next' },
 		eventDidMount: (info: unknown) => {
 			if ((info as any).event.extendedProps.description) {
 				(info as any).el.title = (info as any).event.extendedProps.description;

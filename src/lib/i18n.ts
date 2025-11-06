@@ -76,10 +76,10 @@ addMessages('fi', {
 	logout: 'Kirjaudu ulos',
 	login: 'Kirjaudu sisään',
 	// Layout
-	rss_feed: 'RSS-syöte',
-	html_feed: 'HTML-syöte',
-	ical_feed: 'iCal-syöte',
-	atom_feed: 'ATOM-syöte',
+	rss_feed: 'RSS',
+	html_feed: 'HTML',
+	ical_feed: 'iCalendar',
+	atom_feed: 'ATOM',
 	// Callback
 	completing_login: 'Viimeistellään kirjautumista...'
 });
