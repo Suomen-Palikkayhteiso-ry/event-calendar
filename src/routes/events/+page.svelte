@@ -8,7 +8,7 @@
 	import { resolve } from '$app/paths';
 	import { Datepicker, Timepicker } from 'flowbite-svelte';
 	import { _ } from 'svelte-i18n';
-	import toast from 'svelte-toast';
+	import Toast from 'svelte-toast';
 
 	let events = $state<Event[]>([]);
 	let currentPage = $state(1);
@@ -149,7 +149,7 @@
 
 			await pb.collection('events').create(submitData);
 
-			toast.push($_('event_created_successfully'));
+			Toast($_('event_created_successfully'));
 
 			// Reset form
 			formData.title = '';
