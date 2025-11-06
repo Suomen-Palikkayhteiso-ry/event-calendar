@@ -14,7 +14,7 @@
 	import { user } from '$lib/auth';
 	import { Datepicker, Timepicker } from 'flowbite-svelte';
 	import { _ } from 'svelte-i18n';
-	import { toast } from 'svelte-toast';
+	import toast from 'svelte-toast';
 
 	let event = $state<Event | null>(null);
 	let isSubmitting = $state(false);

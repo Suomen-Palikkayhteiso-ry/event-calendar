@@ -8,7 +8,7 @@
 	import { resolve } from '$app/paths';
 	import { Datepicker, Timepicker } from 'flowbite-svelte';
 	import { _ } from 'svelte-i18n';
-	import { toast } from 'svelte-toast';
+	import toast from 'svelte-toast';
 
 	let events = $state<Event[]>([]);
 	let currentPage = $state(1);

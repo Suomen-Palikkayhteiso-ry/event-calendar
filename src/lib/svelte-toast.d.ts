@@ -21,9 +21,12 @@ declare module 'svelte-toast' {
 		intro: { x: number; y: number };
 	}
 
-	export const toast: {
+	interface ToastAPI {
 		push: (msg: string, options?: ToastOptions) => string;
 		pop: (id?: string) => void;
 		set: (id: string, options: Partial<ToastOptions>) => void;
-	};
+	}
+
+	declare const toast: ToastAPI;
+	export default toast;
 }

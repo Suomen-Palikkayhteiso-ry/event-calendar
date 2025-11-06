@@ -4,7 +4,7 @@
 </script>
 
 <header>
-	<div class="title">{$_('calendar_title')}</div>
+	<a href="/" class="title">{$_('calendar_title')}</a>
 
 	{#if $user}
 		<div class="auth">
@@ -54,5 +54,10 @@
 		font-size: 1.25rem;
 		font-weight: 600;
 		color: var(--color-text);
+		text-decoration: none;
+	}
+
+	.title:hover {
+		color: var(--color-link-hover, #0056a3);
 	}
 </style>
