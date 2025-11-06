@@ -257,6 +257,7 @@
 				bind:value={formData.title}
 				placeholder={$_('event_title')}
 				required
+				autofocus
 				disabled={isSubmitting}
 				class="focus:ring-opacity-25 box-border w-full rounded border border-gray-300 p-3 text-base focus:border-brand-primary focus:ring-2 focus:ring-brand-primary focus:outline-none"
 			/>
