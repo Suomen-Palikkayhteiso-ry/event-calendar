@@ -167,7 +167,7 @@ body { font-family: Arial, sans-serif; margin: 20px; }
 <div class="details-column">
 <h2>${event.title}${event.location ? ` | ${event.location}` : ''}</h2>
 <p>${event.description || ''}</p>
-${event.url ? `<p><a href="${event.url}" target="_blank">Tapahtuman verkkosivut</a></p>` : ''}
+${event.url ? `<p><a href="${event.url}" target="_blank">Lue lisää&hellip;</a></p>` : ''}
 </div>
 </div>
 `;
