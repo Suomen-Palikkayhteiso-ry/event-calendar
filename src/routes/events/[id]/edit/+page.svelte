@@ -236,12 +236,11 @@
 		try {
 			const submitData = new FormData();
 			submitData.append('title', formData.title);
-			if (formData.location) submitData.append('location', formData.location);
-			if (formData.description) submitData.append('description', formData.description);
-			if (formData.url) submitData.append('url', formData.url);
+			submitData.append('location', formData.location);
+			submitData.append('description', formData.description);
+			submitData.append('url', formData.url);
 			if (formData.image) submitData.append('image', formData.image);
-			if (formData.image_description)
-				submitData.append('image_description', formData.image_description);
+			submitData.append('image_description', formData.image_description);
 			submitData.append(
 				'start_date',
 				formData.all_day
