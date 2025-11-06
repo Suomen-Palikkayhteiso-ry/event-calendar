@@ -1,4 +1,4 @@
-name: Deploy to GitHub Pages
+name: Deploy
 
 on:
   push:
@@ -32,6 +32,9 @@ jobs:
 
       - name: Build
         run: pnpm run build
+
+      - name: Generate RSS and ICAL
+        run: node scripts/generate-feeds.js
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
