@@ -59,11 +59,14 @@
 
 	// Reactive statements for date/time synchronization
 	$effect(() => {
+		// Ensure end date is at least the start date
+		if (endDateObj < startDateObj) {
+			endDateObj = new Date(startDateObj);
+		}
 		// For timed events (not all-day), force end date to match start date
 		if (!formData.all_day) {
 			endDateObj = new Date(startDateObj);
 		}
-		// For all-day events, allow different end dates
 	});
 
 	$effect(() => {
@@ -141,7 +144,7 @@
 			if (formData.image) submitData.append('image', formData.image);
 			if (formData.image_description)
 				submitData.append('image_description', formData.image_description);
-			submitData.append('state', 'submitted');
+			submitData.append('state', 'published');
 
 			await pb.collection('events').create(submitData);
 
@@ -426,9 +429,9 @@
 	}
 
 	button[type='submit'] {
-		background-color: var(--color-theme);
+		background-color: #0056a3;
 		color: white;
-		border: none;
+		border: 1px solid #004080;
 		padding: 0.75rem 1.5rem;
 		border-radius: 4px;
 		font-size: 1rem;
@@ -441,8 +444,15 @@
 	}
 
 	button[type='submit']:disabled {
-		background-color: #ccc;
+		background-color: #e9ecef;
+		color: #495057;
+		border: 1px solid #adb5bd;
 		cursor: not-allowed;
+	}
+
+	button[type='submit']:disabled:hover {
+		background-color: #dee2e6;
+		border-color: #6c757d;
 	}
 
 	.btn-secondary {
