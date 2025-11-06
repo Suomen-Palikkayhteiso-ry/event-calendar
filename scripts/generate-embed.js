@@ -126,7 +126,7 @@ body { font-family: Arial, sans-serif; margin: 20px; }
 				);
 				const startDay = startHelsinki.getDay();
 				let prefix = '';
-				if (event.end_date) {
+				if (event.end_date && event.end_date !== event.start_date) {
 					const endDate = new Date(
 						event.end_date.endsWith('Z') ? event.end_date : event.end_date + 'Z'
 					);
