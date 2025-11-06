@@ -45,6 +45,7 @@ addMessages('fi', {
 	total_events: 'tapahtumaa yhteensä',
 	next_button: 'Seuraava',
 	failed_create_event: 'Tapahtuman luonti epäonnistui. Yritä uudelleen.',
+	event_created_successfully: 'Tapahtuma luotu onnistuneesti.',
 	// Event detail
 	confirm_delete:
 		'Oletko varma, että haluat poistaa tämän tapahtuman? Tätä toimintoa ei voi peruuttaa.',
@@ -59,6 +60,7 @@ addMessages('fi', {
 	saving: 'Tallennetaan...',
 	save_changes: 'Tallenna muutokset',
 	failed_update_event: 'Tapahtuman päivitys epäonnistui. Yritä uudelleen.',
+	event_updated_successfully: 'Tapahtuma päivitetty onnistuneesti.',
 	// Status options
 	submitted: 'Lähetetty',
 	published: 'Julkaistu',

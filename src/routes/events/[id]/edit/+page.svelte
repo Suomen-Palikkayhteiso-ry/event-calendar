@@ -14,6 +14,7 @@
 	import { user } from '$lib/auth';
 	import { Datepicker, Timepicker } from 'flowbite-svelte';
 	import { _ } from 'svelte-i18n';
+	import { toast } from 'svelte-toast';
 
 	let event = $state<Event | null>(null);
 	let isSubmitting = $state(false);
@@ -256,6 +257,8 @@
 			submitData.append('state', formData.state);
 
 			await pb.collection('events').update(event.id, submitData);
+
+			toast.push($_('event_updated_successfully'));
 
 			// Redirect back to view
 			goto(resolve(`/events/${event.id}`));
