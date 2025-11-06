@@ -74,6 +74,7 @@ addMessages('fi', {
 	// Layout
 	rss_feed: 'RSS-syöte',
 	ical_feed: 'iCal-syöte',
+	atom_feed: 'ATOM-syöte',
 	// Callback
 	completing_login: 'Viimeistellään kirjautumista...'
 });
