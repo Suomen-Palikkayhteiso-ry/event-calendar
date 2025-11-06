@@ -5,22 +5,32 @@
 
 @import '../static/fonts/outfit.css';
 
-root {
+/* Tailwind v4 theme configuration - generates utility classes */
+@theme {
+	/* Primary color scale (dark violet) - generates bg-primary-*, text-primary-*, etc. */
+	--color-primary-50: #f0f1ff;
+	--color-primary-100: #e0e3ff;
+	--color-primary-200: #c7ccff;
+	--color-primary-300: #a3a9ff;
+	--color-primary-400: #7f86ff;
+	--color-primary-500: #38419d;
+	--color-primary-600: #2d347d;
+	--color-primary-700: #23295d;
+	--color-primary-800: #191e3d;
+	--color-primary-900: #0f131d;
+
+	/* Brand colors - generates bg-brand-*, text-brand-*, etc. */
+	--color-brand-primary: #38419d;
+	--color-brand-secondary: #3887be;
+	--color-brand-accent: #52d3d8;
+	--color-brand-dark: #200e3a;
+	--color-brand-highlight: #f2f597;
+}
+
+:root {
 	--font-body: 'Outfit', sans-serif;
 	--font-mono: 'Fira Mono', monospace;
-	--color-primary: #0056a3;
-	--color-primary-50: #eff6ff;
-	--color-primary-100: #dbeafe;
-	--color-primary-200: #bfdbfe;
-	--color-primary-300: #93c5fd;
-	--color-primary-400: #60a5fa;
-	--color-primary-500: #3b82f6;
-	--color-primary-600: #2563eb;
-	--color-primary-700: #1d4ed8;
-	--color-primary-800: #1e40af;
-	--color-primary-900: #1e3a8a;
 	--color-bg: white;
-	--color-theme: #0056a3;
 	--color-text: rgba(0, 0, 0, 0.7);
 	font-family: var(--font-body);
 	color: var(--color-text);
@@ -30,29 +40,6 @@ body {
 	min-height: 100vh;
 	margin: 0;
 	background-color: var(--color-bg);
-}
-
-/* Override flowbite primary colors to use blue theme */
-.bg-primary-700 {
-	background-color: #1d4ed8 !important;
-}
-.text-primary-700 {
-	color: #1d4ed8 !important;
-}
-.hover\:bg-primary-800:hover {
-	background-color: #1e40af !important;
-}
-.dark\:bg-primary-600 {
-	background-color: #2563eb !important;
-}
-.dark\:hover\:bg-primary-700:hover {
-	background-color: #1d4ed8 !important;
-}
-.focus-within\:ring-primary-300:focus-within {
-	--tw-ring-color: #93c5fd !important;
-}
-.dark\:focus-within\:ring-primary-800:focus-within {
-	--tw-ring-color: #1e40af !important;
 }
 
 h1,

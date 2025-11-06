@@ -14,8 +14,8 @@ addMessages('fi', {
 	prev: 'Edellinen',
 	next: 'Seuraava',
 	// Page titles
-	event_calendar: 'Tapahtumakalenteri',
-	event_calendar_description: 'Hallinnoi ja julkaise tapahtumia kalenterisovelluksellamme',
+	event_calendar: 'Palikkakalenteri',
+	event_calendar_description: 'Suomen Palikkayhteisö ry:n Palikkakalenteri',
 	// Events management
 	add_new_event: 'Lisää uusi tapahtuma',
 	login_required: 'Sinun täytyy kirjautua sisään hallitaksesi tapahtumia.',
@@ -26,6 +26,8 @@ addMessages('fi', {
 	location_optional: 'Paikka (valinnainen)',
 	description_label: 'Kuvaus',
 	description_optional: 'Kuvaus (valinnainen)',
+	url_label: 'URL:',
+	url_optional: 'URL (valinnainen)',
 	image_label: 'Kuva',
 	image_description_label: 'Kuvan kuvaus',
 	image_description_optional: 'Kuvan kuvaus (valinnainen)',
@@ -61,7 +63,7 @@ addMessages('fi', {
 	failed_update_event: 'Tapahtuman päivitys epäonnistui. Yritä uudelleen.',
 	event_updated_successfully: 'Tapahtuma päivitetty onnistuneesti.',
 	// Status options
-	submitted: 'Lähetetty',
+	draft: 'Luonnos',
 	published: 'Julkaistu',
 	// Header
 	organization_alt: 'Suomen Palikkayhteisö ry',

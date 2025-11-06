@@ -9,59 +9,31 @@
 	let { children } = $props();
 </script>
 
-<div class="app">
+<div class="app flex min-h-screen flex-col">
 	<Header />
 
-	<main>
+	<main class="mx-auto box-border flex w-full max-w-4xl flex-1 flex-col p-4">
 		<SvelteToast />
 		{@render children()}
 	</main>
 
-	<footer>
+	<footer class="mt-auto border-t border-gray-200 bg-gray-50 p-4 text-center">
 		<div class="footer-content">
 			<p>
 				<!-- eslint-disable-next-line svelte/no-navigation-without-resolve --><!--These are external links, so resolve is not needed.-->
-				<a href="/feed.rss" target="_blank">{$_('rss_feed')}</a> |
+				<a
+					href="/feed.rss"
+					target="_blank"
+					class="mx-2 text-brand-primary no-underline hover:underline">{$_('rss_feed')}</a
+				>
+				|
 				<!-- eslint-disable-next-line svelte/no-navigation-without-resolve --><!--These are external links, so resolve is not needed.-->
-				<a href="/feed.ical" target="_blank">{$_('ical_feed')}</a>
+				<a
+					href="/feed.ical"
+					target="_blank"
+					class="mx-2 text-brand-primary no-underline hover:underline">{$_('ical_feed')}</a
+				>
 			</p>
 		</div>
 	</footer>
 </div>
-
-<style>
-	.app {
-		display: flex;
-		flex-direction: column;
-		min-height: 100vh;
-	}
-
-	main {
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-		padding: 1rem;
-		width: 100%;
-		max-width: 64rem;
-		margin: 0 auto;
-		box-sizing: border-box;
-	}
-
-	footer {
-		background-color: #f8f9fa;
-		border-top: 1px solid #e9ecef;
-		padding: 1rem;
-		text-align: center;
-		margin-top: auto;
-	}
-
-	.footer-content a {
-		color: var(--color-theme);
-		text-decoration: none;
-		margin: 0 0.5rem;
-	}
-
-	.footer-content a:hover {
-		text-decoration: underline;
-	}
-</style>

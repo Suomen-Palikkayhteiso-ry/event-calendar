@@ -10,10 +10,11 @@
 	import { _ } from 'svelte-i18n';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import { parseUTCDate } from '$lib/date-utils';
+	import { parseUTCDate, dateToHelsinkiDateString } from '$lib/date-utils';
 	import { user } from '$lib/auth';
 
 	let events: Event[] = [];
+	let calendarWrapper: HTMLElement;
 	let calendarOptions = $state({
 		view: 'dayGridMonth',
 		events: [] as any[],
@@ -32,7 +33,6 @@
 			// Make events clickable with pointer cursor
 			if ((info as any).event.id !== 'selected-day') {
 				(info as any).el.style.cursor = 'pointer';
-				(info as any).el.tabIndex = (info as any).event.extendedProps.order;
 				(info as any).el.addEventListener('keydown', (e: KeyboardEvent) => {
 					if (e.key === 'Enter' || e.key === ' ') {
 						e.preventDefault();
@@ -53,6 +53,11 @@
 			sort: 'start_date'
 		});
 		updateCalendarEvents();
+		// Focus the Next button after calendar is rendered
+		setTimeout(() => {
+			const nextBtn = calendarWrapper?.querySelector('.ec-next') as HTMLElement;
+			nextBtn?.focus();
+		}, 100);
 	});
 
 	function updateCalendarEvents() {
@@ -97,13 +102,12 @@
 			<label for="datepicker" class="block text-sm font-medium text-gray-700"
 				>{$_('select_date')}</label
 			>
-			<Datepicker id="datepicker" bind:value={selectedDate} locale="fi" tabindex={-1} />
+			<Datepicker id="datepicker" bind:value={selectedDate} locale="fi" />
 		</div>
 		<button
-			class="add-event-btn"
-			onclick={() => goto(resolve('/events'))}
-			title="Manage Events"
-			tabindex={-1}
+			class="flex h-12 w-12 flex-shrink-0 cursor-pointer items-center justify-center rounded-full border-none bg-primary-500 text-xl font-bold text-white transition-colors duration-200 hover:bg-primary-600"
+			onclick={() => goto(`?date=${dateToHelsinkiDateString(selectedDate)}` + resolve(`/events`))}
+			title="Add new event"
 		>
 			+
 		</button>
@@ -113,42 +117,30 @@
 		<label for="datepicker" class="block text-sm font-medium text-gray-700"
 			>{$_('select_date')}</label
 		>
-		<Datepicker id="datepicker" bind:value={selectedDate} locale="fi" tabindex={-1} />
+		<Datepicker id="datepicker" bind:value={selectedDate} locale="fi" />
 	</div>
 {/if}
 
-<Calendar plugins={[DayGrid]} options={calendarOptions} />
+<div bind:this={calendarWrapper}>
+	<Calendar plugins={[DayGrid]} options={calendarOptions} />
+</div>
 
 <style>
-	.add-event-btn {
-		background-color: #0056a3;
-		color: white;
-		border: none;
-		width: 3rem;
-		height: 3rem;
-		border-radius: 50%;
-		font-size: 1.5rem;
-		font-weight: bold;
-		cursor: pointer;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		transition: background-color 0.2s;
-		flex-shrink: 0;
-	}
-
-	.add-event-btn:hover {
-		background-color: #004080;
-	}
-
 	/* Make datepicker current date visible */
 	:global(.day.today) {
-		background-color: var(--color-theme) !important;
+		background-color: var(--color-brand-accent) !important;
 		color: white !important;
-		border: 2px solid var(--color-theme) !important;
+		border: 2px solid var(--color-brand-accent) !important;
 	}
 	:global(.day.today:not(.selected)) {
 		background-color: white !important;
-		color: var(--color-theme) !important;
+		color: var(--color-brand-accent) !important;
+	}
+
+	/* Style calendar events */
+	:global(.ec-event) {
+		background-color: var(--color-brand-primary) !important;
+		border-color: var(--color-brand-primary) !important;
+		color: white !important;
 	}
 </style>

@@ -27,9 +27,10 @@
 		all_day: false,
 		location: '',
 		description: '',
+		url: '',
 		image: null as File | null,
 		image_description: '',
-		state: 'submitted' as 'submitted' | 'published'
+		state: 'published' as 'draft' | 'published'
 	});
 
 	// Date/Time picker values (Date objects for components)
@@ -38,17 +39,9 @@
 	let endDateObj = $state(new Date());
 	let endTimeObj = $state(new Date(1970, 0, 1, 17, 0)); // Default to 5:00 PM
 
-	// String values for Timepicker components
-	let startTimeString = $derived(
-		String(startTimeObj.getHours()).padStart(2, '0') +
-			':' +
-			String(startTimeObj.getMinutes()).padStart(2, '0')
-	);
-	let endTimeString = $derived(
-		String(endTimeObj.getHours()).padStart(2, '0') +
-			':' +
-			String(endTimeObj.getMinutes()).padStart(2, '0')
-	);
+	// String values for Timepicker components (separate state, not derived)
+	let startTimeString = $state('09:00');
+	let endTimeString = $state('17:00');
 
 	// Helper function to format Date objects for API
 	function formatDateTimeForAPI(dateObj: Date, timeObj: Date): string {
@@ -87,14 +80,14 @@
 		if (!event) return; // Don't run until event is loaded
 
 		const [hours, minutes] = startTimeString.split(':').map(Number);
-		startTimeObj.setHours(hours, minutes);
+		startTimeObj = new Date(1970, 0, 1, hours, minutes);
 	});
 
 	$effect(() => {
 		if (!event) return; // Don't run until event is loaded
 
 		const [hours, minutes] = endTimeString.split(':').map(Number);
-		endTimeObj.setHours(hours, minutes);
+		endTimeObj = new Date(1970, 0, 1, hours, minutes);
 	});
 
 	// Check authentication
@@ -152,6 +145,7 @@
 			formData.title = event.title;
 			formData.location = event.location || '';
 			formData.description = event.description || '';
+			formData.url = event.url || '';
 			formData.image = null; // Don't pre-populate file input
 			formData.image_description = event.image_description || '';
 
@@ -172,8 +166,11 @@
 					startDateTime.getDate()
 				);
 			}
-			// eslint-disable-next-line svelte/prefer-svelte-reactivity
 			startTimeObj = new Date(1970, 0, 1, startDateTime.getHours(), startDateTime.getMinutes());
+			startTimeString =
+				String(startDateTime.getHours()).padStart(2, '0') +
+				':' +
+				String(startDateTime.getMinutes()).padStart(2, '0');
 
 			if (event.end_date) {
 				const endDateTime = event.all_day
@@ -192,8 +189,11 @@
 						endDateTime.getDate()
 					);
 				}
-				// eslint-disable-next-line svelte/prefer-svelte-reactivity
 				endTimeObj = new Date(1970, 0, 1, endDateTime.getHours(), endDateTime.getMinutes());
+				endTimeString =
+					String(endDateTime.getHours()).padStart(2, '0') +
+					':' +
+					String(endDateTime.getMinutes()).padStart(2, '0');
 			} else {
 				// No end date, use start date
 				if (event.all_day) {
@@ -206,6 +206,10 @@
 					);
 				}
 				endTimeObj = new Date(1970, 0, 1, startDateTime.getHours(), startDateTime.getMinutes());
+				endTimeString =
+					String(startDateTime.getHours()).padStart(2, '0') +
+					':' +
+					String(startDateTime.getMinutes()).padStart(2, '0');
 			}
 
 			formData.all_day = event.all_day;
@@ -234,6 +238,7 @@
 			submitData.append('title', formData.title);
 			if (formData.location) submitData.append('location', formData.location);
 			if (formData.description) submitData.append('description', formData.description);
+			if (formData.url) submitData.append('url', formData.url);
 			if (formData.image) submitData.append('image', formData.image);
 			if (formData.image_description)
 				submitData.append('image_description', formData.image_description);
@@ -272,261 +277,179 @@
 </script>
 
 {#if event}
-	<div class="event-header">
-		<h1>{$_('edit_event')}</h1>
-	</div>
+	<h1 class="mb-8 text-gray-900">{$_('edit_event')}</h1>
 
-	<div class="edit-form">
-		<form onsubmit={saveEdit}>
-			<div class="form-group">
-				<label for="editTitle">{$_('title_required')}</label>
-				<input
-					type="text"
-					id="editTitle"
-					bind:value={formData.title}
-					required
+	<form onsubmit={saveEdit}>
+		<div class="mb-4">
+			<label for="editTitle" class="mb-2 block font-medium text-gray-700"
+				>{$_('title_required')}</label
+			>
+			<input
+				type="text"
+				id="editTitle"
+				bind:value={formData.title}
+				required
+				disabled={isSubmitting}
+				class="focus:ring-opacity-25 box-border w-full rounded border border-gray-300 p-3 text-base focus:border-brand-primary focus:ring-2 focus:ring-brand-primary focus:outline-none"
+			/>
+		</div>
+
+		<div class="mb-4">
+			<label for="editLocation" class="mb-2 block font-medium text-gray-700"
+				>{$_('location_label')}</label
+			>
+			<input
+				type="text"
+				id="editLocation"
+				bind:value={formData.location}
+				disabled={isSubmitting}
+				class="focus:ring-opacity-25 box-border w-full rounded border border-gray-300 p-3 text-base focus:border-brand-primary focus:ring-2 focus:ring-brand-primary focus:outline-none"
+			/>
+		</div>
+
+		<div class="mb-4">
+			<label for="editDescription" class="mb-2 block font-medium text-gray-700"
+				>{$_('description_label')}</label
+			>
+			<textarea
+				id="editDescription"
+				bind:value={formData.description}
+				rows="3"
+				disabled={isSubmitting}
+				class="focus:ring-opacity-25 box-border w-full rounded border border-gray-300 p-3 text-base focus:border-brand-primary focus:ring-2 focus:ring-brand-primary focus:outline-none"
+			></textarea>
+		</div>
+
+		<div class="mb-4">
+			<label for="editUrl" class="mb-2 block font-medium text-gray-700">{$_('url_label')}</label>
+			<input
+				type="url"
+				id="editUrl"
+				bind:value={formData.url}
+				placeholder={$_('url_optional')}
+				disabled={isSubmitting}
+				pattern="https?://.+"
+				class="focus:ring-opacity-25 box-border w-full rounded border border-gray-300 p-3 text-base focus:border-brand-primary focus:ring-2 focus:ring-brand-primary focus:outline-none"
+			/>
+		</div>
+
+		<div class="mb-4">
+			<label for="editImage" class="mb-2 block font-medium text-gray-700">{$_('image_label')}</label
+			>
+			<input
+				type="file"
+				id="editImage"
+				accept="image/*"
+				disabled={isSubmitting}
+				onchange={(e) => {
+					const target = e.target as HTMLInputElement;
+					formData.image = target.files?.[0] || null;
+				}}
+			/>
+			{#if event.image}
+				<p class="my-2 text-sm text-gray-600 italic">{$_('current_image')} {event.image}</p>
+			{/if}
+		</div>
+
+		<div class="mb-4">
+			<label for="editImageDescription" class="mb-2 block font-medium text-gray-700"
+				>{$_('image_description_label')}</label
+			>
+			<input
+				type="text"
+				id="editImageDescription"
+				bind:value={formData.image_description}
+				placeholder={$_('image_description_optional')}
+				disabled={isSubmitting}
+				class="focus:ring-opacity-25 box-border w-full rounded border border-gray-300 p-3 text-base focus:border-brand-primary focus:ring-2 focus:ring-brand-primary focus:outline-none"
+			/>
+		</div>
+
+		<div class="flex gap-4">
+			<div class="mb-4 flex-1">
+				<label for="editStartDate" class="mb-2 block font-medium text-gray-700"
+					>{$_('start_date_required')}</label
+				>
+				<Datepicker
+					id="editStartDate"
+					bind:value={startDateObj}
+					locale="fi"
+					firstDayOfWeek={1}
 					disabled={isSubmitting}
 				/>
-			</div>
-
-			<div class="form-group">
-				<label for="editLocation">{$_('location_label')}</label>
-				<input
-					type="text"
-					id="editLocation"
-					bind:value={formData.location}
-					disabled={isSubmitting}
-				/>
-			</div>
-
-			<div class="form-group">
-				<label for="editDescription">{$_('description_label')}</label>
-				<textarea
-					id="editDescription"
-					bind:value={formData.description}
-					rows="3"
-					disabled={isSubmitting}
-				></textarea>
-			</div>
-
-			<div class="form-group">
-				<label for="editImage">{$_('image_label')}</label>
-				<input
-					type="file"
-					id="editImage"
-					accept="image/*"
-					disabled={isSubmitting}
-					onchange={(e) => {
-						const target = e.target as HTMLInputElement;
-						formData.image = target.files?.[0] || null;
-					}}
-				/>
-				{#if event.image}
-					<p class="current-image">{$_('current_image')} {event.image}</p>
+				{#if !formData.all_day}
+					<Timepicker id="editStartTime" bind:value={startTimeString} disabled={isSubmitting} />
 				{/if}
 			</div>
 
-			<div class="form-group">
-				<label for="editImageDescription">{$_('image_description_label')}</label>
-				<input
-					type="text"
-					id="editImageDescription"
-					bind:value={formData.image_description}
-					placeholder={$_('image_description_optional')}
-					disabled={isSubmitting}
-				/>
-			</div>
-
-			<div class="form-row">
-				<div class="form-group">
-					<label for="editStartDate">{$_('start_date_required')}</label>
-					<Datepicker
-						id="editStartDate"
-						bind:value={startDateObj}
-						locale="fi"
-						firstDayOfWeek={1}
-						disabled={isSubmitting}
-					/>
-					{#if !formData.all_day}
-						<Timepicker id="editStartTime" bind:value={startTimeString} disabled={isSubmitting} />
-					{/if}
-				</div>
-
-				<div class="form-group">
-					<label for="editEndDate">{$_('end_date')}</label>
-					<Datepicker
-						id="editEndDate"
-						bind:value={endDateObj}
-						locale="fi"
-						firstDayOfWeek={1}
-						disabled={isSubmitting || !formData.all_day}
-					/>
-					{#if !formData.all_day}
-						<Timepicker id="editEndTime" bind:value={endTimeString} disabled={isSubmitting} />
-					{/if}
-				</div>
-			</div>
-
-			<div class="form-group">
-				<label class="checkbox-label">
-					<input type="checkbox" bind:checked={formData.all_day} disabled={isSubmitting} />
-					{$_('all_day_event_label')}
-				</label>
-			</div>
-
-			<div class="form-group">
-				<label for="editState">{$_('status')}</label>
-				<select id="editState" bind:value={formData.state} disabled={isSubmitting}>
-					<option value="submitted">{$_('submitted')}</option>
-					<option value="published">{$_('published')}</option>
-				</select>
-			</div>
-
-			<div class="form-actions">
-				<button
-					type="submit"
-					class="save-btn"
-					disabled={isSubmitting || !formData.title || !formData.start_date}
+			<div class="mb-4 flex-1">
+				<label for="editEndDate" class="mb-2 block font-medium text-gray-700"
+					>{$_('end_date')}</label
 				>
-					{isSubmitting ? $_('saving') : $_('save_changes')}
-				</button>
-				<button type="button" class="btn-secondary" onclick={cancelEdit} disabled={isSubmitting}>
-					{$_('cancel')}
-				</button>
+				<Datepicker
+					id="editEndDate"
+					bind:value={endDateObj}
+					locale="fi"
+					firstDayOfWeek={1}
+					disabled={isSubmitting || !formData.all_day}
+				/>
+				{#if !formData.all_day}
+					<Timepicker id="editEndTime" bind:value={endTimeString} disabled={isSubmitting} />
+				{/if}
 			</div>
-		</form>
-	</div>
+		</div>
+
+		<div class="mb-4">
+			<label class="flex cursor-pointer items-center gap-2 font-normal">
+				<input type="checkbox" bind:checked={formData.all_day} disabled={isSubmitting} />
+				{$_('all_day_event_label')}
+			</label>
+		</div>
+
+		<div class="mb-4">
+			<label for="editState" class="mb-2 block font-medium text-gray-700">{$_('status')}</label>
+			<select
+				id="editState"
+				bind:value={formData.state}
+				disabled={isSubmitting}
+				class="focus:ring-opacity-25 box-border w-full rounded border border-gray-300 p-3 text-base focus:border-brand-primary focus:ring-2 focus:ring-brand-primary focus:outline-none"
+			>
+				<option value="draft">{$_('draft')}</option>
+				<option value="published">{$_('published')}</option>
+			</select>
+		</div>
+
+		<div class="mt-6 flex gap-2">
+			<button
+				type="submit"
+				disabled={isSubmitting || !formData.title || !formData.start_date}
+				class="cursor-pointer rounded border border-primary-500 bg-primary-500 px-6 py-3 text-base text-white transition-colors hover:bg-primary-600 disabled:cursor-not-allowed disabled:border-gray-400 disabled:bg-gray-200 disabled:text-gray-600 disabled:hover:bg-gray-300"
+			>
+				{isSubmitting ? $_('saving') : $_('save_changes')}
+			</button>
+			<button
+				type="button"
+				class="cursor-pointer rounded border-none bg-gray-600 px-6 py-3 text-base text-white transition-colors hover:bg-gray-700 disabled:cursor-not-allowed disabled:bg-gray-400"
+				onclick={cancelEdit}
+				disabled={isSubmitting}
+			>
+				{$_('cancel')}
+			</button>
+		</div>
+	</form>
 {:else}
 	<p>{$_('loading_event')}</p>
 {/if}
 
 <style>
-	.event-header {
-		display: flex;
-		justify-content: space-between;
-		align-items: flex-start;
-	}
-
-	.event-header h1 {
-		margin: 1rem 0 3rem 0;
-		flex: 1;
-	}
-
-	.save-btn {
-		background-color: #0056a3;
-		color: white;
-		border: none;
-		padding: 0.75rem 1.5rem;
-		border-radius: 4px;
-		font-size: 1rem;
-		cursor: pointer;
-		transition: background-color 0.2s;
-	}
-
-	.save-btn:hover:not(:disabled) {
-		background-color: #004080;
-	}
-
-	.save-btn:disabled {
-		background-color: #ccc;
-		cursor: not-allowed;
-	}
-
-	.btn-secondary {
-		background-color: #6c757d;
-		color: white;
-		border: none;
-		padding: 0.75rem 1.5rem;
-		border-radius: 4px;
-		font-size: 1rem;
-		cursor: pointer;
-		transition: background-color 0.2s;
-	}
-
-	.btn-secondary:hover:not(:disabled) {
-		background-color: #545b62;
-	}
-
-	.btn-secondary:disabled {
-		background-color: #ccc;
-		cursor: not-allowed;
-	}
-
-	.edit-form {
-		background: #f8f9fa;
-		padding: 2rem;
-		border-radius: 8px;
-		margin-bottom: 2rem;
-	}
-
-	.form-group {
-		margin-bottom: 1rem;
-	}
-
-	.form-row {
-		display: flex;
-		gap: 1rem;
-	}
-
-	.form-row .form-group {
-		flex: 1;
-	}
-
-	label {
-		display: block;
-		margin-bottom: 0.5rem;
-		font-weight: 500;
-		color: #555;
-	}
-
-	input[type='text'],
-	textarea,
-	select {
-		width: 100%;
-		padding: 0.75rem;
-		border: 1px solid #ddd;
-		border-radius: 4px;
-		font-size: 1rem;
-		box-sizing: border-box;
-	}
-
-	input[type='text']:focus,
-	textarea:focus,
-	select:focus {
-		outline: none;
-		border-color: var(--color-theme);
-		box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
-	}
-
-	.checkbox-label {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-		font-weight: normal;
-		cursor: pointer;
-	}
-
-	.current-image {
-		margin: 0.5rem 0 0 0;
-		font-size: 0.9rem;
-		color: #666;
-		font-style: italic;
-	}
-
-	.form-actions {
-		display: flex;
-		gap: 0.5rem;
-		margin-top: 1.5rem;
-	}
-
 	/* Make datepicker current date visible */
 	:global(.day.today) {
-		background-color: var(--color-theme) !important;
+		background-color: var(--color-brand-accent) !important;
 		color: white !important;
-		border: 2px solid var(--color-theme) !important;
+		border: 2px solid var(--color-brand-accent) !important;
 	}
 	:global(.day.today:not(.selected)) {
 		background-color: white !important;
-		color: var(--color-theme) !important;
+		color: var(--color-brand-accent) !important;
 	}
 </style>

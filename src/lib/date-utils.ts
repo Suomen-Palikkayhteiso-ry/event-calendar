@@ -129,3 +129,21 @@ export function utcToHelsinkiDate(utcString: string): string {
 	const day = parts.find((p) => p.type === 'day')?.value;
 	return `${year}-${month}-${day}`;
 }
+
+/**
+ * Convert a Date object to Helsinki timezone date string (YYYY-MM-DD)
+ * Assumes the Date object represents a date in the user's local context
+ */
+export function dateToHelsinkiDateString(date: Date): string {
+	const helsinkiFormatter = new Intl.DateTimeFormat('sv-SE', {
+		timeZone: 'Europe/Helsinki',
+		year: 'numeric',
+		month: '2-digit',
+		day: '2-digit'
+	});
+	const parts = helsinkiFormatter.formatToParts(date);
+	const year = parts.find((p) => p.type === 'year')?.value;
+	const month = parts.find((p) => p.type === 'month')?.value;
+	const day = parts.find((p) => p.type === 'day')?.value;
+	return `${year}-${month}-${day}`;
+}

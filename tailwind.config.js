@@ -1,23 +1,14 @@
-/** @type {import('tailwindcss').Config} */
+/**
+ * Tailwind CSS v4 Configuration
+ *
+ * Note: In Tailwind v4, theme configuration (colors, spacing, etc.) is done
+ * via CSS using @theme blocks in your CSS files (see src/app.css).
+ * This config file is only used for:
+ * - content paths (where to scan for classes)
+ * - plugins
+ *
+ * Color configuration has been moved to src/app.css @theme block.
+ */
 export default {
-	content: ['./src/**/*.{html,js,svelte,ts}'],
-	theme: {
-		extend: {
-			colors: {
-				primary: {
-					50: '#eff6ff',
-					100: '#dbeafe',
-					200: '#bfdbfe',
-					300: '#93c5fd',
-					400: '#60a5fa',
-					500: '#3b82f6',
-					600: '#2563eb',
-					700: '#1d4ed8',
-					800: '#1e40af',
-					900: '#1e3a8a'
-				}
-			}
-		}
-	},
-	plugins: []
+	content: ['./src/**/*.{html,js,svelte,ts}']
 };

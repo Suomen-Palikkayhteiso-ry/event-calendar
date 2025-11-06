@@ -4,61 +4,29 @@
 	import { resolve } from '$app/paths';
 </script>
 
-<header>
-	<a href={resolve('/')} class="title">{$_('calendar_title')}</a>
+<header
+	class="relative flex items-center justify-between overflow-visible border-b border-gray-200 bg-gray-50 p-4"
+>
+	<a
+		href={resolve('/')}
+		class="text-xl font-semibold text-gray-700 no-underline hover:text-brand-primary"
+		>{$_('calendar_title')}</a
+	>
 
 	{#if $user}
-		<div class="auth">
-			<span>{$user.name}</span>
-			<button on:click={logout}>{$_('logout')}</button>
+		<div class="flex items-center gap-4">
+			<span class="text-gray-700">{$user.name}</span>
+			<button
+				class="cursor-pointer rounded border border-gray-300 bg-gray-600 px-4 py-2 font-medium text-white hover:bg-gray-700"
+				on:click={logout}>{$_('logout')}</button
+			>
 		</div>
 	{:else}
-		<div class="auth">
-			<button on:click={login}>{$_('login')}</button>
+		<div class="flex items-center gap-4">
+			<button
+				class="cursor-pointer rounded border border-brand-accent bg-brand-secondary px-4 py-2 font-medium text-white hover:bg-brand-accent"
+				on:click={login}>{$_('login')}</button
+			>
 		</div>
 	{/if}
 </header>
-
-<style>
-	header {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		padding: 1rem;
-		position: relative;
-		overflow: visible;
-		background-color: #f8f9fa;
-		border-bottom: 1px solid #e9ecef;
-	}
-
-	.auth {
-		display: flex;
-		align-items: center;
-		gap: 1rem;
-	}
-
-	.auth button {
-		padding: 0.5rem 1rem;
-		background-color: #0056a3;
-		color: white;
-		border: 1px solid #004080;
-		border-radius: 0.25rem;
-		cursor: pointer;
-		font-weight: 500;
-	}
-
-	.auth button:hover {
-		background-color: #004080;
-	}
-
-	.title {
-		font-size: 1.25rem;
-		font-weight: 600;
-		color: var(--color-text);
-		text-decoration: none;
-	}
-
-	.title:hover {
-		color: var(--color-link-hover, #0056a3);
-	}
-</style>

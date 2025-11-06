@@ -26,3 +26,5 @@ vite.config.ts.timestamp-*
 # Generated
 static/feed.ical
 static/feed.rss
+static/feed.atom
+static/images/

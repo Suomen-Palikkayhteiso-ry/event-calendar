@@ -2,6 +2,7 @@ import PocketBase from 'pocketbase';
 import { Feed } from 'feed';
 import ical from 'ical-generator';
 import fs from 'fs';
+import path from 'path';
 
 const pb = new PocketBase('https://data.suomenpalikkayhteiso.fi');
 
@@ -10,6 +11,31 @@ async function generateFeeds() {
 		sort: 'start_date',
 		filter: 'state = "published"'
 	});
+
+	// Create images directory if it doesn't exist
+	const imagesDir = path.join('static', 'images');
+	if (!fs.existsSync(imagesDir)) {
+		fs.mkdirSync(imagesDir, { recursive: true });
+	}
+
+	// Download and cache event images
+	const imageUrls = new Map();
+	for (const event of events) {
+		if (event.image) {
+			try {
+				const imageUrl = `https://data.suomenpalikkayhteiso.fi/api/files/events/${event.id}/${event.image}`;
+				const response = await fetch(imageUrl);
+				if (response.ok) {
+					const buffer = await response.arrayBuffer();
+					const localImagePath = path.join(imagesDir, `${event.id}_${event.image}`);
+					fs.writeFileSync(localImagePath, Buffer.from(buffer));
+					imageUrls.set(event.id, `/images/${event.id}_${event.image}`);
+				}
+			} catch (error) {
+				console.warn(`Failed to download image for event ${event.id}:`, error.message);
+			}
+		}
+	}
 
 	// Generate RSS feed
 	const feed = new Feed({
@@ -38,11 +64,12 @@ async function generateFeeds() {
 		const eventDate = new Date(event.start_date + (event.start_date.includes('Z') ? '' : 'Z')); // Ensure UTC
 		const description = event.description || event.title;
 		const content = event.location ? `${description}\n\nLocation: ${event.location}` : description;
+		const eventUrl = event.url || `https://kalenteri.suomenpalikkayhteiso.fi/#/events/${event.id}`;
 
-		feed.addItem({
+		const feedItem = {
 			title: `${event.title} | ${event.location}`,
 			id: event.id,
-			link: `https://kalenteri.suomenpalikkayhteiso.fi/#/events/${event.id}`,
+			link: eventUrl,
 			description: content,
 			date: eventDate,
 			author: [
@@ -50,10 +77,19 @@ async function generateFeeds() {
 					name: 'Suomen Palikkayhteisö ry'
 				}
 			]
-		});
+		};
+
+		// Add image if available
+		const imageUrl = imageUrls.get(event.id);
+		if (imageUrl) {
+			feedItem.image = `https://kalenteri.suomenpalikkayhteiso.fi${imageUrl}`;
+		}
+
+		feed.addItem(feedItem);
 	});
 
 	fs.writeFileSync('static/feed.rss', feed.rss2());
+	fs.writeFileSync('static/feed.atom', feed.atom1());
 
 	// Generate ICAL feed
 	const calendar = ical({
@@ -69,6 +105,7 @@ async function generateFeeds() {
 			: new Date(startDate.getTime() + (event.all_day ? 24 * 60 * 60 * 1000 : 60 * 60 * 1000)); // Default 1 day for all_day, 1 hour otherwise
 
 		const description = event.description || event.title;
+		const eventUrl = event.url || `https://kalenteri.suomenpalikkayhteiso.fi/#/events/${event.id}`;
 
 		const eventData = {
 			id: event.id,
@@ -76,7 +113,7 @@ async function generateFeeds() {
 			end: endDate,
 			summary: `${event.title} | ${event.location}`,
 			description: description,
-			url: `https://kalenteri.suomenpalikkayhteiso.fi/#/events/${event.id}`,
+			url: eventUrl,
 			timezone: 'Europe/Helsinki'
 		};
 

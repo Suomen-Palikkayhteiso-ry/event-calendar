@@ -4,7 +4,7 @@ This file provides instructions for AI coding agents on how to work with this pr
 
 ## Project Overview
 
-This is a SvelteKit application for an event calendar. It uses TypeScript, Prettier, and ESLint for code quality, and Tailwind CSS for styling. The backend is powered by PocketBase.
+This is a SvelteKit application for an event calendar. It uses TypeScript, Prettier, and ESLint for code quality, and Tailwind CSS v4 for styling. The backend is powered by PocketBase.
 
 ## Build and Test Commands
 
@@ -23,6 +23,33 @@ This project uses `pnpm` as the package manager.
 - **Trailing Comma:** No trailing commas.
 - **Print Width:** 100 characters.
 - **Formatting:** Use `pnpm format` to format the code.
+
+## Tailwind CSS v4 Configuration
+
+This project uses **Tailwind CSS v4**, which has a different configuration approach than v3:
+
+- **Theme configuration:** Colors and design tokens are defined in `src/app.css` using the `@theme` directive, NOT in `tailwind.config.js`
+- **Config file purpose:** The `tailwind.config.js` file is only used for content paths (where to scan for classes)
+- **Utility generation:** The `@theme` block automatically generates utility classes like `bg-primary-500`, `text-brand-primary`, etc.
+- **CSS-first approach:** All theme customization is done in CSS files using `@theme` blocks
+
+### Adding New Colors
+
+To add new colors that generate utility classes:
+
+1. Add them to the `@theme` block in `src/app.css`:
+   ```css
+   @theme {
+   	--color-my-color: #hexvalue;
+   }
+   ```
+2. This automatically generates utilities: `bg-my-color`, `text-my-color`, `border-my-color`, etc.
+3. Do NOT add colors to `tailwind.config.js` - they will be ignored
+
+### Current Color Palette
+
+- **Primary colors** (dark violet): `primary-50` through `primary-900` (generates `bg-primary-*`, `text-primary-*`, etc.)
+- **Brand colors**: `brand-primary`, `brand-secondary`, `brand-accent`, `brand-dark`, `brand-highlight`
 
 ## Security Considerations
 
