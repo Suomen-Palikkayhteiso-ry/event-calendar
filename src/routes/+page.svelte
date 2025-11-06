@@ -28,13 +28,13 @@
 			prev: $_('prev'),
 			next: $_('next_button')
 		},
-		headerToolbar: {start: 'title', center: '', end: 'dayGridMonth,listMonth today prev,next'},
+		headerToolbar: { start: 'title', center: '', end: 'dayGridMonth,listMonth today prev,next' },
 		eventDidMount: (info: unknown) => {
 			if ((info as any).event.extendedProps.description) {
 				(info as any).el.title = (info as any).event.extendedProps.description;
 			}
 			if ((info as any).event.allDay) {
-				(info as any).el.style.backgroundColor = 'var(--color-brand-accent)';
+				(info as any).el.style.backgroundColor = 'var(--color-white)';
 				(info as any).el.style.color = 'var(--color-brand-primary)';
 				(info as any).el.style.border = '1px solid var(--color-brand-primary)';
 			} else {
