@@ -9,10 +9,10 @@
 	import { Datepicker, Timepicker } from 'flowbite-svelte';
 	import { _ } from 'svelte-i18n';
 
-	let events: Event[] = [];
-	let currentPage = 1;
+	let events = $state<Event[]>([]);
+	let currentPage = $state(1);
 	let pageSize = 10;
-	let isSubmitting = false;
+	let isSubmitting = $state(false);
 
 	// Form data object
 	let formData = $state({
@@ -86,7 +86,7 @@
 	// Sync end date with start date when all day is enabled
 	// Removed: Allow different days for all-day events
 
-	let totalEvents = 0;
+	let totalEvents = $state(0);
 
 	// Check authentication
 	$effect(() => {
@@ -111,7 +111,8 @@
 	onMount(async () => {
 		await fetchEvents();
 	});
-	async function createEvent() {
+	async function createEvent(e: SubmitEvent) {
+		e.preventDefault();
 		if (!$user) return;
 
 		isSubmitting = true;
@@ -151,9 +152,13 @@
 			formData.image = null;
 			formData.image_description = '';
 			// Reset Date objects to defaults
+
 			startDateObj = new Date();
+			// eslint-disable-next-line svelte/prefer-svelte-reactivity
 			startTimeObj = new Date(1970, 0, 1, 9, 0);
+
 			endDateObj = new Date();
+			// eslint-disable-next-line svelte/prefer-svelte-reactivity
 			endTimeObj = new Date(1970, 0, 1, 17, 0);
 
 			// Refresh events list
@@ -167,13 +172,7 @@
 	}
 
 	function cancelAdd() {
-		goto('/');
-	}
-
-	async function goToPage(page: number) {
-		if (page >= 1 && page <= Math.ceil(totalEvents / pageSize)) {
-			await fetchEvents(page);
-		}
+		goto(resolve('/'));
 	}
 
 	async function nextPage() {
@@ -197,7 +196,7 @@
 {:else}
 	<div class="create-form">
 		<h2>{$_('create_new_event')}</h2>
-		<form on:submit|preventDefault={createEvent}>
+		<form onsubmit={createEvent}>
 			<div class="form-group">
 				<label for="title">{$_('title_required')}</label>
 				<input
@@ -239,7 +238,7 @@
 					id="image"
 					accept="image/*"
 					disabled={isSubmitting}
-					on:change={(e) => {
+					onchange={(e) => {
 						const target = e.target as HTMLInputElement;
 						formData.image = target.files?.[0] || null;
 					}}
@@ -298,7 +297,7 @@
 				<button type="submit" disabled={isSubmitting || !formData.title || !formData.start_date}>
 					{isSubmitting ? $_('creating') : $_('create_event')}
 				</button>
-				<button type="button" class="btn-secondary" on:click={cancelAdd} disabled={isSubmitting}>
+				<button type="button" class="btn-secondary" onclick={cancelAdd} disabled={isSubmitting}>
 					{$_('cancel')}
 				</button>
 			</div>
@@ -331,7 +330,7 @@
 
 		{#if totalEvents > pageSize}
 			<div class="pagination">
-				<button class="pagination-btn" disabled={currentPage === 1} on:click={prevPage}>
+				<button class="pagination-btn" disabled={currentPage === 1} onclick={prevPage}>
 					{$_('previous')}
 				</button>
 
@@ -347,7 +346,7 @@
 				<button
 					class="pagination-btn"
 					disabled={currentPage === Math.ceil(totalEvents / pageSize)}
-					on:click={nextPage}
+					onclick={nextPage}
 				>
 					{$_('next_button')}
 				</button>
@@ -395,19 +394,7 @@
 		color: #555;
 	}
 
-	input[type='time'] {
-		width: 100%;
-		min-width: 140px;
-		padding: 0.75rem 2.5rem 0.75rem 0.75rem; /* Extra right padding for clock icon */
-		border: 1px solid #ddd;
-		border-radius: 4px;
-		font-size: 1rem;
-		box-sizing: border-box;
-	}
-
 	input[type='text'],
-	input[type='date'],
-	input[type='datetime-local'],
 	textarea {
 		width: 100%;
 		padding: 0.75rem;
@@ -418,22 +405,10 @@
 	}
 
 	input[type='text']:focus,
-	input[type='date']:focus,
-	input[type='datetime-local']:focus,
-	input[type='time']:focus,
 	textarea:focus {
 		outline: none;
 		border-color: var(--color-theme);
 		box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
-	}
-
-	/* Force 24-hour time format for time inputs */
-	input[type='time']::-webkit-datetime-edit-ampm-field {
-		display: none;
-	}
-
-	input[type='time']::-webkit-datetime-edit-fields-wrapper {
-		padding: 0;
 	}
 
 	.checkbox-label {

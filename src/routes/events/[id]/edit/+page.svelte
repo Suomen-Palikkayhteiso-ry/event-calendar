@@ -9,7 +9,6 @@
 		localDateToUTC,
 		parseUTCDate,
 		localDateTimeToUTC,
-		utcToHelsinkiDateTimeLocal,
 		utcToHelsinkiDate
 	} from '$lib/date-utils';
 	import { user } from '$lib/auth';
@@ -172,6 +171,7 @@
 					startDateTime.getDate()
 				);
 			}
+			// eslint-disable-next-line svelte/prefer-svelte-reactivity
 			startTimeObj = new Date(1970, 0, 1, startDateTime.getHours(), startDateTime.getMinutes());
 
 			if (event.end_date) {
@@ -182,6 +182,7 @@
 				// For all-day events, use the Helsinki end date
 				if (event.all_day) {
 					const helsinkiEndDateStr = utcToHelsinkiDate(event.end_date);
+
 					endDateObj = new Date(helsinkiEndDateStr + 'T00:00:00');
 				} else {
 					endDateObj = new Date(
@@ -190,6 +191,7 @@
 						endDateTime.getDate()
 					);
 				}
+				// eslint-disable-next-line svelte/prefer-svelte-reactivity
 				endTimeObj = new Date(1970, 0, 1, endDateTime.getHours(), endDateTime.getMinutes());
 			} else {
 				// No end date, use start date
@@ -221,7 +223,8 @@
 		}
 	}
 
-	async function saveEdit() {
+	async function saveEdit(e: SubmitEvent) {
+		e.preventDefault();
 		if (!$user || !event) return;
 
 		isSubmitting = true;
@@ -271,7 +274,7 @@
 	</div>
 
 	<div class="edit-form">
-		<form on:submit|preventDefault={saveEdit}>
+		<form onsubmit={saveEdit}>
 			<div class="form-group">
 				<label for="editTitle">{$_('title_required')}</label>
 				<input
@@ -310,7 +313,7 @@
 					id="editImage"
 					accept="image/*"
 					disabled={isSubmitting}
-					on:change={(e) => {
+					onchange={(e) => {
 						const target = e.target as HTMLInputElement;
 						formData.image = target.files?.[0] || null;
 					}}
@@ -384,7 +387,7 @@
 				>
 					{isSubmitting ? $_('saving') : $_('save_changes')}
 				</button>
-				<button type="button" class="btn-secondary" on:click={cancelEdit} disabled={isSubmitting}>
+				<button type="button" class="btn-secondary" onclick={cancelEdit} disabled={isSubmitting}>
 					{$_('cancel')}
 				</button>
 			</div>
@@ -473,20 +476,7 @@
 		color: #555;
 	}
 
-	input[type='time'] {
-		width: 100%;
-		min-width: 140px;
-		padding: 0.75rem 2.5rem 0.75rem 0.75rem; /* Extra right padding for clock icon */
-		border: 1px solid #ddd;
-		border-radius: 4px;
-		font-size: 1rem;
-		box-sizing: border-box;
-		background: red;
-	}
-
 	input[type='text'],
-	input[type='date'],
-	input[type='datetime-local'],
 	textarea,
 	select {
 		width: 100%;
@@ -498,23 +488,11 @@
 	}
 
 	input[type='text']:focus,
-	input[type='date']:focus,
-	input[type='datetime-local']:focus,
-	input[type='time']:focus,
 	textarea:focus,
 	select:focus {
 		outline: none;
 		border-color: var(--color-theme);
 		box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
-	}
-
-	/* Force 24-hour time format for time inputs */
-	input[type='time']::-webkit-datetime-edit-ampm-field {
-		display: none;
-	}
-
-	input[type='time']::-webkit-datetime-edit-fields-wrapper {
-		padding: 0;
 	}
 
 	.checkbox-label {

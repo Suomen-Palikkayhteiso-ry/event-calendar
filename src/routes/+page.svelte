@@ -97,19 +97,13 @@
 			<label for="datepicker" class="block text-sm font-medium text-gray-700"
 				>{$_('select_date')}</label
 			>
-			<Datepicker
-				id="datepicker"
-				bind:value={selectedDate}
-				locale="fi"
-				firstDayOfWeek={1}
-				tabindex="-1"
-			/>
+			<Datepicker id="datepicker" bind:value={selectedDate} locale="fi" tabindex={-1} />
 		</div>
 		<button
 			class="add-event-btn"
 			onclick={() => goto(resolve('/events'))}
 			title="Manage Events"
-			tabindex="-1"
+			tabindex={-1}
 		>
 			+
 		</button>
@@ -119,13 +113,7 @@
 		<label for="datepicker" class="block text-sm font-medium text-gray-700"
 			>{$_('select_date')}</label
 		>
-		<Datepicker
-			id="datepicker"
-			bind:value={selectedDate}
-			locale="fi"
-			firstDayOfWeek={1}
-			tabindex="-1"
-		/>
+		<Datepicker id="datepicker" bind:value={selectedDate} locale="fi" tabindex={-1} />
 	</div>
 {/if}
 

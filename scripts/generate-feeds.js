@@ -13,24 +13,23 @@ async function generateFeeds() {
 
 	// Generate RSS feed
 	const feed = new Feed({
-		title: 'Suomen Palikkayhteisön tapahtumakalenteri',
-		description:
-			'Suomen Palikkayhteisön tapahtumakalenteri - tapahtumat, näyttelyt ja kokoontumiset',
+		title: 'Palikkakalenteri',
+		description: 'Suomen Palikkayhteisö ry:n Palikkakalenteri',
 		id: 'https://kalenteri.suomenpalikkayhteiso.fi/',
 		link: 'https://kalenteri.suomenpalikkayhteiso.fi/',
 		language: 'fi',
 		image: 'https://kalenteri.suomenpalikkayhteiso.fi/logo.png',
 		favicon: 'https://kalenteri.suomenpalikkayhteiso.fi/favicon.ico',
-		copyright: 'All rights reserved 2023, Suomen Palikkayhteisö',
+		copyright: 'Suomen Palikkayhteisö ry',
 		updated: new Date(),
-		generator: 'Event Calendar Generator',
+		generator: 'Emmet',
 		feedLinks: {
 			rss: 'https://kalenteri.suomenpalikkayhteiso.fi/feed.rss',
 			atom: 'https://kalenteri.suomenpalikkayhteiso.fi/feed.atom'
 		},
 		author: {
 			name: 'Suomen Palikkayhteisö',
-			email: 'info@suomenpalikkayhteiso.fi',
+			email: 'suomenpalikkayhteisory@outlook.com',
 			link: 'https://kalenteri.suomenpalikkayhteiso.fi/'
 		}
 	});
@@ -41,14 +40,14 @@ async function generateFeeds() {
 		const content = event.location ? `${description}\n\nLocation: ${event.location}` : description;
 
 		feed.addItem({
-			title: event.title,
+			title: `${event.title} | ${event.location}`,
 			id: event.id,
 			link: `https://kalenteri.suomenpalikkayhteiso.fi/#/events/${event.id}`,
 			description: content,
 			date: eventDate,
 			author: [
 				{
-					name: 'Event Calendar'
+					name: 'Suomen Palikkayhteisö ry'
 				}
 			]
 		});
@@ -75,7 +74,7 @@ async function generateFeeds() {
 			id: event.id,
 			start: startDate,
 			end: endDate,
-			summary: event.title,
+			summary: `${event.title} | ${event.location}`,
 			description: description,
 			url: `https://kalenteri.suomenpalikkayhteiso.fi/#/events/${event.id}`,
 			timezone: 'Europe/Helsinki'
