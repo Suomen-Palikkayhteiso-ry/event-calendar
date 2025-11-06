@@ -4,7 +4,6 @@
 </script>
 
 <header>
-	<div></div>
 	<div class="title">{$_('calendar_title')}</div>
 
 	{#if $user}
