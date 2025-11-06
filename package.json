@@ -53,6 +53,6 @@
 		"ical-generator": "^10.0.0",
 		"pocketbase": "^0.26.3",
 		"svelte-i18n": "^4.0.1",
-		"svelte-toast": "^1.0.0"
+		"@zerodevx/svelte-toast": "^0.9.5"
 	}
 }

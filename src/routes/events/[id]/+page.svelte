@@ -49,14 +49,10 @@
 	async function deleteEvent() {
 		if (!$user || !event) return;
 
-		if (!confirm($_('confirm_delete'))) {
-			return;
-		}
-
 		isDeleting = true;
 		try {
 			await pb.collection('events').delete(event.id);
-			goto(resolve('/events'));
+			goto(resolve('/'));
 		} catch (error) {
 			console.error('Error deleting event:', error);
 			alert($_('failed_delete_event'));

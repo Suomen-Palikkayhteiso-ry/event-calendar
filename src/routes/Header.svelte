@@ -1,10 +1,11 @@
 <script lang="ts">
 	import { user, login, logout } from '$lib/auth';
 	import { _ } from 'svelte-i18n';
+	import { resolve } from '$app/paths';
 </script>
 
 <header>
-	<a href="/" class="title">{$_('calendar_title')}</a>
+	<a href={resolve('/')} class="title">{$_('calendar_title')}</a>
 
 	{#if $user}
 		<div class="auth">

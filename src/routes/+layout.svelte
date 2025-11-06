@@ -4,6 +4,7 @@
 	import 'flowbite/dist/flowbite.min.css';
 	import '../lib/i18n';
 	import { _ } from 'svelte-i18n';
+	import { SvelteToast } from '@zerodevx/svelte-toast';
 
 	let { children } = $props();
 </script>
@@ -12,6 +13,7 @@
 	<Header />
 
 	<main>
+		<SvelteToast />
 		{@render children()}
 	</main>
 
