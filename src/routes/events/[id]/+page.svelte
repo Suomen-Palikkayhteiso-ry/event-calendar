@@ -49,15 +49,17 @@
 	async function deleteEvent() {
 		if (!$user || !event) return;
 
-		isDeleting = true;
-		try {
-			await pb.collection('events').delete(event.id);
-			goto(resolve('/'));
-		} catch (error) {
-			console.error('Error deleting event:', error);
-			alert($_('failed_delete_event'));
-		} finally {
-			isDeleting = false;
+		if (confirm($_('confirm_delete_event'))) {
+			isDeleting = true;
+			try {
+				await pb.collection('events').delete(event.id);
+				goto(resolve('/'));
+			} catch (error) {
+				console.error('Error deleting event:', error);
+				alert($_('failed_delete_event'));
+			} finally {
+				isDeleting = false;
+			}
 		}
 	}
 </script>

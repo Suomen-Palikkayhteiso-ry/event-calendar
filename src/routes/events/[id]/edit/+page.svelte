@@ -228,45 +228,47 @@
 		e.preventDefault();
 		if (!$user || !event) return;
 
-		isSubmitting = true;
-		try {
-			const submitData = new FormData();
-			submitData.append('title', formData.title);
-			if (formData.location) submitData.append('location', formData.location);
-			if (formData.description) submitData.append('description', formData.description);
-			if (formData.image) submitData.append('image', formData.image);
-			if (formData.image_description)
-				submitData.append('image_description', formData.image_description);
-			submitData.append(
-				'start_date',
-				formData.all_day
-					? localDateToUTC(formData.start_date.split('T')[0])
-					: localDateTimeToUTC(formData.start_date)
-			);
-			submitData.append(
-				'end_date',
-				formData.end_date
-					? formData.all_day
-						? localDateToUTC(formData.end_date.split('T')[0])
-						: localDateTimeToUTC(formData.end_date)
-					: formData.all_day
+		if (confirm($_('confirm_save_changes'))) {
+			isSubmitting = true;
+			try {
+				const submitData = new FormData();
+				submitData.append('title', formData.title);
+				if (formData.location) submitData.append('location', formData.location);
+				if (formData.description) submitData.append('description', formData.description);
+				if (formData.image) submitData.append('image', formData.image);
+				if (formData.image_description)
+					submitData.append('image_description', formData.image_description);
+				submitData.append(
+					'start_date',
+					formData.all_day
 						? localDateToUTC(formData.start_date.split('T')[0])
 						: localDateTimeToUTC(formData.start_date)
-			);
-			submitData.append('all_day', formData.all_day.toString());
-			submitData.append('state', formData.state);
+				);
+				submitData.append(
+					'end_date',
+					formData.end_date
+						? formData.all_day
+							? localDateToUTC(formData.end_date.split('T')[0])
+							: localDateTimeToUTC(formData.end_date)
+						: formData.all_day
+							? localDateToUTC(formData.start_date.split('T')[0])
+							: localDateTimeToUTC(formData.start_date)
+				);
+				submitData.append('all_day', formData.all_day.toString());
+				submitData.append('state', formData.state);
 
-			await pb.collection('events').update(event.id, submitData);
+				await pb.collection('events').update(event.id, submitData);
 
-			toast.push($_('event_updated_successfully'));
+				toast.push($_('event_updated_successfully'));
 
-			// Redirect back to view
-			goto(resolve(`/events/${event.id}`));
-		} catch (error) {
-			console.error('Error updating event:', error);
-			alert($_('failed_update_event'));
-		} finally {
-			isSubmitting = false;
+				// Redirect back to view
+				goto(resolve(`/events/${event.id}`));
+			} catch (error) {
+				console.error('Error updating event:', error);
+				alert($_('failed_update_event'));
+			} finally {
+				isSubmitting = false;
+			}
 		}
 	}
 </script>

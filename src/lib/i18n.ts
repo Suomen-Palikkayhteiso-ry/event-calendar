@@ -47,8 +47,7 @@ addMessages('fi', {
 	failed_create_event: 'Tapahtuman luonti epäonnistui. Yritä uudelleen.',
 	event_created_successfully: 'Tapahtuma luotu onnistuneesti.',
 	// Event detail
-	confirm_delete:
-		'Oletko varma, että haluat poistaa tämän tapahtuman? Tätä toimintoa ei voi peruuttaa.',
+	confirm_delete_event: 'Oletko varma, että haluat poistaa tämän tapahtuman? Toimintoa ei voi peruuttaa.',
 	deleting: 'Poistetaan...',
 	delete: 'Poista',
 	back_to_calendar_detail: 'Takaisin kalenteriin',
@@ -59,6 +58,7 @@ addMessages('fi', {
 	current_image: 'Nykyinen kuva:',
 	saving: 'Tallennetaan...',
 	save_changes: 'Tallenna muutokset',
+	confirm_save_changes: 'Haluatko varmasti tallentaa muutokset?',
 	failed_update_event: 'Tapahtuman päivitys epäonnistui. Yritä uudelleen.',
 	event_updated_successfully: 'Tapahtuma päivitetty onnistuneesti.',
 	// Status options
