@@ -76,7 +76,11 @@
 				>
 				<button
 					class="cursor-pointer rounded border-none bg-red-600 px-6 py-3 text-base text-white transition-colors hover:bg-red-700 disabled:cursor-not-allowed disabled:bg-gray-400"
-					on:click={deleteEvent}
+					on:click={() => {
+						if (confirm($_('confirm_delete_event'))) {
+							deleteEvent();
+						}
+					}}
 					disabled={isDeleting}
 				>
 					{isDeleting ? $_('deleting') : $_('delete')}

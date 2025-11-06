@@ -55,6 +55,7 @@ addMessages('fi', {
 	loading_event: 'Ladataan tapahtumaa...',
 	failed_delete_event: 'Tapahtuman poistaminen epäonnistui. Yritä uudelleen.',
 	event_deleted_successfully: 'Tapahtuma poistettu onnistuneesti.',
+	confirm_delete_event: 'Haluatko varmasti poistaa tämän tapahtuman?',
 	// Event edit
 	edit_event: 'Muokkaa tapahtumaa',
 	current_image: 'Nykyinen kuva:',
