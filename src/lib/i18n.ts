@@ -3,6 +3,7 @@ import { addMessages, init } from 'svelte-i18n';
 addMessages('fi', {
 	calendar: 'kalenteri',
 	list: 'lista',
+	back: 'takaisin',
 	public_calendar: 'Palikkakalenteri',
 	select_date: 'Päivä:',
 	back_to_calendar: 'Takaisin kalenteriin',

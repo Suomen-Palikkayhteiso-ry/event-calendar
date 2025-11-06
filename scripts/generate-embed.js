@@ -4,9 +4,18 @@ import fs from 'fs';
 const pb = new PocketBase('https://data.suomenpalikkayhteiso.fi');
 
 const monthNames = [
-	'Tammikuu', 'Helmikuu', 'Maaliskuu', 'Huhtikuu', 'Toukokuu',
-	'Kesäkuu', 'Heinäkuu', 'Elokuu', 'Syyskuu', 'Lokakuu',
-	'Marraskuu', 'Joulukuu'
+	'Tammikuu',
+	'Helmikuu',
+	'Maaliskuu',
+	'Huhtikuu',
+	'Toukokuu',
+	'Kesäkuu',
+	'Heinäkuu',
+	'Elokuu',
+	'Syyskuu',
+	'Lokakuu',
+	'Marraskuu',
+	'Joulukuu'
 ];
 
 const dayAbbr = ['su', 'ma', 'ti', 'ke', 'to', 'pe', 'la'];
@@ -41,7 +50,9 @@ async function generateEmbed() {
 	// Group events by month-year
 	const groups = {};
 	events.forEach((event) => {
-		const date = new Date(event.start_date.endsWith('Z') ? event.start_date : event.start_date + 'Z');
+		const date = new Date(
+			event.start_date.endsWith('Z') ? event.start_date : event.start_date + 'Z'
+		);
 		const helsinkiDate = new Date(date.toLocaleString('en-US', { timeZone: 'Europe/Helsinki' }));
 		const year = helsinkiDate.getFullYear();
 		const month = helsinkiDate.getMonth();
@@ -107,13 +118,21 @@ body { font-family: Arial, sans-serif; margin: 20px; }
 				}
 			}
 			if (event.all_day) {
-				const startDate = new Date(event.start_date.endsWith('Z') ? event.start_date : event.start_date + 'Z');
-				const startHelsinki = new Date(startDate.toLocaleString('en-US', { timeZone: 'Europe/Helsinki' }));
+				const startDate = new Date(
+					event.start_date.endsWith('Z') ? event.start_date : event.start_date + 'Z'
+				);
+				const startHelsinki = new Date(
+					startDate.toLocaleString('en-US', { timeZone: 'Europe/Helsinki' })
+				);
 				const startDay = startHelsinki.getDay();
 				let prefix = '';
 				if (event.end_date) {
-					const endDate = new Date(event.end_date.endsWith('Z') ? event.end_date : event.end_date + 'Z');
-					const endHelsinki = new Date(endDate.toLocaleString('en-US', { timeZone: 'Europe/Helsinki' }));
+					const endDate = new Date(
+						event.end_date.endsWith('Z') ? event.end_date : event.end_date + 'Z'
+					);
+					const endHelsinki = new Date(
+						endDate.toLocaleString('en-US', { timeZone: 'Europe/Helsinki' })
+					);
 					const endDay = endHelsinki.getDay();
 					const duration = Math.ceil((endDate - startDate) / (24 * 60 * 60 * 1000)) + 1;
 					if (duration < 8) {
@@ -125,17 +144,25 @@ body { font-family: Arial, sans-serif; margin: 20px; }
 				dateStr = prefix + dateStr;
 			} else {
 				// For timed events, add day abbr and "klo" for single day
-				const startDate = new Date(event.start_date.endsWith('Z') ? event.start_date : event.start_date + 'Z');
-				const startHelsinki = new Date(startDate.toLocaleString('en-US', { timeZone: 'Europe/Helsinki' }));
+				const startDate = new Date(
+					event.start_date.endsWith('Z') ? event.start_date : event.start_date + 'Z'
+				);
+				const startHelsinki = new Date(
+					startDate.toLocaleString('en-US', { timeZone: 'Europe/Helsinki' })
+				);
 				const startDay = startHelsinki.getDay();
-				const isSingleDay = !event.end_date || formatDateInHelsinki(event.start_date, false).split(' ')[0] === formatDateInHelsinki(event.end_date, false).split(' ')[0];
+				const isSingleDay =
+					!event.end_date ||
+					formatDateInHelsinki(event.start_date, false).split(' ')[0] ===
+						formatDateInHelsinki(event.end_date, false).split(' ')[0];
 				if (isSingleDay) {
 					const parts = dateStr.split(' ');
 					if (parts.length === 2) {
 						dateStr = `${dayAbbr[startDay]} ${parts[0]} klo ${parts[1]}`;
 					}
 				}
-			}		html += `<div class="event">
+			}
+			html += `<div class="event">
 <div class="date-column">${dateStr}</div>
 <div class="details-column">
 <h2>${event.title}${event.location ? ` | ${event.location}` : ''}</h2>

@@ -4,7 +4,7 @@
 	import { pb } from '$lib/pocketbase';
 	import type { Event } from '$lib/types';
 	// @ts-expect-error Calendar library types not available
-	import { Calendar, DayGrid, List } from '@event-calendar/core';
+	import { Calendar, DayGrid, List, Interaction } from '@event-calendar/core';
 	import '@event-calendar/core/index.css';
 	import { Datepicker } from 'flowbite-svelte';
 	import { _ } from 'svelte-i18n';
@@ -12,6 +12,7 @@
 	import { resolve } from '$app/paths';
 	import { parseUTCDate, dateToHelsinkiDateString } from '$lib/date-utils';
 	import { user } from '$lib/auth';
+	import { page } from '$app/stores';
 
 	let events: Event[] = [];
 	let calendarWrapper: HTMLElement;
@@ -24,11 +25,11 @@
 		buttonText: {
 			listMonth: $_('list'),
 			dayGridMonth: $_('calendar'),
-			today: $_('today'),
+			today: $_('back'),
 			prev: $_('prev'),
 			next: $_('next_button')
 		},
-		headerToolbar: { start: 'title', center: '', end: 'dayGridMonth,listMonth today prev,next' },
+		headerToolbar: { start: 'title', center: '', end: 'dayGridMonth,listMonth prev,next' },
 		eventDidMount: (info: unknown) => {
 			if ((info as any).event.extendedProps.description) {
 				(info as any).el.title = (info as any).event.extendedProps.description;
@@ -56,6 +57,9 @@
 		eventClick: (info: unknown) => {
 			if ((info as any).event.id === 'selected-day') return;
 			goto(resolve(`/events/${(info as any).event.id}`));
+		},
+		dateClick: (info: unknown) => {
+			selectedDate = (info as any).date;
 		}
 	});
 	let selectedDate = $state(new Date());
@@ -70,6 +74,20 @@
 			const nextBtn = calendarWrapper?.querySelector('.ec-next') as HTMLElement;
 			nextBtn?.focus();
 		}, 100);
+	});
+
+	$effect(() => {
+		const dateParam = $page.url.searchParams.get('date');
+		if (dateParam) {
+			const paramDate = new Date(dateParam + 'T00:00:00');
+			if (paramDate.getTime() !== selectedDate.getTime()) {
+				selectedDate = paramDate;
+				// Clear the date from querystring after consuming it
+				const newUrl = new URL($page.url);
+				newUrl.searchParams.delete('date');
+				goto(newUrl.pathname + newUrl.search, { replaceState: true });
+			}
+		}
 	});
 
 	function updateCalendarEvents() {
@@ -88,8 +106,8 @@
 			})),
 			{
 				id: 'selected-day',
-				start: selectedDate.toISOString().split('T')[0],
-				end: selectedDate.toISOString().split('T')[0],
+				start: dateToHelsinkiDateString(selectedDate),
+				end: dateToHelsinkiDateString(selectedDate),
 				display: 'background',
 				backgroundColor: '#e0f7fa',
 				borderColor: '#00bcd4'
@@ -111,7 +129,7 @@
 {#if $user}
 	<div class="mb-4 flex items-end gap-4">
 		<div class="flex-1">
-			<label for="datepicker" class="block text-sm font-medium text-gray-700"
+			<label for="datepicker" class="invisible block text-sm font-medium text-gray-700"
 				>{$_('select_date')}</label
 			>
 			<Datepicker id="datepicker" bind:value={selectedDate} locale="fi" />
@@ -134,7 +152,7 @@
 {/if}
 
 <div bind:this={calendarWrapper}>
-	<Calendar plugins={[List, DayGrid]} options={calendarOptions} />
+	<Calendar plugins={[List, DayGrid, Interaction]} options={calendarOptions} />
 </div>
 
 <style>
