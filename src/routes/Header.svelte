@@ -1,21 +1,15 @@
 <script lang="ts">
 	import { user, login, logout } from '$lib/auth';
-	import { resolve } from '$app/paths';
 	import { _ } from 'svelte-i18n';
 </script>
 
 <header>
-	<div class="corner">
-		<a href={resolve('/')}>
-			<img src="/logo.svg" alt={$_('organization_alt')} class="logo" />
-		</a>
-	</div>
-
+	<div></div>
 	<div class="title">{$_('calendar_title')}</div>
 
 	{#if $user}
 		<div class="auth">
-			<span>{$_('hello')} {$user.name}</span>
+			<span>{$user.name}</span>
 			<button on:click={logout}>{$_('logout')}</button>
 		</div>
 	{:else}
@@ -35,28 +29,6 @@
 		overflow: visible;
 		background-color: #f8f9fa;
 		border-bottom: 1px solid #e9ecef;
-	}
-
-	.corner {
-		width: 3em;
-		height: 3em;
-	}
-
-	.corner a {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		width: 100%;
-		height: 100%;
-	}
-
-	.logo {
-		height: 4.5em;
-		width: auto;
-		position: absolute;
-		top: 0.5em;
-		left: 0.5em;
-		z-index: 10;
 	}
 
 	.auth {
