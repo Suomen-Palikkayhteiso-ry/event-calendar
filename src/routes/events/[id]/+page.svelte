@@ -29,6 +29,11 @@
 			.getOne(eventId)
 			.then((loadedEvent) => {
 				event = loadedEvent as unknown as Event;
+				// Redirect if event is deleted
+				if (event.state === 'deleted') {
+					goto(resolve('/events'));
+					return;
+				}
 			})
 			.catch(() => {
 				goto(resolve('/events'));
@@ -52,7 +57,7 @@
 
 		isDeleting = true;
 		try {
-			await pb.collection('events').delete(event.id);
+			await pb.collection('events').update(event.id, { state: 'deleted' });
 			toast.push($_('event_deleted_successfully'));
 			goto(resolve('/'));
 		} catch (error) {

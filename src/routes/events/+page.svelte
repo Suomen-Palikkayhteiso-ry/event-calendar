@@ -105,7 +105,7 @@
 
 		const result = await pb.collection('events').getList(page, pageSize, {
 			sort: 'start_date',
-			filter: '' // Add any filters if needed
+			filter: 'state = "published" || state = "draft"'
 		});
 
 		events = result.items as unknown as Event[];

@@ -29,7 +29,7 @@
 			prev: $_('prev'),
 			next: $_('next_button')
 		},
-		headerToolbar: { start: 'title', center: '', end: 'prev,next' },
+		headerToolbar: { start: 'title', center: '', end: 'today prev,next' },
 		eventDidMount: (info: unknown) => {
 			if ((info as any).event.extendedProps.description) {
 				(info as any).el.title = (info as any).event.extendedProps.description;
@@ -66,7 +66,8 @@
 
 	onMount(async () => {
 		events = await pb.collection('events').getFullList({
-			sort: 'start_date'
+			sort: 'start_date',
+			filter: 'state = "published"'
 		});
 		updateCalendarEvents();
 		// Focus the Next button after calendar is rendered

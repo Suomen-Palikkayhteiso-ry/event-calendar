@@ -1,4 +1,4 @@
-name: Hourly build
+name: Hourly update
 
 on:
   schedule:
