@@ -1,5 +1,6 @@
 import PocketBase from 'pocketbase';
 import fs from 'fs';
+import qrcode from 'qrcode';
 
 const pb = new PocketBase('https://data.suomenpalikkayhteiso.fi');
 
@@ -77,6 +78,7 @@ async function generateEmbed() {
 body { font-family: Arial, sans-serif; margin: 20px; }
 .month-header { font-size: 1.5em; font-weight: bold; color: var(--color-brand-primary); margin: 3ex 0 1.5ex 0; border-bottom: 2px solid var(--color-brand-accent); padding-bottom: 5px; }
 .event { display: flex; margin-top: 0.5ex; margin-bottom: 20px; border-left: 3px solid var(--color-brand-accent); padding-left: 15px; }
+.event { page-break-inside: avoid; break-inside: avoid; }
 .date-column { flex: 0 0 200px; font-weight: bold; color: var(--color-brand-primary); }
 .details-column { flex: 1; }
 .details-column h2 { margin-top: -0.5ex; margin-bottom: 0; }
@@ -88,9 +90,9 @@ body { font-family: Arial, sans-serif; margin: 20px; }
 <div class="events">
 `;
 
-	Object.values(groups).forEach((group) => {
+	for (const group of Object.values(groups)) {
 		html += `<div class="month-header">${monthNames[group.month]} ${group.year}</div>`;
-		group.events.forEach((event) => {
+		for (const event of group.events) {
 			const startFormatted = formatDateInHelsinki(event.start_date, event.all_day);
 			let dateStr = startFormatted;
 			if (event.end_date) {
@@ -163,17 +165,22 @@ body { font-family: Arial, sans-serif; margin: 20px; }
 					}
 				}
 			}
+			let qrCodeDataUri = '';
+			if (event.url) {
+				qrCodeDataUri = await qrcode.toDataURL(event.url);
+			}
 			html += `<div class="event">
 <div class="date-column">${dateStr}</div>
 <div class="details-column">
+${qrCodeDataUri ? `<a href="${event.url}" title="Lisätietoja" target="_blank" style="color: black; text-decoration: none; float: right; margin-left: 10px; display: flex; flex-direction: column; align-items: center;"><img src="${qrCodeDataUri}" alt="QR-koodi" style="width: 100px; height: 100px;"/></a>` : ''}
 <h2>${event.title}${event.location ? ` | ${event.location}` : ''}</h2>
 <p>${event.description || ''}</p>
-${event.url ? `<p><a href="${event.url}" target="_blank">Lue lisää&hellip;</a></p>` : ''}
+${event.url && !qrCodeDataUri ? `<p><a href="${event.url}" target="_blank">Lue lisää&hellip;</a></p>` : ''}
 </div>
 </div>
 `;
-		});
-	});
+		}
+	}
 
 	html += `</div>
 </body>
