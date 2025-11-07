@@ -81,7 +81,10 @@ addMessages('fi', {
 	ical_feed: 'iCalendar',
 	atom_feed: 'ATOM',
 	// Callback
-	completing_login: 'Viimeistellään kirjautumista...'
+	completing_login: 'Viimeistellään kirjautumista...',
+	// Non-member instructions
+	non_member_prefix: 'Jos et ole Suomen Palikkayhteisö ry:n jäsen, ',
+	send_event_email: 'lähetä tapahtumasi meille sähköpostilla'
 });
 
 init({

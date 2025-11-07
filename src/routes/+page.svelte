@@ -144,8 +144,15 @@
 		</button>
 	</div>
 {:else}
+	<p>
+		{$_('non_member_prefix')}<a
+			style="text-decoration: underline; color: blue;"
+			href="mailto:suomenpalikkayhteisory@outlook.com?subject=Uusi%20tapahtuma%20Palikkakalenteriin&body=Tapahtuman%20nimi%3A%0D%0A%0D%0ATarkempi%20kuvaus%3A%0D%0A%0D%0APaikkakunta%3A%0D%0A%0D%0AAlkaa%3A%0D%0A%0D%0AP%C3%A4%C3%A4ttyy%3A%0D%0A%0D%0AKotisivut%3A%0D%0A%0D%0A"
+			>{$_('send_event_email')}</a
+		>.
+	</p>
 	<div class="mb-4">
-		<label for="datepicker" class="block text-sm font-medium text-gray-700"
+		<label for="datepicker" class="invisible block text-sm font-medium text-gray-700"
 			>{$_('select_date')}</label
 		>
 		<Datepicker id="datepicker" bind:value={selectedDate} locale="fi" />
