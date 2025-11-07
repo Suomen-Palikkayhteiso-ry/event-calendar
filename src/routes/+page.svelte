@@ -25,7 +25,7 @@
 		buttonText: {
 			listMonth: $_('list'),
 			dayGridMonth: $_('calendar'),
-			today: $_('back'),
+			today: $_('today'),
 			prev: $_('prev'),
 			next: $_('next_button')
 		},
