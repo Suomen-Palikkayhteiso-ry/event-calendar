@@ -172,8 +172,8 @@ body { font-family: Arial, sans-serif; margin: 20px; }
 			html += `<div class="event">
 <div class="date-column">${dateStr}</div>
 <div class="details-column">
-${qrCodeDataUri ? `<a href="${event.url}" title="Lisätietoja" target="_blank" style="color: black; text-decoration: none; float: right; margin-left: 10px; display: flex; flex-direction: column; align-items: center;"><img src="${qrCodeDataUri}" alt="QR-koodi" style="width: 100px; height: 100px;"/></a>` : ''}
 <h2>${event.title}${event.location ? ` | ${event.location}` : ''}</h2>
+${qrCodeDataUri ? `<a href="${event.url}" title="Lisätietoja" target="_blank" style="color: black; text-decoration: none; float: right; margin-left: 10px; display: flex; flex-direction: column; align-items: center;"><img src="${qrCodeDataUri}" alt="QR-koodi" style="width: 100px; height: 100px;"/></a>` : ''}
 <p>${event.description || ''}</p>
 ${event.url && !qrCodeDataUri ? `<p><a href="${event.url}" target="_blank">Lue lisää&hellip;</a></p>` : ''}
 </div>
