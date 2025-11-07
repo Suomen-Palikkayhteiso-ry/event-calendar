@@ -1,8 +1,13 @@
-name: Daily build
+name: Build
 
 on:
-  schedule:
-    - cron: '0 * * * *'
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
 
 jobs:
   build:
@@ -25,16 +30,14 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Restore build cache
+      - name: Build
+        run: make clean dist
+
+      - name: Cache build directory
         uses: actions/cache@v4
         with:
           path: ./build
           key: build-${{ github.sha }}
-          restore-keys: |
-            build-
-
-      - name: Update build
-        run: make dist
 
       - name: Setup Pages
         uses: actions/configure-pages@v5

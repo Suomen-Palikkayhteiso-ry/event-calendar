@@ -1,13 +1,8 @@
-name: Deploy
+name: Hourly build
 
 on:
-  push:
-    branches: [main]
-
-permissions:
-  contents: read
-  pages: write
-  id-token: write
+  schedule:
+    - cron: '0 * * * *'
 
 jobs:
   build:
@@ -30,14 +25,16 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Build
-        run: make dist
-
-      - name: Cache build directory
+      - name: Restore build cache
         uses: actions/cache@v4
         with:
           path: ./build
           key: build-${{ github.sha }}
+          restore-keys: |
+            build-
+
+      - name: Update build
+        run: make dist
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
