@@ -31,13 +31,13 @@ jobs:
         run: pnpm install
 
       - name: Build
-        run: pnpm run build
+        run: make dist
 
-      - name: Generate RSS and ICAL
-        run: node scripts/generate-feeds.js
-
-      - name: Generate embed
-        run: node scripts/generate-embed.js
+      - name: Cache build directory
+        uses: actions/cache@v4
+        with:
+          path: ./build
+          key: build-${{ github.sha }}
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
