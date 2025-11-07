@@ -68,6 +68,7 @@ async function generateEmbed() {
 <head>
 <meta charset="UTF-8">
 <title>Palikkakalenteri</title>
+<meta name="build-date" content="${nowIso}">
 	<style>
 :root {
 	--color-brand-primary: #000000; /*#38419d*/
