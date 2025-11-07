@@ -179,6 +179,9 @@ ${event.url ? `<p><a href="${event.url}" target="_blank">Lue lisää&hellip;</a>
 </html>`;
 
 	fs.writeFileSync('static/kalenteri.html', html);
+	if (fs.existsSync('build')) {
+		fs.writeFileSync('build/kalenteri.html', html);
+	}
 	console.log('Generated kalenteri.html with', events.length, 'events');
 }
 

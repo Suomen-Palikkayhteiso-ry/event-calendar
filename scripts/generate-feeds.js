@@ -182,6 +182,10 @@ async function generateFeeds() {
 
 	fs.writeFileSync('static/kalenteri.rss', feed.rss2());
 	fs.writeFileSync('static/kalenteri.atom', feed.atom1());
+	if (fs.existsSync('build')) {
+		fs.writeFileSync('build/kalenteri.rss', feed.rss2());
+		fs.writeFileSync('build/kalenteri.atom', feed.atom1());
+	}
 
 	// Generate ICAL feed
 	const calendar = ical({
