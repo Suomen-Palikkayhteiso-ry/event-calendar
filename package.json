@@ -11,9 +11,8 @@
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"format": "prettier --write .",
-		"lint": "prettier --check . && eslint .",
-		"generate-embed": "node scripts/generate-embed.js",
-		"generate-feeds": "node scripts/generate-feeds.js"
+		"lint": "prettier --check . && eslint . scripts",
+		"generate-statics": "node scripts/generate-statics.js"
 	},
 	"devDependencies": {
 		"@eslint/compat": "^1.4.0",

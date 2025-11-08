@@ -1,4 +1,4 @@
-.PHONY: clean watch format check embed feeds dist
+.PHONY: clean watch format check statics dist
 
 clean:
 	$(RM) -r build
@@ -12,13 +12,10 @@ format:
 check:
 	pnpm check
 
-embed:
-	pnpm run generate-embed
-
 build:
 	pnpm run build
 
-feeds:
-	pnpm run generate-feeds
+statics:
+	pnpm run generate-statics
 
-dist: build feeds embed
+dist: build statics
