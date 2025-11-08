@@ -86,7 +86,7 @@ addMessages('fi', {
 	html_description:
 		'Upota tai tulosta valmis HTML-tapahtumalistaus, jossa on myös kalenterilinkit yksittäisiin tapahtumiin.',
 	feeds_description:
-		'Uutissyötteet integroitavaksi verkkosivuille tai uutislukijoihin. Sisältävät myös tapahtumakohtaiset iCalendar-linkit.',
+		'Uutissyötteet integroitavaksi verkkosivuille tai uutislukijoihin. Sisältää iCalendar-linkit.',
 	// Callback
 	completing_login: 'Viimeistellään kirjautumista...',
 	// Non-member instructions
