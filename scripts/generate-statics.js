@@ -13,6 +13,8 @@ import {
 	pocketBaseUrl
 } from './generate-utils.js';
 
+const baseUrl = 'https://kalenteri.suomenpalikkayhteiso.fi';
+
 const monthNames = [
 	'Tammikuu',
 	'Helmikuu',
@@ -68,7 +70,7 @@ body { font-family: Arial, sans-serif; margin: 20px; }
 .details-column p { margin: 1ex 0 1.5ex 0; hyphens: auto; }
 .qrcode { display: none; }
 @media print {
-.qrcode { display: block; }
+.qrcode { display: flex; }
 .readmore { display: none; }
 }
 </style>
@@ -83,9 +85,12 @@ body { font-family: Arial, sans-serif; margin: 20px; }
 		for (const event of group.events) {
 			const dateStr = formatEventDisplayDate(event);
 			let qrCodeDataUri = '';
-			if (event.url) {
-				qrCodeDataUri = await qrcode.toDataURL(event.url);
-			}
+			// Generate QR code for all events since they all have ICS files now
+			qrCodeDataUri = await qrcode.toDataURL(`${baseUrl}/${event.id}.ics`, {
+				errorCorrectionLevel: 'M',
+				width: 100,
+				margin: 1
+			});
 			const titleContent = event.url
 				? `<a href="${event.url}" title="Lisätietoja" target="_blank" style="text-decoration: none; color: black;">${event.title}${event.location ? ` <span style="font-weight: normal;">| ${event.location}</span>` : ''}</a>`
 				: `${event.title}${event.location ? ` <span style="font-weight: normal;">| ${event.location}</span>` : ''}`;
@@ -93,9 +98,9 @@ body { font-family: Arial, sans-serif; margin: 20px; }
 <div class="date-column">${dateStr}</div>
 <div class="details-column">
 <h2>${titleContent}</h2>
-${qrCodeDataUri ? `<a href="${event.url}" class="qrcode" title="Lisätietoja" target="_blank" style="color: black; text-decoration: none; float: right; margin-left: 10px; flex-direction: column; align-items: center;"><img src="${qrCodeDataUri}" alt="QR-koodi" style="width: 100px; height: 100px;"/></a>` : ''}
+				${qrCodeDataUri ? `<a href="${baseUrl}/${event.id}.ics" class="qrcode" title="Lisää kalenteriin" target="_blank" style="color: black; text-decoration: none; float: right; margin-left: 10px; flex-direction: column; align-items: center;"><div style="position: relative; width: 100px; height: 100px;"><img src="${qrCodeDataUri}" alt="QR-koodi kalenteriin" style="width: 100px; height: 100px;"/><img src="/calendar-icon.svg" alt="" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 24px; height: 24px; background-color: white; padding: 2px; border-radius: 2px;"/></div></a>` : ''}
 <p>${event.description || ''}</p>
-${event.url ? `<p><a href="${event.url}" class="readmore" target="_blank">Lue lisää&hellip;</a></p>` : ''}
+<p class="readmore"><a href="${baseUrl}/${event.id}.ics" target="_blank">Lisää kalenteriin</a>${event.url ? ` | <a href="${event.url}" target="_blank">Lue lisää&hellip;</a>` : ''}</p>
 </div>
 </div>
 `;
@@ -136,6 +141,51 @@ async function downloadEventImages(events) {
 
 async function generateFeeds(events) {
 	const imageUrls = await downloadEventImages(events);
+
+	// Generate individual ICS files for each event
+	const eventIcsDataUris = new Map();
+	events.forEach((event) => {
+		const individualCalendar = ical({
+			title: 'Palikkakalenteri',
+			description: 'Suomen Palikkayhteisö ry:n Palikkakalenteri',
+			timezone: 'Europe/Helsinki'
+		});
+
+		const startDate = toUtcDate(event.start_date);
+		const endDate = event.end_date
+			? toUtcDate(event.end_date)
+			: new Date(startDate.getTime() + (event.all_day ? 24 * 60 * 60 * 1000 : 60 * 60 * 1000));
+		const description = event.description || event.title;
+		const eventUrl = event.url || `https://kalenteri.suomenpalikkayhteiso.fi/#/events/${event.id}`;
+
+		const eventData = {
+			id: event.id,
+			start: startDate,
+			end: endDate,
+			summary: `${event.title} | ${event.location}`,
+			description,
+			url: eventUrl,
+			timezone: 'Europe/Helsinki'
+		};
+
+		if (event.location) {
+			eventData.location = event.location;
+		}
+
+		if (event.all_day) {
+			eventData.allDay = true;
+		}
+
+		individualCalendar.createEvent(eventData);
+
+		const icsContent = individualCalendar.toString();
+		writeStaticFile(`${event.id}.ics`, icsContent);
+
+		// Create data URI for enclosure
+		const base64Ics = Buffer.from(icsContent, 'utf8').toString('base64');
+		const dataUri = `data:text/calendar;charset=utf-8;base64,${base64Ics}`;
+		eventIcsDataUris.set(event.id, dataUri);
+	});
 
 	const feed = new Feed({
 		title: 'Palikkakalenteri',
@@ -184,12 +234,23 @@ async function generateFeeds(events) {
 			feedItem.image = `https://kalenteri.suomenpalikkayhteiso.fi${imageUrl}`;
 		}
 
+		// Add ICS enclosure
+		const icsDataUri = eventIcsDataUris.get(event.id);
+		if (icsDataUri) {
+			feedItem.enclosure = {
+				url: icsDataUri,
+				type: 'text/calendar'
+			};
+		}
+
 		feed.addItem(feedItem);
 	});
 
 	const rss = feed.rss2();
 	writeStaticFile('kalenteri.rss', rss);
-	const atom = feed.atom1();
+	let atom = feed.atom1();
+	// Postprocess Atom feed to fix incorrect enclosure type for ICS data URIs
+	atom = atom.replace(/type="image\/text\/calendar[^"]*"/g, 'type="text/calendar"');
 	writeStaticFile('kalenteri.atom', atom);
 
 	const calendar = ical({
@@ -230,7 +291,9 @@ async function generateFeeds(events) {
 	const ics = calendar.toString();
 	writeStaticFile('kalenteri.ics', ics);
 
-	console.log('Generated kalenteri.rss, kalenteri.atom and kalenteri.ics');
+	console.log(
+		'Generated kalenteri.rss, kalenteri.atom, kalenteri.ics and individual event ICS files'
+	);
 }
 
 async function generateStatics() {
