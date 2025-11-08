@@ -1,0 +1,69 @@
+{
+    "version": "https://jsonfeed.org/version/1",
+    "title": "Palikkakalenteri",
+    "home_page_url": "https://kalenteri.suomenpalikkayhteiso.fi/",
+    "description": "Suomen Palikkayhteisö ry:n Palikkakalenteri",
+    "icon": "https://kalenteri.suomenpalikkayhteiso.fi/logo.png",
+    "author": {
+        "name": "Suomen Palikkayhteisö ry",
+        "url": "https://suomenpalikkayhteiso.fi/"
+    },
+    "items": [
+        {
+            "id": "https://kalenteri.suomenpalikkayhteiso.fi/#/events/481wo99pit133iw",
+            "content_html": "Pieni Lego-näyttely vitriinissä Nurmon kirjastossa. Teokset Elias 9v, Eemi 7v, Oiva 6v (vasen vitriini) ja Miro 9v (oikea vitriini). Mikäli paikan päällä pääsee käymään voi vieraskirjaan jättää nimen.\n\n3.–28.11.",
+            "url": "https://kalenteri.suomenpalikkayhteiso.fi/#/events/481wo99pit133iw",
+            "title": " | Nurmon kirjasto",
+            "image": "https://kalenteri.suomenpalikkayhteiso.fi/images/481wo99pit133iw_nurmo_sktahqx6k0.jpg",
+            "date_modified": "2025-11-07T08:24:30.424Z",
+            "date_published": "2025-11-03T19:28:01.944Z",
+            "author": {
+                "name": "Suomen Palikkayhteisö ry"
+            }
+        },
+        {
+            "id": "https://kalenteri.suomenpalikkayhteiso.fi/#/events/8ugpc9bj93m4udi",
+            "content_html": "Suuri Snadi -pienoisrautatie- ja pienoismallitapahtuma palaa uudistuneena Helsinkiin. Suuri Snadi Special - tapahtuma järjestetään marraskuun 15. päivänä Akk Arcadassa, Arabianrannassa Helsingissä - entistä mielenkiintoisempana!\n\nla 15.11. klo 10.00–17.00",
+            "url": "https://suurisnadi.fi/",
+            "title": " | Helsinki",
+            "date_modified": "2025-11-06T20:48:34.306Z",
+            "date_published": "2025-11-06T05:47:34.536Z",
+            "author": {
+                "name": "Suomen Palikkayhteisö ry"
+            }
+        },
+        {
+            "id": "https://kalenteri.suomenpalikkayhteiso.fi/#/events/mm52krmbrlu9aob",
+            "content_html": "Tervetuloa mukaan huikaisevaan LEGO-tapahtumaan! Laukaan Kirkonkylän Vanhempainyhdistys ry ja MLL Laukaa ry järjestävät yhdessä huikaisevan koko perheen LEGOLYSTI-päivän Laukaan kirkonkylän koululla.\n\nla 15.11. klo 10.00–15.00",
+            "url": "https://visitlaukaa.fi/tapahtuma/legolysti/",
+            "title": " | Laukaa",
+            "date_modified": "2025-11-06T20:47:56.406Z",
+            "date_published": "2025-11-06T20:47:56.406Z",
+            "author": {
+                "name": "Suomen Palikkayhteisö ry"
+            }
+        },
+        {
+            "id": "https://kalenteri.suomenpalikkayhteiso.fi/#/events/d7pt0u7102m1tp5",
+            "content_html": "Panttilan Palikka järjestää Lego- ja lastentapahtuman Seinäjoella toukokuussa 2026.\n\nla 2.5.",
+            "url": "https://kalenteri.suomenpalikkayhteiso.fi/#/events/d7pt0u7102m1tp5",
+            "title": " | Seinäjoki",
+            "date_modified": "2025-11-06T22:27:34.392Z",
+            "date_published": "2025-11-06T22:27:34.392Z",
+            "author": {
+                "name": "Suomen Palikkayhteisö ry"
+            }
+        },
+        {
+            "id": "https://kalenteri.suomenpalikkayhteiso.fi/#/events/lw0vk9y1pptdec2",
+            "content_html": "Panttilan Palikka järjestää tapahtuman Vaasassa elokuussa 2026.\n\nla 15.8.",
+            "url": "https://kalenteri.suomenpalikkayhteiso.fi/#/events/lw0vk9y1pptdec2",
+            "title": " | Vaasa",
+            "date_modified": "2025-11-07T05:54:06.720Z",
+            "date_published": "2025-11-07T05:45:41.616Z",
+            "author": {
+                "name": "Suomen Palikkayhteisö ry"
+            }
+        }
+    ]
+}

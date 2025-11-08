@@ -250,7 +250,7 @@ a:hover { background-color: #0056b3; }
 <p><a href="${event.id}.ics">Lisää kalenteriin</a></p>
 </body>
 </html>`;
-				writeStaticFile(`events/${event.id}.html`, eventHtml);
+		writeStaticFile(`events/${event.id}.html`, eventHtml);
 	});
 
 	const feed = new Feed({
