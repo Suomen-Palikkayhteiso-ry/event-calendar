@@ -225,6 +225,7 @@ async function generateFeeds() {
 	});
 
 	fs.writeFileSync('static/kalenteri.ical', calendar.toString());
+	fs.writeFileSync('static/kalenteri.ics', calendar.toString());
 }
 
 generateFeeds();
