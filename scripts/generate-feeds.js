@@ -224,8 +224,10 @@ async function generateFeeds() {
 		calendar.createEvent(eventData);
 	});
 
-	fs.writeFileSync('static/kalenteri.ical', calendar.toString());
 	fs.writeFileSync('static/kalenteri.ics', calendar.toString());
+	if (fs.existsSync('build')) {
+		fs.writeFileSync('build/kalenteri.ics', calendar.toString());
+	}
 }
 
 generateFeeds();

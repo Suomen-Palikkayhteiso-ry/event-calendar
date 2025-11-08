@@ -1,8 +1,0 @@
-BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//sebbo.net//ical-generator//EN
-NAME:Event Calendar
-X-WR-CALNAME:Event Calendar
-TIMEZONE-ID:Europe/Berlin
-X-WR-TIMEZONE:Europe/Berlin
-END:VCALENDAR
