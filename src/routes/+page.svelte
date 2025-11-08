@@ -97,7 +97,15 @@
 				id: event.id,
 				title: event.location ? `${event.title} / ${event.location}` : event.title,
 				start: parseUTCDate(event.start_date),
-				end: event.end_date ? parseUTCDate(event.end_date) : parseUTCDate(event.start_date),
+				end: (() => {
+					const baseEnd = event.end_date ? parseUTCDate(event.end_date) : parseUTCDate(event.start_date);
+					if (event.all_day) {
+						const adjusted = new Date(baseEnd);
+						adjusted.setDate(adjusted.getDate() + 1);
+						return adjusted;
+					}
+					return baseEnd;
+				})(),
 				allDay: event.all_day,
 				display: event.all_day ? 'block' : 'auto',
 				extendedProps: {
