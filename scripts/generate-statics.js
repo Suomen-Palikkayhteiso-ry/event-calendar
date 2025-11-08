@@ -113,7 +113,8 @@ body { font-family: Arial, sans-serif; margin: 20px; }
 				id: `${baseUrl}/#/events/${event.id}`,
 				start: startDate,
 				end: endDate,
-				summary: event.title,
+				summary:
+					event.all_day && event.location ? `${event.title} | ${event.location}` : event.title,
 				description,
 				url: eventUrl,
 				timezone: 'Europe/Helsinki'
@@ -284,9 +285,7 @@ a:hover { background-color: #0056b3; }
 		const feedItem = {
 			title:
 				`${event.all_day ? dateStr : formatDateInHelsinki(event.start_date, true)} ${event.title}` +
-				event.location
-					? ` | ${event.location}`
-					: '',
+				(event.location ? ` | ${event.location}` : ''),
 			id: `${baseUrl}/#/events/${event.id}`,
 			link: eventUrl,
 			description: content,
@@ -346,7 +345,7 @@ a:hover { background-color: #0056b3; }
 			id: `${baseUrl}/#/events/${event.id}`,
 			start: startDate,
 			end: endDate,
-			summary: event.title,
+			summary: event.all_day && event.location ? `${event.title} | ${event.location}` : event.title,
 			description,
 			url: eventUrl,
 			timezone: 'Europe/Helsinki'
