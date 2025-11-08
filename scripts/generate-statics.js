@@ -104,7 +104,7 @@ body { font-family: Arial, sans-serif; margin: 20px; }
 			let endDate = event.end_date
 				? toHelsinkiDate(event.end_date)
 				: new Date(startDate.getTime() + (event.all_day ? 24 * 60 * 60 * 1000 : 60 * 60 * 1000));
-			
+
 			if (event.all_day) {
 				endDate = new Date(endDate.getTime() + 24 * 60 * 60 * 1000);
 			}
@@ -201,7 +201,7 @@ async function generateFeeds(events) {
 		let endDate = event.end_date
 			? toHelsinkiDate(event.end_date)
 			: new Date(startDate.getTime() + (event.all_day ? 24 * 60 * 60 * 1000 : 60 * 60 * 1000));
-		
+
 		if (event.all_day) {
 			endDate = new Date(endDate.getTime() + 24 * 60 * 60 * 1000);
 		}
@@ -345,7 +345,7 @@ a:hover { background-color: #0056b3; }
 		let endDate = event.end_date
 			? toHelsinkiDate(event.end_date)
 			: new Date(startDate.getTime() + (event.all_day ? 24 * 60 * 60 * 1000 : 60 * 60 * 1000));
-		
+
 		if (event.all_day) {
 			endDate = new Date(endDate.getTime() + 24 * 60 * 60 * 1000);
 		}

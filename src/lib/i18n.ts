@@ -82,11 +82,11 @@ addMessages('fi', {
 	atom_feed: 'ATOM',
 	json_feed: 'JSON',
 	ical_description:
-		'iCalendar mahdollistaa tilauksen tai integraation koko kalenteriin. Klikkaa tästä tilaus puhelimeesi.',
+		'iCalendar-muoto tilaa tai integroi koko kalenterin kaikkine tapahtumineen. Klikkaa tästä tilaus puhelimeesi.',
 	html_description:
-		'Upota tai tulosta valmis renderöity tapahtumalistaus kalenterilinkeillä yksittäisiin tapahtumiin.',
+		'Upota tai tulosta valmis HTML-tapahtumalistaus, jossa on myös kalenterilinkit yksittäisiin tapahtumiin.',
 	feeds_description:
-		'Uudet tapahtumasyötteet integroitavaksi verkkosivuille tai uutislukijoihin. Sisältävät myös linkit kalenteritapahtumiin.',
+		'Uutissyötteet integroitavaksi verkkosivuille tai uutislukijoihin. Sisältävät myös tapahtumakohtaiset iCalendar-linkit.',
 	// Callback
 	completing_login: 'Viimeistellään kirjautumista...',
 	// Non-member instructions
