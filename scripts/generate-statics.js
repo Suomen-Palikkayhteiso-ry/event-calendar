@@ -86,7 +86,7 @@ body { font-family: Arial, sans-serif; margin: 20px; }
 			const dateStr = formatEventDisplayDate(event);
 			let qrCodeDataUri = '';
 			// Generate QR code for all events since they all have ICS files now
-			qrCodeDataUri = await qrcode.toDataURL(`${baseUrl}/${event.id}.ics`, {
+			qrCodeDataUri = await qrcode.toDataURL(`${baseUrl}/${event.id}.html`, {
 				errorCorrectionLevel: 'M',
 				width: 100,
 				margin: 1
@@ -98,7 +98,7 @@ body { font-family: Arial, sans-serif; margin: 20px; }
 <div class="date-column">${dateStr}</div>
 <div class="details-column">
 <h2>${titleContent}</h2>
-				${qrCodeDataUri ? `<a href="${baseUrl}/${event.id}.ics" class="qrcode" title="Lisää kalenteriin" target="_blank" style="color: black; text-decoration: none; float: right; margin-left: 10px; flex-direction: column; align-items: center;"><div style="position: relative; width: 100px; height: 100px;"><img src="${qrCodeDataUri}" alt="QR-koodi kalenteriin" style="width: 100px; height: 100px;"/><img src="/calendar-icon.svg" alt="" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 24px; height: 24px; background-color: white; padding: 2px; border-radius: 2px;"/></div></a>` : ''}
+				${qrCodeDataUri ? `<a href="${baseUrl}/${event.id}.html" class="qrcode" title="Lisää kalenteriin" target="_blank" style="color: black; text-decoration: none; float: right; margin-left: 10px; flex-direction: column; align-items: center;"><div style="position: relative; width: 100px; height: 100px;"><img src="${qrCodeDataUri}" alt="QR-koodi kalenteriin" style="width: 100px; height: 100px;"/><img src="/calendar-icon.svg" alt="" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 24px; height: 24px; background-color: white; padding: 2px; border-radius: 2px;"/></div></a>` : ''}
 <p>${event.description || ''}</p>
 <p class="readmore"><a href="${baseUrl}/${event.id}.ics" target="_blank">Lisää kalenteriin</a>${event.url ? ` | <a href="${event.url}" target="_blank">Lue lisää&hellip;</a>` : ''}</p>
 </div>
@@ -148,7 +148,7 @@ async function generateFeeds(events) {
 		const individualCalendar = ical({
 			title: 'Palikkakalenteri',
 			description: 'Suomen Palikkayhteisö ry:n Palikkakalenteri',
-			timezone: 'Europe/Helsinki',
+			timezone: 'Europe/Helsinki'
 		});
 
 		const startDate = toUtcDate(event.start_date);
@@ -179,13 +179,36 @@ async function generateFeeds(events) {
 		individualCalendar.createEvent(eventData);
 
 		const icsContent = individualCalendar.toString();
-		const cleanedIcsContent = icsContent.replace(/^PRODID:.*$/m, '');
-		writeStaticFile(`${event.id}.ics`, cleanedIcsContent);
+		writeStaticFile(`${event.id}.ics`, icsContent);
 
 		// Create data URI for enclosure
-		const base64Ics = Buffer.from(cleanedIcsContent, 'utf8').toString('base64');
+		const base64Ics = Buffer.from(icsContent, 'utf8').toString('base64');
 		const dataUri = `data:text/calendar;charset=utf-8;base64,${base64Ics}`;
 		eventIcsDataUris.set(event.id, dataUri);
+
+		// Generate HTML file for the event
+		const eventHtml = `<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<title>${event.title} - Palikkakalenteri</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body { font-family: Arial, sans-serif; margin: 20px; text-align: center; }
+h1 { color: #333; }
+p { margin: 20px 0; }
+a { display: inline-block; padding: 12px 24px; background-color: #007bff; color: white; text-decoration: none; border-radius: 4px; }
+a:hover { background-color: #0056b3; }
+</style>
+</head>
+<body>
+<h1>${event.title}</h1>
+<p>${event.location ? `Paikka: ${event.location}<br>` : ''}${formatEventDisplayDate(event)}</p>
+<p>${event.description || ''}</p>
+<p><a href="${event.id}.ics">Lisää kalenteriin</a></p>
+</body>
+</html>`;
+		writeStaticFile(`${event.id}.html`, eventHtml);
 	});
 
 	const feed = new Feed({
@@ -257,8 +280,7 @@ async function generateFeeds(events) {
 	const calendar = ical({
 		title: 'Palikkakalenteri',
 		description: 'Suomen Palikkayhteisö ry:n Palikkakalenteri',
-		timezone: 'Europe/Helsinki',
-		prodid: null
+		timezone: 'Europe/Helsinki'
 	});
 
 	events.forEach((event) => {
@@ -291,8 +313,7 @@ async function generateFeeds(events) {
 	});
 
 	const ics = calendar.toString();
-	const cleanedIcs = ics.replace(/^PRODID:.*$/m, '');
-	writeStaticFile('kalenteri.ics', cleanedIcs);
+	writeStaticFile('kalenteri.ics', ics);
 
 	console.log(
 		'Generated kalenteri.rss, kalenteri.atom, kalenteri.ics and individual event ICS files'
