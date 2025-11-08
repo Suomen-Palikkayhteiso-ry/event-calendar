@@ -29,7 +29,7 @@
 				|
 				<!-- eslint-disable-next-line svelte/no-navigation-without-resolve --><!--These are external links, so resolve is not needed.-->
 				<a
-					href="/kalenteri.ics"
+					href={`webcal://${window ? window.location.host : ''}/kalenteri.ics`}
 					target="_blank"
 					class="mx-2 text-brand-primary no-underline hover:underline">{$_('ical_feed')}</a
 				>
