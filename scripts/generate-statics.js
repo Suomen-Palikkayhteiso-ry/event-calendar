@@ -162,7 +162,7 @@ async function generateFeeds(events) {
 			id: event.id,
 			start: startDate,
 			end: endDate,
-			summary: `${event.title} | ${event.location}`,
+			summary: event.title,
 			description,
 			url: eventUrl,
 			timezone: 'Europe/Helsinki'
@@ -240,7 +240,11 @@ a:hover { background-color: #0056b3; }
 		const eventUrl = event.url || `https://kalenteri.suomenpalikkayhteiso.fi/#/events/${event.id}`;
 
 		const feedItem = {
-			title: `${event.all_day ? dateStr : formatDateInHelsinki(event.start_date, true)} ${event.title} | ${event.location}`,
+			title:
+				`${event.all_day ? dateStr : formatDateInHelsinki(event.start_date, true)} ${event.title}` +
+				event.location
+					? ` | ${event.location}`
+					: '',
 			id: event.id,
 			link: eventUrl,
 			description: content,
@@ -295,7 +299,7 @@ a:hover { background-color: #0056b3; }
 			id: event.id,
 			start: startDate,
 			end: endDate,
-			summary: `${event.title} | ${event.location}`,
+			summary: event.title,
 			description,
 			url: eventUrl,
 			timezone: 'Europe/Helsinki'
