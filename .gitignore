@@ -25,7 +25,7 @@ vite.config.ts.timestamp-*
 
 # Generated
 static/*.ics
-static/kalenteri.rss
-static/kalenteri.atom
-static/kalenteri.html
+static/*.rss
+static/*.atom
+static/*.html
 static/images/
