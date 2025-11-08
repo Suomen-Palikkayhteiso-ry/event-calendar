@@ -82,7 +82,7 @@ body { font-family: Arial, sans-serif; margin: 20px; }
 .date-column { flex: 0 0 200px; font-weight: bold; color: var(--color-brand-primary); }
 .details-column { flex: 1; }
 .details-column h2 { margin-top: -0.5ex; margin-bottom: 0; }
-.details-column p { margin: 1ex 0 1.5ex 0; }
+.details-column p { margin: 1ex 0 1.5ex 0; hyphens: auto; }
 </style>
 </head>
 <body>
