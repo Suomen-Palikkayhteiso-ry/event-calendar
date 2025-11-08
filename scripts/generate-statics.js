@@ -91,6 +91,46 @@ body { font-family: Arial, sans-serif; margin: 20px; }
 				width: 100,
 				margin: 1
 			});
+
+			// Generate data URI for event-specific ICS
+			const individualCalendar = ical({
+				title: 'Palikkakalenteri',
+				description: 'Suomen Palikkayhteisö ry:n Palikkakalenteri',
+				timezone: 'Europe/Helsinki'
+			});
+
+			const startDate = toUtcDate(event.start_date);
+			const endDate = event.end_date
+				? toUtcDate(event.end_date)
+				: new Date(startDate.getTime() + (event.all_day ? 24 * 60 * 60 * 1000 : 60 * 60 * 1000));
+			const description = event.description || event.title;
+			const eventUrl =
+				event.url || `https://kalenteri.suomenpalikkayhteiso.fi/#/events/${event.id}`;
+
+			const eventData = {
+				id: event.id,
+				start: startDate,
+				end: endDate,
+				summary: event.title,
+				description,
+				url: eventUrl,
+				timezone: 'Europe/Helsinki'
+			};
+
+			if (event.location) {
+				eventData.location = event.location;
+			}
+
+			if (event.all_day) {
+				eventData.allDay = true;
+			}
+
+			individualCalendar.createEvent(eventData);
+
+			const icsContent = individualCalendar.toString();
+			const base64Ics = Buffer.from(icsContent, 'utf8').toString('base64');
+			const icsDataUri = `data:text/calendar;charset=utf-8;base64,${base64Ics}`;
+
 			const titleContent = event.url
 				? `<a href="${event.url}" title="Lisätietoja" target="_blank" style="text-decoration: none; color: black;">${event.title}${event.location ? ` <span style="font-weight: normal;">| ${event.location}</span>` : ''}</a>`
 				: `${event.title}${event.location ? ` <span style="font-weight: normal;">| ${event.location}</span>` : ''}`;
@@ -100,7 +140,7 @@ body { font-family: Arial, sans-serif; margin: 20px; }
 <h2>${titleContent}</h2>
 				${qrCodeDataUri ? `<a href="${baseUrl}/${event.id}.html" class="qrcode" title="Lisää kalenteriin" target="_blank" style="color: black; text-decoration: none; float: right; margin-left: 10px; flex-direction: column; align-items: center;"><div style="position: relative; width: 100px; height: 100px;"><img src="${qrCodeDataUri}" alt="QR-koodi kalenteriin" style="width: 100px; height: 100px;"/><img src="/calendar-icon.svg" alt="" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 24px; height: 24px; background-color: white; padding: 2px; border-radius: 2px;"/></div></a>` : ''}
 <p>${event.description || ''}</p>
-<p class="readmore"><a href="${baseUrl}/${event.id}.ics" target="_blank">Lisää kalenteriin</a>${event.url ? ` | <a href="${event.url}" target="_blank">Lue lisää&hellip;</a>` : ''}</p>
+<p class="readmore"><a href="${icsDataUri}" target="_blank">Lisää kalenteriin</a>${event.url ? ` | <a href="${event.url}" target="_blank">Lue lisää&hellip;</a>` : ''}</p>
 </div>
 </div>
 `;
