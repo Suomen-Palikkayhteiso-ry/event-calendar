@@ -82,7 +82,7 @@ addMessages('fi', {
 	atom_feed: 'ATOM',
 	json_feed: 'JSON',
 	ical_description:
-		'iCalendar-muoto tilaa tai integroi koko kalenterin kaikkine tapahtumineen. Klikkaa tästä tilaus puhelimeesi.',
+		'iCalendar-muoto tilaa tai integroi koko kalenteri eli kaikki tapahtumat. Klikkaa tästä tilaus puhelimeesi.',
 	html_description:
 		'Upota tai tulosta valmis HTML-tapahtumalistaus, jossa on myös kalenterilinkit yksittäisiin tapahtumiin.',
 	feeds_description:
