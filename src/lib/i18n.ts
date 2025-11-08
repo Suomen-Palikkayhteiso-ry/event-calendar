@@ -80,6 +80,7 @@ addMessages('fi', {
 	html_feed: 'HTML',
 	ical_feed: 'iCalendar',
 	atom_feed: 'ATOM',
+	json_feed: 'JSON',
 	// Callback
 	completing_login: 'Viimeistellään kirjautumista...',
 	// Non-member instructions

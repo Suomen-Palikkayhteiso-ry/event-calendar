@@ -47,6 +47,13 @@
 					target="_blank"
 					class="mx-2 text-brand-primary no-underline hover:underline">{$_('rss_feed')}</a
 				>
+				|
+				<!-- eslint-disable-next-line svelte/no-navigation-without-resolve --><!--These are external links, so resolve is not needed.-->
+				<a
+					href="/kalenteri.json"
+					target="_blank"
+					class="mx-2 text-brand-primary no-underline hover:underline">{$_('json_feed')}</a
+				>
 			</p>
 		</div>
 	</footer>

@@ -1,0 +1,21 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//sebbo.net//ical-generator//EN
+X-WR-CALDESC:Suomen Palikkayhteisö ry:n Palikkakalenteri
+TIMEZONE-ID:Europe/Helsinki
+X-WR-TIMEZONE:Europe/Helsinki
+BEGIN:VEVENT
+UID:https://kalenteri.suomenpalikkayhteiso.fi/#/events/8ugpc9bj93m4udi
+SEQUENCE:0
+DTSTAMP:20251108T225431
+DTSTART;TZID=Europe/Helsinki:20251115T100000
+DTEND;TZID=Europe/Helsinki:20251115T170000
+SUMMARY:Suuri Snadi Special
+LOCATION:Helsinki
+DESCRIPTION:Suuri Snadi -pienoisrautatie- ja pienoismallitapahtuma palaa u
+ udistuneena Helsinkiin. Suuri Snadi Special - tapahtuma järjestetään ma
+ rraskuun 15. päivänä Akk Arcadassa\, Arabianrannassa Helsingissä - ent
+ istä mielenkiintoisempana!
+URL;VALUE=URI:https://suurisnadi.fi/
+END:VEVENT
+END:VCALENDAR
