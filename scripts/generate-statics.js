@@ -101,9 +101,13 @@ body { font-family: Arial, sans-serif; margin: 20px; }
 			});
 
 			const startDate = toHelsinkiDate(event.start_date);
-			const endDate = event.end_date
+			let endDate = event.end_date
 				? toHelsinkiDate(event.end_date)
 				: new Date(startDate.getTime() + (event.all_day ? 24 * 60 * 60 * 1000 : 60 * 60 * 1000));
+			
+			if (event.all_day) {
+				endDate = new Date(endDate.getTime() + 24 * 60 * 60 * 1000);
+			}
 			const description = event.description || event.title;
 			const eventUrl =
 				event.url || `https://kalenteri.suomenpalikkayhteiso.fi/#/events/${event.id}`;
@@ -194,9 +198,13 @@ async function generateFeeds(events) {
 		});
 
 		const startDate = toHelsinkiDate(event.start_date);
-		const endDate = event.end_date
+		let endDate = event.end_date
 			? toHelsinkiDate(event.end_date)
 			: new Date(startDate.getTime() + (event.all_day ? 24 * 60 * 60 * 1000 : 60 * 60 * 1000));
+		
+		if (event.all_day) {
+			endDate = new Date(endDate.getTime() + 24 * 60 * 60 * 1000);
+		}
 		const description = event.description || event.title;
 		const eventUrl = event.url || `https://kalenteri.suomenpalikkayhteiso.fi/#/events/${event.id}`;
 
@@ -334,9 +342,13 @@ a:hover { background-color: #0056b3; }
 
 	events.forEach((event) => {
 		const startDate = toHelsinkiDate(event.start_date);
-		const endDate = event.end_date
+		let endDate = event.end_date
 			? toHelsinkiDate(event.end_date)
 			: new Date(startDate.getTime() + (event.all_day ? 24 * 60 * 60 * 1000 : 60 * 60 * 1000));
+		
+		if (event.all_day) {
+			endDate = new Date(endDate.getTime() + 24 * 60 * 60 * 1000);
+		}
 		const description = event.description || event.title;
 		const eventUrl = event.url || `https://kalenteri.suomenpalikkayhteiso.fi/#/events/${event.id}`;
 
