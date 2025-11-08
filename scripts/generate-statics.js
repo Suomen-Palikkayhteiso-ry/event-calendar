@@ -10,7 +10,6 @@ import {
 	formatDateInHelsinki,
 	formatEventDisplayDate,
 	toHelsinkiDate,
-	toUtcDate,
 	writeStaticFile,
 	pocketBaseUrl
 } from './generate-utils.js';
@@ -97,33 +96,13 @@ body { font-family: Arial, sans-serif; margin: 20px; }
 			// Generate data URI for event-specific ICS
 			const individualCalendar = ical({
 				title: 'Palikkakalenteri',
-				description: 'Suomen Palikkayhteisö ry:n Palikkakalenteri'
-			}).timezone({
-				name: 'Europe/Helsinki',
-				generator: tzid => {
-					return `BEGIN:VTIMEZONE
-TZID:${tzid}
-BEGIN:STANDARD
-DTSTART:19700101T000000
-TZOFFSETFROM:+0300
-TZOFFSETTO:+0200
-TZNAME:EET
-RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU
-END:STANDARD
-BEGIN:DAYLIGHT
-DTSTART:19700329T030000
-TZOFFSETFROM:+0200
-TZOFFSETTO:+0300
-TZNAME:EEST
-RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU
-END:DAYLIGHT
-END:VTIMEZONE`;
-				}
+				description: 'Suomen Palikkayhteisö ry:n Palikkakalenteri',
+				timezone: 'Europe/Helsinki'
 			});
 
-			const startDate = toUtcDate(event.start_date);
+			const startDate = toHelsinkiDate(event.start_date);
 			const endDate = event.end_date
-				? toUtcDate(event.end_date)
+				? toHelsinkiDate(event.end_date)
 				: new Date(startDate.getTime() + (event.all_day ? 24 * 60 * 60 * 1000 : 60 * 60 * 1000));
 			const description = event.description || event.title;
 			const eventUrl =
@@ -210,33 +189,13 @@ async function generateFeeds(events) {
 	events.forEach((event) => {
 		const individualCalendar = ical({
 			title: 'Palikkakalenteri',
-			description: 'Suomen Palikkayhteisö ry:n Palikkakalenteri'
-		}).timezone({
-			name: 'Europe/Helsinki',
-			generator: tzid => {
-				return `BEGIN:VTIMEZONE
-TZID:${tzid}
-BEGIN:STANDARD
-DTSTART:19700101T000000
-TZOFFSETFROM:+0300
-TZOFFSETTO:+0200
-TZNAME:EET
-RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU
-END:STANDARD
-BEGIN:DAYLIGHT
-DTSTART:19700329T030000
-TZOFFSETFROM:+0200
-TZOFFSETTO:+0300
-TZNAME:EEST
-RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU
-END:DAYLIGHT
-END:VTIMEZONE`;
-			}
+			description: 'Suomen Palikkayhteisö ry:n Palikkakalenteri',
+			timezone: 'Europe/Helsinki'
 		});
 
-		const startDate = toUtcDate(event.start_date);
+		const startDate = toHelsinkiDate(event.start_date);
 		const endDate = event.end_date
-			? toUtcDate(event.end_date)
+			? toHelsinkiDate(event.end_date)
 			: new Date(startDate.getTime() + (event.all_day ? 24 * 60 * 60 * 1000 : 60 * 60 * 1000));
 		const description = event.description || event.title;
 		const eventUrl = event.url || `https://kalenteri.suomenpalikkayhteiso.fi/#/events/${event.id}`;
@@ -369,34 +328,14 @@ a:hover { background-color: #0056b3; }
 
 	const calendar = ical({
 		title: 'Palikkakalenteri',
-		description: 'Suomen Palikkayhteisö ry:n Palikkakalenteri'
-	}).timezone({
-		name: 'Europe/Helsinki',
-		generator: tzid => {
-			return `BEGIN:VTIMEZONE
-TZID:${tzid}
-BEGIN:STANDARD
-DTSTART:19700101T000000
-TZOFFSETFROM:+0300
-TZOFFSETTO:+0200
-TZNAME:EET
-RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU
-END:STANDARD
-BEGIN:DAYLIGHT
-DTSTART:19700329T030000
-TZOFFSETFROM:+0200
-TZOFFSETTO:+0300
-TZNAME:EEST
-RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU
-END:DAYLIGHT
-END:VTIMEZONE`;
-		}
+		description: 'Suomen Palikkayhteisö ry:n Palikkakalenteri',
+		timezone: 'Europe/Helsinki'
 	});
 
 	events.forEach((event) => {
-		const startDate = toUtcDate(event.start_date);
+		const startDate = toHelsinkiDate(event.start_date);
 		const endDate = event.end_date
-			? toUtcDate(event.end_date)
+			? toHelsinkiDate(event.end_date)
 			: new Date(startDate.getTime() + (event.all_day ? 24 * 60 * 60 * 1000 : 60 * 60 * 1000));
 		const description = event.description || event.title;
 		const eventUrl = event.url || `https://kalenteri.suomenpalikkayhteiso.fi/#/events/${event.id}`;
