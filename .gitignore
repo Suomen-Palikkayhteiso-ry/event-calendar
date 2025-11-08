@@ -24,8 +24,10 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
 # Generated
+static/kalenteri.json
 static/*.ics
 static/*.rss
 static/*.atom
 static/*.html
 static/images/
+static/events/
