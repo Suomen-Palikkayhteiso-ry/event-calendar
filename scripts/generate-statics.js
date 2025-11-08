@@ -148,7 +148,7 @@ async function generateFeeds(events) {
 		const individualCalendar = ical({
 			title: 'Palikkakalenteri',
 			description: 'Suomen Palikkayhteisö ry:n Palikkakalenteri',
-			timezone: 'Europe/Helsinki'
+			timezone: 'Europe/Helsinki',
 		});
 
 		const startDate = toUtcDate(event.start_date);
@@ -179,10 +179,11 @@ async function generateFeeds(events) {
 		individualCalendar.createEvent(eventData);
 
 		const icsContent = individualCalendar.toString();
-		writeStaticFile(`${event.id}.ics`, icsContent);
+		const cleanedIcsContent = icsContent.replace(/^PRODID:.*$/m, '');
+		writeStaticFile(`${event.id}.ics`, cleanedIcsContent);
 
 		// Create data URI for enclosure
-		const base64Ics = Buffer.from(icsContent, 'utf8').toString('base64');
+		const base64Ics = Buffer.from(cleanedIcsContent, 'utf8').toString('base64');
 		const dataUri = `data:text/calendar;charset=utf-8;base64,${base64Ics}`;
 		eventIcsDataUris.set(event.id, dataUri);
 	});
@@ -256,7 +257,8 @@ async function generateFeeds(events) {
 	const calendar = ical({
 		title: 'Palikkakalenteri',
 		description: 'Suomen Palikkayhteisö ry:n Palikkakalenteri',
-		timezone: 'Europe/Helsinki'
+		timezone: 'Europe/Helsinki',
+		prodid: null
 	});
 
 	events.forEach((event) => {
@@ -289,7 +291,8 @@ async function generateFeeds(events) {
 	});
 
 	const ics = calendar.toString();
-	writeStaticFile('kalenteri.ics', ics);
+	const cleanedIcs = ics.replace(/^PRODID:.*$/m, '');
+	writeStaticFile('kalenteri.ics', cleanedIcs);
 
 	console.log(
 		'Generated kalenteri.rss, kalenteri.atom, kalenteri.ics and individual event ICS files'
