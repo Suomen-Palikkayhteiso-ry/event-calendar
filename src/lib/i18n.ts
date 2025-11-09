@@ -86,7 +86,7 @@ addMessages('fi', {
 	html_description:
 		'Upota tai tulosta valmis HTML-tapahtumalistaus. Sisältää kalenterilinkit yksittäisiin tapahtumiin.',
 	feeds_description:
-		'Syötemuodot integroivat uudet tapahtumat verkkosivuille tai uutislukijoihin. Nämäkin sisältävät kalenterilinkit.',
+		'Uutissyötteet integroivat uudet tapahtumat verkkosivuille tai uutislukijoihin. Nämäkin sisältävät kalenterilinkit.',
 	// Callback
 	completing_login: 'Viimeistellään kirjautumista...',
 	// Non-member instructions
