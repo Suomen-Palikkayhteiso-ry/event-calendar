@@ -253,7 +253,7 @@ a:hover { background-color: #0056b3; }
 </head>
 <body>
 <h1>${event.title}</h1>
-<p>${event.location ? `Paikka: ${event.location}<br>` : ''}${formatEventDisplayDate(event)}</p>
+<p>${event.location ? `${event.location}<br>` : ''}${formatEventDisplayDate(event)}</p>
 <p>${event.description || ''}</p>
 <p><a href="${event.id}.ics">Lisää kalenteriin</a></p>
 </body>
