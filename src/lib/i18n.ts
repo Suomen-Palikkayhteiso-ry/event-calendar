@@ -29,8 +29,8 @@ addMessages('fi', {
 	location_optional: 'Paikka (valinnainen)',
 	description_label: 'Kuvaus',
 	description_optional: 'Kuvaus (valinnainen)',
-	url_label: 'URL:',
-	url_optional: 'URL (valinnainen)',
+	url_label: 'Kotisivut:',
+	url_optional: 'Kotisivut (valinnainen)',
 	image_label: 'Kuva',
 	image_description_label: 'Kuvan kuvaus',
 	image_description_optional: 'Kuvan kuvaus (valinnainen)',
@@ -77,14 +77,14 @@ addMessages('fi', {
 	login: 'Kirjaudu sisään',
 	// Layout
 	rss_feed: 'RSS',
-	html_feed: 'HTML',
+	html_feed: 'HTML | PDF',
 	ical_feed: 'iCalendar',
 	atom_feed: 'ATOM',
 	json_feed: 'JSON',
 	ical_description:
 		'Kalenterivienti (ICS) tilaa tai integroi koko kalenterin helposti. Klikkaa kalenteri puhelimeesi!',
 	html_description:
-		'Upota tai tulosta valmis HTML-tapahtumalistaus. Sisältää kalenterilinkit yksittäisiin tapahtumiin.',
+		'Upota tai tulosta valmis tapahtumalistaus. Sisältää kalenterilinkit yksittäisiin tapahtumiin.',
 	feeds_description:
 		'Uutissyötteet integroivat uudet tapahtumat verkkosivuille tai uutislukijoihin. Nämäkin sisältävät kalenterilinkit.',
 	// Callback
