@@ -13,6 +13,7 @@
 	import { parseUTCDate, dateToHelsinkiDateString } from '$lib/date-utils';
 	import { user } from '$lib/auth';
 	import { page } from '$app/stores';
+	import { browser } from '$app/environment';
 
 	let events: Event[] = [];
 	let calendarWrapper: HTMLElement;
@@ -64,6 +65,17 @@
 	});
 	let selectedDate = $state(new Date());
 
+	if (browser) {
+		const searchParams = new URLSearchParams(window.location.search);
+		const dateParam = searchParams.get('date');
+		if (dateParam) {
+			const paramDate = new Date(`${dateParam}T00:00:00`);
+			if (!Number.isNaN(paramDate.getTime())) {
+				selectedDate = paramDate;
+			}
+		}
+	}
+
 	onMount(async () => {
 		events = await pb.collection('events').getFullList({
 			sort: 'start_date',
@@ -79,16 +91,16 @@
 
 	$effect(() => {
 		const dateParam = $page.url.searchParams.get('date');
-		if (dateParam) {
-			const paramDate = new Date(dateParam + 'T00:00:00');
-			if (paramDate.getTime() !== selectedDate.getTime()) {
-				selectedDate = paramDate;
-				// Clear the date from querystring after consuming it
-				const newUrl = new URL($page.url);
-				newUrl.searchParams.delete('date');
-				goto(newUrl.pathname + newUrl.search, { replaceState: true });
-			}
+		if (!dateParam) return;
+
+		const paramDate = new Date(`${dateParam}T00:00:00`);
+		if (!Number.isNaN(paramDate.getTime()) && paramDate.getTime() !== selectedDate.getTime()) {
+			selectedDate = paramDate;
 		}
+		// Clear the date from querystring after consuming it
+		const newUrl = new URL($page.url);
+		newUrl.searchParams.delete('date');
+		goto(newUrl.pathname + newUrl.search, { replaceState: true });
 	});
 
 	function updateCalendarEvents() {
@@ -143,7 +155,15 @@
 			<label for="datepicker" class="invisible block text-sm font-medium text-gray-700"
 				>{$_('select_date')}</label
 			>
-			<Datepicker id="datepicker" bind:value={selectedDate} locale="fi" firstDayOfWeek={1} />
+			{#key selectedDate.getTime()}
+				<Datepicker
+					id="datepicker"
+					bind:value={selectedDate}
+					defaultDate={selectedDate}
+					locale="fi"
+					firstDayOfWeek={1}
+				/>
+			{/key}
 		</div>
 		<button
 			class="flex h-12 w-12 flex-shrink-0 cursor-pointer items-center justify-center rounded-full border-none bg-primary-500 text-xl font-bold text-white transition-colors duration-200 hover:bg-primary-600"
@@ -165,7 +185,15 @@
 		<label for="datepicker" class="invisible block text-sm font-medium text-gray-700"
 			>{$_('select_date')}</label
 		>
-		<Datepicker id="datepicker" bind:value={selectedDate} locale="fi" firstDayOfWeek={1} />
+		{#key selectedDate.getTime()}
+			<Datepicker
+				id="datepicker"
+				bind:value={selectedDate}
+				defaultDate={selectedDate}
+				locale="fi"
+				firstDayOfWeek={1}
+			/>
+		{/key}
 	</div>
 {/if}
 

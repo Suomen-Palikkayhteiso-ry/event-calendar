@@ -6,7 +6,7 @@
 	import { user } from '$lib/auth';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import { page } from '$app/stores';
+	import { browser } from '$app/environment';
 	import { Datepicker, Timepicker } from 'flowbite-svelte';
 	import { _ } from 'svelte-i18n';
 	import { toast } from '@zerodevx/svelte-toast';
@@ -35,6 +35,22 @@
 	let startTimeObj = $state(new Date(1970, 0, 1, 9, 0)); // Default to 9:00 AM
 	let endDateObj = $state(new Date());
 	let endTimeObj = $state(new Date(1970, 0, 1, 17, 0)); // Default to 5:00 PM
+
+	if (browser) {
+		const searchParams = new URLSearchParams(window.location.search);
+		const dateParam = searchParams.get('date');
+		if (dateParam) {
+			const [rawYear, rawMonth, rawDay] = dateParam.split('-');
+			const year = parseInt(rawYear, 10);
+			const month = parseInt(rawMonth, 10);
+			const day = parseInt(rawDay, 10);
+			if (!Number.isNaN(year) && !Number.isNaN(month) && !Number.isNaN(day)) {
+				const initial = new Date(year, month - 1, day, 12, 0, 0);
+				startDateObj = new Date(initial);
+				endDateObj = new Date(initial);
+			}
+		}
+	}
 
 	// String values for Timepicker components (separate state, not derived)
 	let startTimeString = $state('09:00');
@@ -116,28 +132,6 @@
 	onMount(async () => {
 		// Wait for the component to be fully rendered
 		await tick();
-
-		// Check for date parameter from front page
-		const urlParams = new URLSearchParams($page.url.search);
-		const dateParam = urlParams.get('date');
-
-		let initialDate: Date;
-		if (dateParam) {
-			// dateParam is in YYYY-MM-DD format representing Helsinki date
-			// Create Date objects that represent this date in local timezone for the date picker
-			const dateParts = dateParam.split('-');
-			const year = parseInt(dateParts[0]);
-			const month = parseInt(dateParts[1]) - 1; // JavaScript months are 0-based
-			const day = parseInt(dateParts[2]);
-			initialDate = new Date(year, month, day, 12, 0, 0); // Use noon to avoid timezone issues
-		} else {
-			// Default to today
-			initialDate = new Date();
-		}
-
-		// Set the Date objects
-		startDateObj = new Date(initialDate);
-		endDateObj = new Date(initialDate);
 
 		// Update formData to match the Date objects
 		formData.start_date = formatDateTimeForAPI(startDateObj, startTimeObj);
@@ -337,13 +331,16 @@
 				<label for="startDate" class="mb-2 block font-medium text-gray-700"
 					>{$_('start_date_required')}</label
 				>
-				<Datepicker
-					id="startDate"
-					bind:value={startDateObj}
-					locale="fi"
-					firstDayOfWeek={1}
-					disabled={isSubmitting}
-				/>
+				{#key startDateObj.getTime()}
+					<Datepicker
+						id="startDate"
+						bind:value={startDateObj}
+						defaultDate={startDateObj}
+						locale="fi"
+						firstDayOfWeek={1}
+						disabled={isSubmitting}
+					/>
+				{/key}
 				{#if !formData.all_day}
 					<Timepicker id="startTime" bind:value={startTimeString} disabled={isSubmitting} />
 				{/if}
@@ -351,13 +348,16 @@
 
 			<div class="mb-4 flex-1">
 				<label for="endDate" class="mb-2 block font-medium text-gray-700">{$_('end_date')}</label>
-				<Datepicker
-					id="endDate"
-					bind:value={endDateObj}
-					locale="fi"
-					firstDayOfWeek={1}
-					disabled={isSubmitting || !formData.all_day}
-				/>
+				{#key endDateObj.getTime()}
+					<Datepicker
+						id="endDate"
+						bind:value={endDateObj}
+						defaultDate={endDateObj}
+						locale="fi"
+						firstDayOfWeek={1}
+						disabled={isSubmitting || !formData.all_day}
+					/>
+				{/key}
 				{#if !formData.all_day}
 					<Timepicker id="endTime" bind:value={endTimeString} disabled={isSubmitting} />
 				{/if}
