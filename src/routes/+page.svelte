@@ -98,7 +98,9 @@
 				title: event.location ? `${event.title} / ${event.location}` : event.title,
 				start: parseUTCDate(event.start_date),
 				end: (() => {
-					const baseEnd = event.end_date ? parseUTCDate(event.end_date) : parseUTCDate(event.start_date);
+					const baseEnd = event.end_date
+						? parseUTCDate(event.end_date)
+						: parseUTCDate(event.start_date);
 					if (event.all_day) {
 						const adjusted = new Date(baseEnd);
 						adjusted.setDate(adjusted.getDate() + 1);
@@ -141,7 +143,7 @@
 			<label for="datepicker" class="invisible block text-sm font-medium text-gray-700"
 				>{$_('select_date')}</label
 			>
-			<Datepicker id="datepicker" bind:value={selectedDate} locale="fi" />
+			<Datepicker id="datepicker" bind:value={selectedDate} locale="fi" firstDayOfWeek={1} />
 		</div>
 		<button
 			class="flex h-12 w-12 flex-shrink-0 cursor-pointer items-center justify-center rounded-full border-none bg-primary-500 text-xl font-bold text-white transition-colors duration-200 hover:bg-primary-600"
@@ -163,7 +165,7 @@
 		<label for="datepicker" class="invisible block text-sm font-medium text-gray-700"
 			>{$_('select_date')}</label
 		>
-		<Datepicker id="datepicker" bind:value={selectedDate} locale="fi" />
+		<Datepicker id="datepicker" bind:value={selectedDate} locale="fi" firstDayOfWeek={1} />
 	</div>
 {/if}
 
