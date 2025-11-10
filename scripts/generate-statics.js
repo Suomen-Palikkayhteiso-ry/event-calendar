@@ -62,6 +62,7 @@ async function generateEmbed(events) {
 	--color-brand-accent: #000000; /*#52d3d8*/
 }
 body { font-family: Arial, sans-serif; margin: 20px; }
+.month { page-break-inside: avoid; break-inside: avoid; }
 .month-header { font-size: 1.5em; font-weight: bold; color: var(--color-brand-primary); margin: 3ex 0 1.5ex 0; border-bottom: 2px solid var(--color-brand-accent); padding-bottom: 5px; }
 .event { display: flex; margin-top: 0.5ex; margin-bottom: 20px; border-left: 3px solid var(--color-brand-accent); padding-left: 15px; }
 .event { page-break-inside: avoid; break-inside: avoid; }
@@ -82,6 +83,7 @@ body { font-family: Arial, sans-serif; margin: 20px; }
 `;
 
 	for (const group of groups.values()) {
+		html += `<div class="month">`;
 		html += `<div class="month-header">${monthNames[group.month]} ${group.year}</div>`;
 		for (const event of group.events) {
 			const dateStr = formatEventDisplayDate(event);
@@ -151,6 +153,7 @@ body { font-family: Arial, sans-serif; margin: 20px; }
 </div>
 `;
 		}
+		html += `</div>`;
 	}
 
 	html += `</div>
