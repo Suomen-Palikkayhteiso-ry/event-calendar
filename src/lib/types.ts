@@ -7,7 +7,7 @@ export interface Event {
 	all_day: boolean;
 	url?: string;
 	location?: string; // Optional location
-	state: 'draft' | 'published' | 'deleted'; // Event state
+	state: 'draft' | 'pending' | 'published' | 'deleted'; // Event state
 	image?: string; // Optional PocketBase file field for event image
 	image_description?: string; // Optional description for the image
 	created: string; // Record creation datetime

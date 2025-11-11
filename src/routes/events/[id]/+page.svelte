@@ -29,11 +29,6 @@
 			.getOne(eventId)
 			.then((loadedEvent) => {
 				event = loadedEvent as unknown as Event;
-				// Redirect if event is deleted
-				if (event.state === 'deleted') {
-					goto(resolve('/events'));
-					return;
-				}
 			})
 			.catch(() => {
 				goto(resolve('/events'));

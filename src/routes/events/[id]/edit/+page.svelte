@@ -30,7 +30,7 @@
 		url: '',
 		image: null as File | null,
 		image_description: '',
-		state: 'published' as 'draft' | 'published' | 'deleted'
+		state: 'published' as 'draft' | 'pending'| 'published' | 'deleted'
 	});
 
 	// Date/Time picker values (Date objects for components)
