@@ -4,7 +4,7 @@
 	import { pb } from '$lib/pocketbase';
 	import type { Event } from '$lib/types';
 	// @ts-expect-error Calendar library types not available
-	import { Calendar, DayGrid, List, Interaction } from '@event-calendar/core';
+	import { Calendar, DayGrid, List } from '@event-calendar/core';
 	import '@event-calendar/core/index.css';
 	import { Datepicker } from 'flowbite-svelte';
 	import { _ } from 'svelte-i18n';
@@ -31,22 +31,24 @@
 			next: $_('next_button')
 		},
 		headerToolbar: { start: 'title', center: '', end: 'today prev,next' },
+		eventClassNames: (info: any) => {
+			const classes = [];
+			if (info.event.allDay) {
+				classes.push('event-allday');
+			} else {
+				classes.push('event-regular');
+			}
+			if (info.event.id !== 'selected-day') {
+				classes.push('event-clickable');
+			}
+			return classes;
+		},
 		eventDidMount: (info: unknown) => {
 			if ((info as any).event.extendedProps.description) {
 				(info as any).el.title = (info as any).event.extendedProps.description;
 			}
-			if ((info as any).event.allDay) {
-				(info as any).el.style.backgroundColor = 'var(--color-white)';
-				(info as any).el.style.color = 'var(--color-brand-primary)';
-				(info as any).el.style.border = '1px solid var(--color-brand-primary)';
-			} else {
-				(info as any).el.style.backgroundColor = 'var(--color-brand-primary)';
-				(info as any).el.style.color = 'var(--color-white)';
-				(info as any).el.style.border = '1px solid var(--color-brand-primary)';
-			}
-			// Make events clickable with pointer cursor
+			// Make events accessible with keyboard navigation
 			if ((info as any).event.id !== 'selected-day') {
-				(info as any).el.style.cursor = 'pointer';
 				(info as any).el.addEventListener('keydown', (e: KeyboardEvent) => {
 					if (e.key === 'Enter' || e.key === ' ') {
 						e.preventDefault();
@@ -198,13 +200,5 @@
 {/if}
 
 <div bind:this={calendarWrapper}>
-	<Calendar plugins={[List, DayGrid, Interaction]} options={calendarOptions} />
+	<Calendar plugins={[List, DayGrid]} options={calendarOptions} />
 </div>
-
-<style>
-	:global(.ec-event) {
-		background-color: var(--color-brand-primary);
-		border-color: var(--color-brand-primary);
-		color: white;
-	}
-</style>
