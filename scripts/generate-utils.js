@@ -20,9 +20,12 @@ export function createPocketBaseClient() {
 }
 
 export async function fetchPublishedEvents(pb) {
+	const yesterday = new Date();
+	yesterday.setDate(yesterday.getDate() - 1);
+	const yesterdayIso = yesterday.toISOString().split('T')[0] + ' 00:00:00';
 	return pb.collection('events').getFullList({
 		sort: 'start_date',
-		filter: 'state = "published"'
+		filter: `state = "published" && (end_date > "${yesterdayIso}" || start_date > "${yesterdayIso}")`
 	});
 }
 
