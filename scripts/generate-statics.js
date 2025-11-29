@@ -366,7 +366,7 @@ a:hover { background-color: #0056b3; }
 					end: event.end_date,
 					all_day: event.all_day,
 					location: event.location,
-					url: event.url || `${baseUrl}/events/${event.id}.html`,
+					url: event.url || `https://kalenteri.suomenpalikkayhteiso.fi/#/events/${event.id}`,
 					id: event.id
 				}
 			}))
