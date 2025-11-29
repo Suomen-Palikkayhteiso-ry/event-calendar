@@ -90,7 +90,7 @@ body { font-family: Arial, sans-serif; margin: 20px; }
 			let qrCodeDataUri = '';
 			// Generate QR code for all events since they all have ICS files now
 			qrCodeDataUri = await qrcode.toDataURL(`${baseUrl}/events/${event.id}.html`, {
-				errorCorrectionLevel: 'H',
+				errorCorrectionLevel: 'M',
 				width: 100,
 				margin: 1
 			});
