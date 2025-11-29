@@ -1,5 +1,6 @@
 <script lang="ts">
 	/* eslint-disable @typescript-eslint/no-explicit-any */
+	/* eslint-disable svelte/prefer-svelte-reactivity, svelte/no-navigation-without-resolve */
 	import { onMount } from 'svelte';
 	import { pb } from '$lib/pocketbase';
 	import type { Event } from '$lib/types';
@@ -17,10 +18,11 @@
 
 	let events: Event[] = [];
 	let calendarWrapper: HTMLElement;
+	let selectedDate = $state(new Date());
 	let calendarOptions = $state({
 		view: 'dayGridMonth',
 		events: [] as any[],
-		date: new Date(),
+		date: selectedDate,
 		locale: 'fi',
 		firstDay: 1,
 		buttonText: {
@@ -65,7 +67,6 @@
 			selectedDate = (info as any).date;
 		}
 	});
-	let selectedDate = $state(new Date());
 
 	if (browser) {
 		const searchParams = new URLSearchParams(window.location.search);
@@ -169,10 +170,9 @@
 		</div>
 		<button
 			class="flex h-12 w-12 flex-shrink-0 cursor-pointer items-center justify-center rounded-full border-none bg-primary-500 text-xl font-bold text-white transition-colors duration-200 hover:bg-primary-600"
-			onclick={() => goto(`?date=${dateToHelsinkiDateString(selectedDate)}` + resolve(`/events`))}
+			onclick={() => goto(`/events?date=${dateToHelsinkiDateString(selectedDate)}`)}
 			title="Add new event"
-		>
-			+
+			>+
 		</button>
 	</div>
 {:else}

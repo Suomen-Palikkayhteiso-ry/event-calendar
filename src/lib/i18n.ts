@@ -27,7 +27,6 @@ addMessages('fi', {
 	title: 'Otsikko',
 	event_title: 'Tapahtuman otsikko',
 	location_label: 'Paikka',
-	location: 'Paikka',
 	location_optional: 'Paikka (valinnainen)',
 	latitude: 'Leveysaste',
 	longitude: 'Pituusaste',

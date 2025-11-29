@@ -15,6 +15,8 @@
 	import { Datepicker, Timepicker } from 'flowbite-svelte';
 	import { _ } from 'svelte-i18n';
 	import { toast } from '@zerodevx/svelte-toast';
+	import Map from '$lib/Map.svelte';
+	import { geocodeLocation } from '$lib/geocode';
 
 	let events = $state<Event[]>([]);
 	let currentPage = $state(1);
@@ -34,8 +36,14 @@
 		url: '',
 		image: null as File | null,
 		image_description: '',
-		state: 'published' as 'draft' | 'published'
+		state: 'published' as 'draft' | 'published',
+		point: null as { lat: number; lon: number } | null
 	});
+
+	let mapCenter = $state<[number, number]>([60.1699, 24.9384]); // Helsinki default
+	let mapZoom = $state(10);
+	let isGeocoding = $state(false);
+	let geocodingEnabled = $state(true);
 
 	// Date/Time picker values (Date objects for components)
 	let startDateObj = $state(new Date());
@@ -108,6 +116,12 @@
 
 		const [hours, minutes] = endTimeString.split(':').map(Number);
 		endTimeObj = new Date(1970, 0, 1, hours, minutes);
+	});
+
+	$effect(() => {
+		if (formData.point) {
+			mapCenter = [formData.point.lat, formData.point.lon];
+		}
 	});
 
 	// Sync end date with start date when all day is enabled
@@ -240,6 +254,7 @@
 			if (formData.image_description)
 				submitData.append('image_description', formData.image_description);
 			submitData.append('state', formData.state);
+			if (formData.point) submitData.append('point', JSON.stringify(formData.point));
 
 			await pb.collection('events').create(submitData);
 
@@ -254,6 +269,7 @@
 			formData.image_description = '';
 			formData.state = 'published';
 			formData.all_day = true;
+			formData.point = null;
 
 			startDateObj = new Date();
 			startTimeObj = new Date(1970, 0, 1, 9, 0);
@@ -409,6 +425,7 @@
 	<form onsubmit={createEvent} class="mb-8">
 		<div class="mb-4">
 			<label for="title" class="mb-2 block font-medium text-gray-700">{$_('title_required')}</label>
+			<!-- svelte-ignore a11y_autofocus -->
 			<input
 				type="text"
 				id="title"
@@ -425,15 +442,91 @@
 			<label for="location" class="mb-2 block font-medium text-gray-700"
 				>{$_('location_label')}</label
 			>
-			<input
-				type="text"
-				id="location"
-				bind:value={formData.location}
-				placeholder={$_('location_optional')}
-				disabled={isSubmitting}
-				class="focus:ring-opacity-25 box-border w-full rounded border border-gray-300 p-3 text-base focus:border-brand-primary focus:ring-2 focus:ring-brand-primary focus:outline-none"
-			/>
+			<div class="flex items-center gap-2">
+				<input
+					type="text"
+					id="location"
+					bind:value={formData.location}
+					placeholder={$_('location_optional')}
+					disabled={isSubmitting}
+					onblur={async () => {
+						if (formData.location && !isGeocoding && geocodingEnabled) {
+							isGeocoding = true;
+							try {
+								const coords = await geocodeLocation(formData.location);
+								if (coords) {
+									formData.point = {
+										lat: parseFloat(coords[0].toFixed(6)),
+										lon: parseFloat(coords[1].toFixed(6))
+									}; // rounded
+									mapZoom = 15; // Zoom in closer after geocoding
+								}
+							} catch (error) {
+								console.error('Geocoding failed:', error);
+								toast.push($_('geocoding_failed'));
+							} finally {
+								isGeocoding = false;
+							}
+						}
+					}}
+					class="focus:ring-opacity-25 box-border flex-1 rounded border border-gray-300 p-3 text-base focus:border-brand-primary focus:ring-2 focus:ring-brand-primary focus:outline-none"
+				/>
+				<button
+					type="button"
+					class="cursor-pointer rounded border border-gray-300 p-3 text-xl hover:bg-gray-50 focus:ring-2 focus:ring-brand-primary focus:outline-none"
+					onclick={() => (geocodingEnabled = !geocodingEnabled)}
+					title={geocodingEnabled ? $_('disable_geocoding') : $_('enable_geocoding')}
+				>
+					{geocodingEnabled ? '🌍' : '📍'}
+				</button>
+			</div>
 		</div>
+
+		{#if formData.location}
+			<div class="mb-4">
+				<Map
+					center={mapCenter}
+					zoom={mapZoom}
+					markerPosition={formData.point ? [formData.point.lat, formData.point.lon] : null}
+					onMarkerMove={(latlng) =>
+						(formData.point = {
+							lat: parseFloat(latlng[0].toFixed(6)),
+							lon: parseFloat(latlng[1].toFixed(6))
+						})}
+				/>
+			</div>
+		{/if}
+
+		{#if formData.point}
+			<div class="mb-4 flex gap-4">
+				<div class="flex-1">
+					<label for="lat" class="mb-2 block font-medium text-gray-700">{$_('latitude')}</label>
+					<input
+						type="number"
+						id="lat"
+						step="0.000001"
+						min="-90"
+						max="90"
+						bind:value={formData.point.lat}
+						disabled={isSubmitting}
+						class="focus:ring-opacity-25 box-border w-full rounded border border-gray-300 p-3 text-base focus:border-brand-primary focus:ring-2 focus:ring-brand-primary focus:outline-none"
+					/>
+				</div>
+				<div class="flex-1">
+					<label for="lng" class="mb-2 block font-medium text-gray-700">{$_('longitude')}</label>
+					<input
+						type="number"
+						id="lng"
+						step="0.000001"
+						min="-180"
+						max="180"
+						bind:value={formData.point.lon}
+						disabled={isSubmitting}
+						class="focus:ring-opacity-25 box-border w-full rounded border border-gray-300 p-3 text-base focus:border-brand-primary focus:ring-2 focus:ring-brand-primary focus:outline-none"
+					/>
+				</div>
+			</div>
+		{/if}
 
 		<div class="mb-4">
 			<label for="description" class="mb-2 block font-medium text-gray-700"

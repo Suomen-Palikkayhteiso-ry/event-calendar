@@ -1,4 +1,5 @@
 <script lang="ts">
+	/* eslint svelte/no-navigation-without-resolve: "off" -- static file links don't need resolve() */
 	import Header from './Header.svelte';
 	import '../app.css';
 	import 'flowbite/dist/flowbite.min.css';
@@ -84,28 +85,24 @@
 				</div>
 				<p class="mb-3 text-sm text-gray-600">{$_('feeds_description')}</p>
 				<div class="text-center">
-					<!-- eslint-disable-next-line svelte/no-navigation-without-resolve --><!--These are external links, so resolve is not needed.-->
 					<a
 						href="/kalenteri.atom"
 						target="_blank"
 						class="mx-1 text-brand-primary no-underline hover:underline">{$_('atom_feed')}</a
 					>
 					|
-					<!-- eslint-disable-next-line svelte/no-navigation-without-resolve --><!--These are external links, so resolve is not needed.-->
 					<a
 						href="/kalenteri.rss"
 						target="_blank"
 						class="mx-1 text-brand-primary no-underline hover:underline">{$_('rss_feed')}</a
 					>
 					|
-					<!-- eslint-disable-next-line svelte/no-navigation-without-resolve --><!--These are external links, so resolve is not needed.-->
 					<a
 						href="/kalenteri.json"
 						target="_blank"
 						class="mx-1 text-brand-primary no-underline hover:underline">{$_('json_feed')}</a
 					>
 					|
-					<!-- eslint-disable-next-line svelte/no-navigation-without-resolve --><!--These are external links, so resolve is not needed.-->
 					<a
 						href="/kalenteri.geo.json"
 						target="_blank"

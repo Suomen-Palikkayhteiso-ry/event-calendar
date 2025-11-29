@@ -1,4 +1,5 @@
 <script lang="ts">
+	/* eslint svelte/no-navigation-without-resolve: "off" -- external URLs don't need resolve() */
 	import { onMount } from 'svelte';
 	import { pb } from '$lib/pocketbase';
 	import type { Event } from '$lib/types';

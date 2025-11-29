@@ -355,8 +355,8 @@ a:hover { background-color: #0056b3; }
 	const geojson = {
 		type: 'FeatureCollection',
 		features: events
-			.filter(event => event.point && event.point.lat !== 0 && event.point.lon !== 0)
-			.map(event => ({
+			.filter((event) => event.point && event.point.lat !== 0 && event.point.lon !== 0)
+			.map((event) => ({
 				type: 'Feature',
 				geometry: {
 					type: 'Point',

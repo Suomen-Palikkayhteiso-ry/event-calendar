@@ -10,11 +10,17 @@ const USER_AGENT = 'EventCalendar/1.0 (https://github.com/datakurre/event-calend
 let lastRequestTime = 0;
 const MIN_DELAY_MS = 1000; // 1 second
 
+interface NominatimResult {
+	lat: string;
+	lon: string;
+	display_name?: string;
+}
+
 async function delay(ms: number) {
 	return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-async function makeRequest(url: string): Promise<any> {
+async function makeRequest(url: string): Promise<NominatimResult[] | NominatimResult> {
 	const now = Date.now();
 	const timeSinceLast = now - lastRequestTime;
 	if (timeSinceLast < MIN_DELAY_MS) {
@@ -46,7 +52,7 @@ export async function geocodeLocation(location: string): Promise<[number, number
 		const url = `${NOMINATIM_BASE_URL}/search?q=${encodeURIComponent(location)}&format=json&limit=1`;
 		const data = await makeRequest(url);
 
-		if (data && data.length > 0) {
+		if (Array.isArray(data) && data.length > 0) {
 			const result = data[0];
 			return [parseFloat(result.lat), parseFloat(result.lon)];
 		}
@@ -65,7 +71,7 @@ export async function reverseGeocode(lat: number, lng: number): Promise<string |
 		const url = `${NOMINATIM_BASE_URL}/reverse?lat=${lat}&lon=${lng}&format=json`;
 		const data = await makeRequest(url);
 
-		if (data && data.display_name) {
+		if (!Array.isArray(data) && data.display_name) {
 			return data.display_name;
 		}
 	} catch (error) {

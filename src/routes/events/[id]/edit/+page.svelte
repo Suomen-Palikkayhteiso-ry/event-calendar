@@ -322,11 +322,11 @@
 			/>
 		</div>
 
-		<div class="mb-4 flex items-center gap-2">
-			<label for="editLocation" class="mb-2 block flex-shrink-0 font-medium text-gray-700"
+		<div class="mb-4">
+			<label for="editLocation" class="mb-2 block font-medium text-gray-700"
 				>{$_('location_label')}</label
 			>
-			<div class="flex flex-1 items-center gap-2">
+			<div class="flex items-center gap-2">
 				<input
 					type="text"
 					id="editLocation"
