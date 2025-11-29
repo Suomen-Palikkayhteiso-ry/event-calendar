@@ -200,6 +200,7 @@ async function generateFeeds(events) {
 
 	// Generate individual ICS files for each event
 	const eventIcsDataUris = new Map();
+	const eventIcsContents = new Map();
 	for (const event of events) {
 		const individualCalendar = ical({
 			title: 'Palikkakalenteri',
@@ -216,7 +217,7 @@ async function generateFeeds(events) {
 			endDate = new Date(endDate.getTime() + 24 * 60 * 60 * 1000);
 		}
 		const description = event.description || event.title;
-		const eventUrl = event.url || `https://kalenteri.suomenpalikkayhteiso.fi/#/events/${event.id}`;
+		const eventUrl = event.url;
 
 		const eventData = {
 			id: `${baseUrl}/#/events/${event.id}`,
@@ -224,7 +225,7 @@ async function generateFeeds(events) {
 			end: endDate,
 			summary: event.title,
 			description,
-			url: eventUrl,
+			...(eventUrl && { url: eventUrl }),
 			timezone: 'Europe/Helsinki'
 		};
 
@@ -245,6 +246,8 @@ async function generateFeeds(events) {
 
 		const icsContent = individualCalendar.toString();
 		writeStaticFile(`events/${event.id}.ics`, icsContent);
+
+		eventIcsContents.set(event.id, icsContent);
 
 		// Create data URI for enclosure
 		const base64Ics = Buffer.from(icsContent, 'utf8').toString('base64');
@@ -367,6 +370,7 @@ a:hover { background-color: #0056b3; }
 					all_day: event.all_day,
 					location: event.location,
 					...(event.url && { url: event.url }),
+					ics: eventIcsContents.get(event.id),
 					id: event.id
 				}
 			}))
