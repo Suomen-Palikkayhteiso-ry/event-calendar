@@ -302,14 +302,14 @@ a:hover { background-color: #0056b3; }
 		const dateStr = formatEventDisplayDate(event);
 		const description = event.description || event.title;
 		const content = `${description}\n\n${dateStr}`;
-		const eventUrl = event.url || `https://kalenteri.suomenpalikkayhteiso.fi/#/events/${event.id}`;
+		const eventUrl = event.url;
 
 		const feedItem = {
 			title:
 				`${event.all_day ? dateStr : formatDateInHelsinki(event.start_date, true)} ${event.title}` +
 				(event.location ? ` | ${event.location}` : ''),
 			id: `${baseUrl}/#/events/${event.id}`,
-			link: eventUrl,
+			...(eventUrl && { link: eventUrl }),
 			description: content,
 			date: new Date(event.updated),
 			published: new Date(event.created),
@@ -366,7 +366,7 @@ a:hover { background-color: #0056b3; }
 					end: event.end_date,
 					all_day: event.all_day,
 					location: event.location,
-					url: event.url || `https://kalenteri.suomenpalikkayhteiso.fi/#/events/${event.id}`,
+					...(event.url && { url: event.url }),
 					id: event.id
 				}
 			}))
@@ -389,7 +389,7 @@ a:hover { background-color: #0056b3; }
 			endDate = new Date(endDate.getTime() + 24 * 60 * 60 * 1000);
 		}
 		const description = event.description || event.title;
-		const eventUrl = event.url || `https://kalenteri.suomenpalikkayhteiso.fi/#/events/${event.id}`;
+		const eventUrl = event.url;
 
 		const eventData = {
 			id: `${baseUrl}/#/events/${event.id}`,
@@ -400,7 +400,7 @@ a:hover { background-color: #0056b3; }
 					? `${event.title} | ${event.location.split(',')[0].trim()}`
 					: event.title,
 			description,
-			url: eventUrl,
+			...(eventUrl && { url: eventUrl }),
 			timezone: 'Europe/Helsinki'
 		};
 
