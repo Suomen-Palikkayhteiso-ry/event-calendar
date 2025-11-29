@@ -2,7 +2,12 @@
 	import { onMount, tick } from 'svelte';
 	import { pb } from '$lib/pocketbase';
 	import type { Event } from '$lib/types';
-	import { formatDateInHelsinki, localDateToUTC, localDateTimeToUTC, dateToHelsinkiDateString } from '$lib/date-utils';
+	import {
+		formatDateInHelsinki,
+		localDateToUTC,
+		localDateTimeToUTC,
+		dateToHelsinkiDateString
+	} from '$lib/date-utils';
 	import { user } from '$lib/auth';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
@@ -13,7 +18,7 @@
 
 	let events = $state<Event[]>([]);
 	let currentPage = $state(1);
-	let pageSize = 10;
+	let pageSize = 100;
 	let isSubmitting = $state(false);
 	let kmlFile: File | null = $state(null);
 	let isImporting = $state(false);
@@ -112,28 +117,39 @@
 	let isMounted = $state(false);
 
 	const months: Record<string, number> = {
-		'january': 0, 'jan': 0,
-		'february': 1, 'feb': 1,
-		'march': 2, 'mar': 2,
-		'april': 3, 'apr': 3,
-		'may': 4,
-		'june': 5, 'jun': 5,
-		'july': 6, 'jul': 6,
-		'august': 7, 'aug': 7,
-		'september': 8, 'sep': 8,
-		'october': 9, 'oct': 9,
-		'november': 10, 'nov': 10,
-		'december': 11, 'dec': 11
+		january: 0,
+		jan: 0,
+		february: 1,
+		feb: 1,
+		march: 2,
+		mar: 2,
+		april: 3,
+		apr: 3,
+		may: 4,
+		june: 5,
+		jun: 5,
+		july: 6,
+		jul: 6,
+		august: 7,
+		aug: 7,
+		september: 8,
+		sep: 8,
+		october: 9,
+		oct: 9,
+		november: 10,
+		nov: 10,
+		december: 11,
+		dec: 11
 	};
 
 	const countryMap: Record<string, string> = {
-		'LAT': 'Latvia',
-		'EST': 'Estonia',
-		'LIT': 'Lithuania',
-		'FIN': 'Finland',
-		'SWE': 'Sweden',
-		'NOR': 'Norway',
-		'DNK': 'Denmark'
+		LAT: 'Latvia',
+		EST: 'Estonia',
+		LIT: 'Lithuania',
+		FIN: 'Finland',
+		SWE: 'Sweden',
+		NOR: 'Norway',
+		DNK: 'Denmark'
 	};
 
 	function parseEventName(name: string) {
@@ -156,7 +172,7 @@
 		if (!$user) return;
 
 		const result = await pb.collection('events').getList(page, pageSize, {
-			sort: 'start_date',
+			sort: '-start_date',
 			filter: 'state = "published" || state = "draft"'
 		});
 
@@ -252,6 +268,18 @@
 			alert($_('failed_create_event'));
 		} finally {
 			isSubmitting = false;
+		}
+	}
+
+	async function updateEventState(eventId: string, newState: string) {
+		try {
+			await pb.collection('events').update(eventId, { state: newState });
+			// Refresh the events list
+			await fetchEvents(currentPage);
+			toast.push($_('event_updated_successfully'));
+		} catch (error) {
+			console.error('Error updating event state:', error);
+			toast.push($_('failed_update_event'));
 		}
 	}
 
@@ -548,7 +576,7 @@
 				id="kmlFile"
 				accept=".kml"
 				disabled={isImporting}
-				onchange={(e) => kmlFile = (e.target as HTMLInputElement).files?.[0] || null}
+				onchange={(e) => (kmlFile = (e.target as HTMLInputElement).files?.[0] || null)}
 				class="focus:ring-opacity-25 box-border w-full rounded border border-gray-300 p-3 text-base focus:border-brand-primary focus:ring-2 focus:ring-brand-primary focus:outline-none"
 			/>
 		</div>
@@ -563,43 +591,68 @@
 
 	<div class="events-list">
 		<h2 class="mb-4 text-gray-900">{$_('existing_events')}</h2>
-		{#each events as event (event.id)}
-			<div class="mb-4 rounded-lg border border-gray-300 bg-white p-6">
-				<div class="mb-2 flex items-start justify-between">
-					<h3 class="m-0 flex-1 text-gray-900">
-						{event.location ? `${event.title} / ` : event.title}
-						{#if event.point && event.point.lat !== 0 && event.point.lon !== 0}
-							<a
-								href="https://www.openstreetmap.org/?mlat={event.point.lat}&mlon={event.point
-									.lon}&zoom=15"
-								target="_blank"
-								rel="noopener noreferrer"
-								class="text-brand-primary hover:underline"
-								>📍
-							</a>
-						{/if}
-						{event.location}
-					</h3>
-					<div class="ml-4">
-						<a
-							href={resolve(`/events/${event.id}`)}
-							class="rounded px-2 py-1 font-medium text-brand-primary no-underline transition-colors hover:bg-blue-50"
-							>{$_('edit')}</a
-						>
-					</div>
-				</div>
-				{#if event.description}
-					<p class="my-2 leading-relaxed text-gray-600">{event.description}</p>
-				{/if}
-				<p class="my-1 text-sm text-gray-500">
-					{formatDateInHelsinki(event.start_date, event.all_day)}
-					{#if event.end_date && event.end_date !== event.start_date}
-						- {formatDateInHelsinki(event.end_date, event.all_day)}
-					{/if}
-				</p>
-				<p class="my-1 text-sm font-medium text-gray-600">{$_('status')} {event.state}</p>
-			</div>
-		{/each}
+		<table class="w-full table-auto border-collapse border border-gray-300">
+			<thead>
+				<tr class="bg-gray-100">
+					<th class="border border-gray-300 px-4 py-2 text-left">{$_('title')}</th>
+					<th class="border border-gray-300 px-4 py-2 text-left">{$_('dates')}</th>
+					<th class="border border-gray-300 px-4 py-2 text-left">{$_('location')}</th>
+					<th class="border border-gray-300 px-4 py-2 text-left">{$_('status')}</th>
+					<th class="border border-gray-300 px-4 py-2 text-left">{$_('actions')}</th>
+				</tr>
+			</thead>
+			<tbody>
+				{#each events as event (event.id)}
+					<tr class="hover:bg-gray-50">
+						<td class="border border-gray-300 px-4 py-2">
+							<div class="flex items-center gap-2">
+								{event.title}
+								{#if event.point && event.point.lat !== 0 && event.point.lon !== 0}
+									<a
+										href="https://www.openstreetmap.org/?mlat={event.point.lat}&mlon={event.point
+											.lon}&zoom=15"
+										target="_blank"
+										rel="noopener noreferrer"
+										class="text-brand-primary"
+										>📍
+									</a>
+								{/if}
+							</div>
+							{#if event.description}
+								<div class="mt-1 text-sm text-gray-600">{event.description}</div>
+							{/if}
+						</td>
+						<td class="border border-gray-300 px-4 py-2 text-sm">
+							{formatDateInHelsinki(event.start_date, event.all_day)}
+							{#if event.end_date && event.end_date !== event.start_date}
+								- {formatDateInHelsinki(event.end_date, event.all_day)}
+							{/if}
+						</td>
+						<td class="border border-gray-300 px-4 py-2 text-sm">{event.location || ''}</td>
+						<td class="border border-gray-300 px-4 py-2">
+							<select
+								value={event.state}
+								onchange={(e) => updateEventState(event.id, (e.target as HTMLSelectElement).value)}
+								class="rounded border border-gray-300 px-2 py-1 text-sm"
+							>
+								<option value="draft">{$_('draft')}</option>
+								<option value="pending">{$_('pending')}</option>
+								<option value="published">{$_('published')}</option>
+								<option value="deleted">{$_('deleted')}</option>
+							</select>
+						</td>
+						<td class="border border-gray-300 px-4 py-2">
+							<button
+								class="rounded bg-brand-primary px-3 py-1 text-sm text-white hover:bg-brand-dark"
+								onclick={() => goto(resolve(`/events/${event.id}/edit`))}
+							>
+								{$_('edit')}
+							</button>
+						</td>
+					</tr>
+				{/each}
+			</tbody>
+		</table>
 
 		{#if totalEvents > pageSize}
 			<div class="mt-8 flex items-center justify-center gap-4 border-t border-gray-300 pt-4">
