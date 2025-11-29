@@ -409,7 +409,18 @@
 			<div class="mb-4 rounded-lg border border-gray-300 bg-white p-6">
 				<div class="mb-2 flex items-start justify-between">
 					<h3 class="m-0 flex-1 text-gray-900">
-						{event.location ? `${event.title} / ${event.location}` : event.title}
+						{event.location ? `${event.title} / ` : event.title}
+						{#if event.point && event.point.lat !== 0 && event.point.lon !== 0}
+							<a
+								href="https://www.openstreetmap.org/?mlat={event.point.lat}&mlon={event.point
+									.lon}&zoom=15"
+								target="_blank"
+								rel="noopener noreferrer"
+								class="text-brand-primary hover:underline"
+								>📍
+							</a>
+						{/if}
+						{event.location}
 					</h3>
 					<div class="ml-4">
 						<a

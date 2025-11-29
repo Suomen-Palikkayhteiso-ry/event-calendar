@@ -1,5 +1,8 @@
 node_modules
 
+# Agents
+TODO*
+
 # Output
 .devenv*
 .output
@@ -25,6 +28,7 @@ vite.config.ts.timestamp-*
 
 # Generated
 static/kalenteri.json
+static/kalenteri.geo.json
 static/*.ics
 static/*.rss
 static/*.atom

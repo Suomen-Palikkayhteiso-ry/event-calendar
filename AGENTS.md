@@ -8,13 +8,15 @@ This is a SvelteKit application for an event calendar. It uses TypeScript, Prett
 
 ## Build and Test Commands
 
-This project uses `pnpm` as the package manager.
+This project uses `pnpm` as the package manager and `devenv` for the development environment.
 
-- **Install dependencies:** `pnpm install`
-- **Run development server:** `pnpm dev`
-- **Build for production:** `pnpm build`
-- **Lint and format:** `pnpm lint`
-- **Check for type errors:** `pnpm check`
+All commands should be prefixed with `devenv shell --` to run them in the proper environment.
+
+- **Install dependencies:** `devenv shell -- pnpm install`
+- **Run development server:** `devenv shell -- pnpm dev`
+- **Build for production:** `devenv shell -- pnpm build`
+- **Lint and format:** `devenv shell -- pnpm lint`
+- **Check for type errors:** `devenv shell -- pnpm check`
 
 ## Code Style
 
@@ -22,7 +24,7 @@ This project uses `pnpm` as the package manager.
 - **Quotes:** Use single quotes.
 - **Trailing Comma:** No trailing commas.
 - **Print Width:** 100 characters.
-- **Formatting:** Use `pnpm format` to format the code.
+- **Formatting:** Use `devenv shell -- pnpm format` to format the code.
 
 ## Tailwind CSS v4 Configuration
 

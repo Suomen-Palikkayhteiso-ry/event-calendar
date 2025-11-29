@@ -15,6 +15,8 @@
 	import { Datepicker, Timepicker } from 'flowbite-svelte';
 	import { _ } from 'svelte-i18n';
 	import { toast } from '@zerodevx/svelte-toast';
+	import Map from '$lib/Map.svelte';
+	import { geocodeLocation } from '$lib/geocode';
 
 	let event = $state<Event | null>(null);
 	let isSubmitting = $state(false);
@@ -30,7 +32,8 @@
 		url: '',
 		image: null as File | null,
 		image_description: '',
-		state: 'published' as 'draft' | 'pending' | 'published' | 'deleted'
+		state: 'published' as 'draft' | 'pending' | 'published' | 'deleted',
+		point: null as { lat: number; lon: number } | null
 	});
 
 	// Date/Time picker values (Date objects for components)
@@ -42,6 +45,11 @@
 	// String values for Timepicker components (separate state, not derived)
 	let startTimeString = $state('09:00');
 	let endTimeString = $state('17:00');
+
+	let mapCenter = $state<[number, number]>([60.1699, 24.9384]); // Helsinki default
+	let mapZoom = $state(10);
+	let isGeocoding = $state(false);
+	let geocodingEnabled = $state(true);
 
 	// Helper function to format Date objects for API
 	function formatDateTimeForAPI(dateObj: Date, timeObj: Date): string {
@@ -88,6 +96,12 @@
 
 		const [hours, minutes] = endTimeString.split(':').map(Number);
 		endTimeObj = new Date(1970, 0, 1, hours, minutes);
+	});
+
+	$effect(() => {
+		if (formData.point) {
+			mapCenter = [formData.point.lat, formData.point.lon];
+		}
 	});
 
 	// Check authentication
@@ -148,7 +162,21 @@
 			formData.url = event.url || '';
 			formData.image = null; // Don't pre-populate file input
 			formData.image_description = event.image_description || '';
-
+			formData.point = event.point
+				? {
+						lat: parseFloat(event.point.lat.toFixed(6)),
+						lon: parseFloat(event.point.lon.toFixed(6))
+					}
+				: null;
+			geocodingEnabled =
+				!event.point ||
+				event.point.lat === 0 ||
+				event.point.lon === 0 ||
+				!event.point.lat ||
+				!event.point.lon;
+			if (event.point) {
+				mapZoom = 15; // Zoom in for existing locations
+			}
 			// Set Date objects for components
 			console.log('Edit form: Parsing dates...');
 			const startDateTime = event.all_day
@@ -241,6 +269,7 @@
 			submitData.append('url', formData.url);
 			if (formData.image) submitData.append('image', formData.image);
 			submitData.append('image_description', formData.image_description);
+			if (formData.point) submitData.append('point', JSON.stringify(formData.point));
 			submitData.append(
 				'start_date',
 				formData.all_day
@@ -293,18 +322,98 @@
 			/>
 		</div>
 
-		<div class="mb-4">
-			<label for="editLocation" class="mb-2 block font-medium text-gray-700"
+		<div class="mb-4 flex items-center gap-2">
+			<label for="editLocation" class="mb-2 block flex-shrink-0 font-medium text-gray-700"
 				>{$_('location_label')}</label
 			>
-			<input
-				type="text"
-				id="editLocation"
-				bind:value={formData.location}
-				disabled={isSubmitting}
-				class="focus:ring-opacity-25 box-border w-full rounded border border-gray-300 p-3 text-base focus:border-brand-primary focus:ring-2 focus:ring-brand-primary focus:outline-none"
-			/>
+			<div class="flex flex-1 items-center gap-2">
+				<input
+					type="text"
+					id="editLocation"
+					bind:value={formData.location}
+					disabled={isSubmitting}
+					onblur={async () => {
+						if (formData.location && !isGeocoding && geocodingEnabled) {
+							isGeocoding = true;
+							try {
+								const coords = await geocodeLocation(formData.location);
+								if (coords) {
+									formData.point = {
+										lat: parseFloat(coords[0].toFixed(6)),
+										lon: parseFloat(coords[1].toFixed(6))
+									}; // rounded
+									mapZoom = 15; // Zoom in closer after geocoding
+								}
+							} catch (error) {
+								console.error('Geocoding failed:', error);
+								toast.push($_('geocoding_failed'));
+							} finally {
+								isGeocoding = false;
+							}
+						}
+					}}
+					class="focus:ring-opacity-25 box-border flex-1 rounded border border-gray-300 p-3 text-base focus:border-brand-primary focus:ring-2 focus:ring-brand-primary focus:outline-none"
+				/>
+				<button
+					type="button"
+					class="cursor-pointer rounded border border-gray-300 p-3 text-xl hover:bg-gray-50 focus:ring-2 focus:ring-brand-primary focus:outline-none"
+					onclick={() => (geocodingEnabled = !geocodingEnabled)}
+					title={geocodingEnabled ? $_('disable_geocoding') : $_('enable_geocoding')}
+				>
+					{geocodingEnabled ? '🌍' : '📍'}
+				</button>
+			</div>
 		</div>
+
+		{#if formData.location}
+			<div class="mb-4">
+				<Map
+					center={mapCenter}
+					zoom={mapZoom}
+					markerPosition={formData.point ? [formData.point.lat, formData.point.lon] : null}
+					onMarkerMove={(latlng) =>
+						(formData.point = {
+							lat: parseFloat(latlng[0].toFixed(6)),
+							lon: parseFloat(latlng[1].toFixed(6))
+						})}
+				/>
+			</div>
+
+			{#if formData.point}
+				<div class="mb-4 flex gap-4">
+					<div class="flex-1">
+						<label for="editLat" class="mb-2 block font-medium text-gray-700"
+							>{$_('latitude')}</label
+						>
+						<input
+							type="number"
+							id="editLat"
+							step="0.000001"
+							min="-90"
+							max="90"
+							bind:value={formData.point.lat}
+							disabled={isSubmitting}
+							class="focus:ring-opacity-25 box-border w-full rounded border border-gray-300 p-3 text-base focus:border-brand-primary focus:ring-2 focus:ring-brand-primary focus:outline-none"
+						/>
+					</div>
+					<div class="flex-1">
+						<label for="editLng" class="mb-2 block font-medium text-gray-700"
+							>{$_('longitude')}</label
+						>
+						<input
+							type="number"
+							id="editLng"
+							step="0.000001"
+							min="-180"
+							max="180"
+							bind:value={formData.point.lon}
+							disabled={isSubmitting}
+							class="focus:ring-opacity-25 box-border w-full rounded border border-gray-300 p-3 text-base focus:border-brand-primary focus:ring-2 focus:ring-brand-primary focus:outline-none"
+						/>
+					</div>
+				</div>
+			{/if}
+		{/if}
 
 		<div class="mb-4">
 			<label for="editDescription" class="mb-2 block font-medium text-gray-700"

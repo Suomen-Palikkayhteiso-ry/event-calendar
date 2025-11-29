@@ -119,14 +119,21 @@ body { font-family: Arial, sans-serif; margin: 20px; }
 				start: startDate,
 				end: endDate,
 				summary:
-					event.all_day && event.location ? `${event.title} | ${event.location}` : event.title,
+					event.all_day && event.location
+						? `${event.title} | ${event.location.split(',')[0].trim()}`
+						: event.title,
 				description,
 				url: eventUrl,
 				timezone: 'Europe/Helsinki'
 			};
 
+			// Set location data
 			if (event.location) {
-				eventData.location = event.location;
+				const loc = { title: event.location };
+				if (event.point && event.point.lat !== 0 && event.point.lon !== 0) {
+					loc.geo = { lat: event.point.lat, lon: event.point.lon };
+				}
+				eventData.location = loc;
 			}
 
 			if (event.all_day) {
@@ -193,7 +200,7 @@ async function generateFeeds(events) {
 
 	// Generate individual ICS files for each event
 	const eventIcsDataUris = new Map();
-	events.forEach((event) => {
+	for (const event of events) {
 		const individualCalendar = ical({
 			title: 'Palikkakalenteri',
 			description: 'Suomen Palikkayhteisö ry:n Palikkakalenteri',
@@ -221,8 +228,13 @@ async function generateFeeds(events) {
 			timezone: 'Europe/Helsinki'
 		};
 
+		// Set location data
 		if (event.location) {
-			eventData.location = event.location;
+			const loc = { title: event.location };
+			if (event.point && event.point.lat !== 0 && event.point.lon !== 0) {
+				loc.geo = { lat: event.point.lat, lon: event.point.lon };
+			}
+			eventData.location = loc;
 		}
 
 		if (event.all_day) {
@@ -262,7 +274,7 @@ a:hover { background-color: #0056b3; }
 </body>
 </html>`;
 		writeStaticFile(`events/${event.id}.html`, eventHtml);
-	});
+	}
 
 	const feed = new Feed({
 		title: 'Palikkakalenteri',
@@ -337,13 +349,37 @@ a:hover { background-color: #0056b3; }
 	const jsonfeed = feed.json1();
 	writeStaticFile('kalenteri.json', jsonfeed);
 
+	const geojson = {
+		type: 'FeatureCollection',
+		features: events
+			.filter(event => event.point && event.point.lat !== 0 && event.point.lon !== 0)
+			.map(event => ({
+				type: 'Feature',
+				geometry: {
+					type: 'Point',
+					coordinates: [event.point.lon, event.point.lat]
+				},
+				properties: {
+					title: event.title,
+					description: event.description || event.title,
+					start: event.start_date,
+					end: event.end_date,
+					all_day: event.all_day,
+					location: event.location,
+					url: event.url || `https://kalenteri.suomenpalikkayhteiso.fi/#/events/${event.id}`,
+					id: event.id
+				}
+			}))
+	};
+	writeStaticFile('kalenteri.geo.json', JSON.stringify(geojson, null, 2));
+
 	const calendar = ical({
 		title: 'Palikkakalenteri',
 		description: 'Suomen Palikkayhteisö ry:n Palikkakalenteri',
 		timezone: 'Europe/Helsinki'
 	});
 
-	events.forEach((event) => {
+	for (const event of events) {
 		const startDate = toHelsinkiDate(event.start_date);
 		let endDate = event.end_date
 			? toHelsinkiDate(event.end_date)
@@ -359,14 +395,22 @@ a:hover { background-color: #0056b3; }
 			id: `${baseUrl}/#/events/${event.id}`,
 			start: startDate,
 			end: endDate,
-			summary: event.all_day && event.location ? `${event.title} | ${event.location}` : event.title,
+			summary:
+				event.all_day && event.location
+					? `${event.title} | ${event.location.split(',')[0].trim()}`
+					: event.title,
 			description,
 			url: eventUrl,
 			timezone: 'Europe/Helsinki'
 		};
 
+		// Set location data
 		if (event.location) {
-			eventData.location = event.location;
+			const loc = { title: event.location };
+			if (event.point && event.point.lat !== 0 && event.point.lon !== 0) {
+				loc.geo = { lat: event.point.lat, lon: event.point.lon };
+			}
+			eventData.location = loc;
 		}
 
 		if (event.all_day) {
@@ -374,13 +418,13 @@ a:hover { background-color: #0056b3; }
 		}
 
 		calendar.createEvent(eventData);
-	});
+	}
 
 	const ics = calendar.toString();
 	writeStaticFile('kalenteri.ics', ics);
 
 	console.log(
-		'Generated kalenteri.rss, kalenteri.atom, kalenteri.ics and individual event ICS files'
+		'Generated kalenteri.rss, kalenteri.atom, kalenteri.json, kalenteri.geo.json, kalenteri.ics and individual event ICS files'
 	);
 }
 

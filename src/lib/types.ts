@@ -10,6 +10,7 @@ export interface Event {
 	state: 'draft' | 'pending' | 'published' | 'deleted'; // Event state
 	image?: string; // Optional PocketBase file field for event image
 	image_description?: string; // Optional description for the image
+	point?: { lat: number; lon: number } | null; // Optional PocketBase geopoint field
 	created: string; // Record creation datetime
 	updated: string; // Record last update datetime
 }

@@ -27,6 +27,12 @@ addMessages('fi', {
 	event_title: 'Tapahtuman otsikko',
 	location_label: 'Paikka',
 	location_optional: 'Paikka (valinnainen)',
+	latitude: 'Leveysaste',
+	longitude: 'Pituusaste',
+	geocoding_failed:
+		'Sijainnin haku epäonnistui. Tarkista osoite tai syötä koordinaatit manuaalisesti.',
+	disable_geocoding: 'Poista geocoding käytöstä',
+	enable_geocoding: 'Ota geocoding käyttöön',
 	description_label: 'Kuvaus',
 	description_optional: 'Kuvaus (valinnainen)',
 	url_label: 'Kotisivut:',

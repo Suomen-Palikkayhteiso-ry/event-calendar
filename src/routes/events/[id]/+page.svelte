@@ -34,10 +34,12 @@
 				goto(resolve('/events'));
 			});
 
-		// Add ESC key listener
-		const handleKeydown = (event: KeyboardEvent) => {
-			if (event.key === 'Escape') {
+		// Add key listeners
+		const handleKeydown = (e: KeyboardEvent) => {
+			if (e.key === 'Escape') {
 				goto(resolve('/'));
+			} else if ((e.key === 'e' || e.key === 'E') && event && $user) {
+				goto(resolve(`/events/${event.id}/edit`));
 			}
 		};
 		document.addEventListener('keydown', handleKeydown);
@@ -96,7 +98,17 @@
 		{#if event.location}
 			<p class="my-3 leading-relaxed">
 				<strong class="text-gray-900">{$_('location')}</strong>
-				{event.location}
+				{#if event.point && event.point.lat !== 0 && event.point.lon !== 0}
+					<a
+						href="https://www.openstreetmap.org/?mlat={event.point.lat}&mlon={event.point
+							.lon}&zoom=15"
+						target="_blank"
+						rel="noopener noreferrer"
+						class="text-brand-primary hover:underline">{event.location}</a
+					>
+				{:else}
+					{event.location}
+				{/if}
 			</p>
 		{/if}
 		<p class="my-3 leading-relaxed">
