@@ -2,7 +2,7 @@
 	import { onMount, tick } from 'svelte';
 	import { pb } from '$lib/pocketbase';
 	import type { Event } from '$lib/types';
-	import { formatDateInHelsinki, localDateToUTC, localDateTimeToUTC } from '$lib/date-utils';
+	import { formatDateInHelsinki, localDateToUTC, localDateTimeToUTC, dateToHelsinkiDateString } from '$lib/date-utils';
 	import { user } from '$lib/auth';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
@@ -15,6 +15,8 @@
 	let currentPage = $state(1);
 	let pageSize = 10;
 	let isSubmitting = $state(false);
+	let kmlFile: File | null = $state(null);
+	let isImporting = $state(false);
 
 	// Form data object
 	let formData = $state({
@@ -108,6 +110,40 @@
 
 	let totalEvents = $state(0);
 	let isMounted = $state(false);
+
+	const months: Record<string, number> = {
+		'january': 0, 'jan': 0,
+		'february': 1, 'feb': 1,
+		'march': 2, 'mar': 2,
+		'april': 3, 'apr': 3,
+		'may': 4,
+		'june': 5, 'jun': 5,
+		'july': 6, 'jul': 6,
+		'august': 7, 'aug': 7,
+		'september': 8, 'sep': 8,
+		'october': 9, 'oct': 9,
+		'november': 10, 'nov': 10,
+		'december': 11, 'dec': 11
+	};
+
+	const countryMap: Record<string, string> = {
+		'LAT': 'Latvia',
+		'EST': 'Estonia',
+		'LIT': 'Lithuania',
+		'FIN': 'Finland',
+		'SWE': 'Sweden',
+		'NOR': 'Norway',
+		'DNK': 'Denmark'
+	};
+
+	function parseEventName(name: string) {
+		const match = name.match(/^(.+?)\s*\(([^)]+)\)\s*(.+)?$/);
+		if (match) {
+			return { title: match[1].trim(), country: match[2], dates: match[3]?.trim() };
+		} else {
+			return { title: name, country: undefined, dates: undefined };
+		}
+	}
 
 	// Check authentication
 	$effect(() => {
@@ -233,6 +269,106 @@
 	async function prevPage() {
 		if (currentPage > 1) {
 			await fetchEvents(currentPage - 1);
+		}
+	}
+
+	async function importKML() {
+		if (!$user || !kmlFile) return;
+
+		isImporting = true;
+		try {
+			const text = await kmlFile.text();
+			const parser = new DOMParser();
+			const doc = parser.parseFromString(text, 'application/xml');
+			const placemarks = doc.querySelectorAll('Placemark');
+
+			for (const pm of Array.from(placemarks)) {
+				const nameEl = pm.querySelector('name');
+				const name = nameEl ? nameEl.textContent!.trim() : '';
+				const descEl = pm.querySelector('description');
+				const description = descEl ? descEl.textContent!.trim() : '';
+				const coordsEl = pm.querySelector('coordinates');
+				if (!coordsEl) continue;
+				const coords = coordsEl.textContent!.trim();
+				const [lonStr, latStr] = coords.split(',');
+				const lon = parseFloat(lonStr);
+				const lat = parseFloat(latStr);
+				if (isNaN(lon) || isNaN(lat)) continue;
+
+				const parsed = parseEventName(name);
+				const yearMatch = parsed.title.match(/(\d{4})/);
+				let year = new Date().getFullYear();
+				if (yearMatch) {
+					year = parseInt(yearMatch[1]);
+				}
+
+				let startDate: Date | null = null;
+				let endDate: Date | null = null;
+
+				if (parsed.dates) {
+					if (parsed.dates.toLowerCase().includes('mid')) {
+						const monthMatch = parsed.dates.match(/mid\s+(\w+)/i);
+						if (monthMatch) {
+							const monthName = monthMatch[1].toLowerCase();
+							const month = months[monthName];
+							if (month !== undefined) {
+								startDate = new Date(year, month, 15);
+								endDate = new Date(year, month, 15);
+							}
+						}
+					} else if (parsed.dates.toLowerCase().startsWith('in ')) {
+						const monthMatch = parsed.dates.match(/in\s+(\w+)/i);
+						if (monthMatch) {
+							const monthName = monthMatch[1].toLowerCase();
+							const month = months[monthName];
+							if (month !== undefined) {
+								startDate = new Date(year, month, 1);
+								endDate = new Date(year, month + 1, 0);
+							}
+						}
+					} else {
+						const dateMatch = parsed.dates.match(/(\w+)\s+(\d+)(?:-(\d+))?/i);
+						if (dateMatch) {
+							const monthName = dateMatch[1].toLowerCase();
+							const month = months[monthName];
+							if (month !== undefined) {
+								const day1 = parseInt(dateMatch[2]);
+								const day2 = dateMatch[3] ? parseInt(dateMatch[3]) : day1;
+								startDate = new Date(year, month, day1);
+								endDate = new Date(year, month, day2);
+							}
+						}
+					}
+				}
+
+				if (!startDate) continue;
+
+				const location = parsed.country ? countryMap[parsed.country] || parsed.country : '';
+				const startDateStr = dateToHelsinkiDateString(startDate);
+				const endDateStr = endDate ? dateToHelsinkiDateString(endDate) : startDateStr;
+
+				const eventData = {
+					title: parsed.title,
+					description,
+					start_date: localDateToUTC(startDateStr),
+					end_date: localDateToUTC(endDateStr),
+					all_day: true,
+					location,
+					state: 'draft',
+					point: lat !== 0 || lon !== 0 ? { lat, lon } : null
+				};
+
+				await pb.collection('events').create(eventData);
+			}
+
+			toast.push('KML imported successfully');
+			kmlFile = null;
+			await fetchEvents(currentPage);
+		} catch (error) {
+			console.error('Error importing KML:', error);
+			alert('Failed to import KML');
+		} finally {
+			isImporting = false;
 		}
 	}
 </script>
@@ -402,6 +538,28 @@
 			</button>
 		</div>
 	</form>
+
+	<div class="mb-8">
+		<h2 class="mb-4 text-gray-900">Import KML</h2>
+		<div class="mb-4">
+			<label for="kmlFile" class="mb-2 block font-medium text-gray-700">KML File</label>
+			<input
+				type="file"
+				id="kmlFile"
+				accept=".kml"
+				disabled={isImporting}
+				onchange={(e) => kmlFile = (e.target as HTMLInputElement).files?.[0] || null}
+				class="focus:ring-opacity-25 box-border w-full rounded border border-gray-300 p-3 text-base focus:border-brand-primary focus:ring-2 focus:ring-brand-primary focus:outline-none"
+			/>
+		</div>
+		<button
+			onclick={importKML}
+			disabled={!kmlFile || isImporting}
+			class="cursor-pointer rounded border border-primary-500 bg-primary-500 px-6 py-3 text-base text-white transition-colors hover:bg-primary-600 disabled:cursor-not-allowed disabled:border-gray-400 disabled:bg-gray-200 disabled:text-gray-600 disabled:hover:bg-gray-300"
+		>
+			{isImporting ? 'Importing...' : 'Import KML'}
+		</button>
+	</div>
 
 	<div class="events-list">
 		<h2 class="mb-4 text-gray-900">{$_('existing_events')}</h2>
