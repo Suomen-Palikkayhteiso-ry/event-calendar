@@ -103,7 +103,8 @@
 		// Clear the date from querystring after consuming it
 		const newUrl = new URL($page.url);
 		newUrl.searchParams.delete('date');
-		goto(newUrl.pathname + newUrl.search, { replaceState: true });
+		// @ts-ignore
+		goto(resolve(newUrl.pathname + newUrl.search, { replaceState: true }));
 	});
 
 	function updateCalendarEvents() {
@@ -170,7 +171,7 @@
 		</div>
 		<button
 			class="flex h-12 w-12 flex-shrink-0 cursor-pointer items-center justify-center rounded-full border-none bg-primary-500 text-xl font-bold text-white transition-colors duration-200 hover:bg-primary-600"
-			onclick={() => goto(`/events?date=${dateToHelsinkiDateString(selectedDate)}`)}
+			onclick={() => goto(resolve(`/events?date=${dateToHelsinkiDateString(selectedDate)}`) as any)}
 			title="Add new event"
 			>+
 		</button>
