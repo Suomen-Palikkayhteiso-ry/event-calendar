@@ -87,12 +87,13 @@ addMessages('fi', {
 	ical_feed: 'iCalendar',
 	atom_feed: 'ATOM',
 	json_feed: 'JSON',
+	geojson_feed: 'GeoJSON',
 	ical_description:
 		'Kalenterivienti (ICS) tilaa tai integroi koko kalenterin helposti. Klikkaa kalenteri puhelimeesi!',
 	html_description:
 		'Upota tai tulosta valmis tapahtumalistaus. Sisältää kalenterilinkit yksittäisiin tapahtumiin.',
 	feeds_description:
-		'Uutissyötteet integroivat uudet tapahtumat verkkosivuille tai uutislukijoihin. Nämäkin sisältävät kalenterilinkit.',
+		'Syötteet integroivat uudet tapahtumat verkkosivuille. Nämäkin sisältävät kalenterilinkit.',
 	// Callback
 	completing_login: 'Viimeistellään kirjautumista...',
 	// Non-member instructions

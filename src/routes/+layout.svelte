@@ -80,7 +80,7 @@
 							d="M6 5c7.18 0 13 5.82 13 13M6 11a7 7 0 017 7m-6 0a1 1 0 11-2 0 1 1 0 012 0m6 0a1 1 0 11-2 0 1 1 0 012 0m6 0a1 1 0 11-2 0 1 1 0 012 0"
 						></path>
 					</svg>
-					<h3 class="text-lg font-semibold">Uutissyötteet</h3>
+					<h3 class="text-lg font-semibold">Syötteet</h3>
 				</div>
 				<p class="mb-3 text-sm text-gray-600">{$_('feeds_description')}</p>
 				<div class="text-center">
@@ -103,6 +103,13 @@
 						href="/kalenteri.json"
 						target="_blank"
 						class="mx-1 text-brand-primary no-underline hover:underline">{$_('json_feed')}</a
+					>
+					|
+					<!-- eslint-disable-next-line svelte/no-navigation-without-resolve --><!--These are external links, so resolve is not needed.-->
+					<a
+						href="/kalenteri.geo.json"
+						target="_blank"
+						class="mx-1 text-brand-primary no-underline hover:underline">{$_('geojson_feed')}</a
 					>
 				</div>
 			</div>
