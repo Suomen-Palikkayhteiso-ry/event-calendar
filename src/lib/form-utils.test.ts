@@ -7,12 +7,12 @@ vi.mock('svelte-i18n', () => ({
 	_: { subscribe: vi.fn() },
 	get: vi.fn((store) => (key: string) => {
 		const translations: Record<string, string> = {
-			'title_required_error': 'Otsikko on pakollinen',
-			'start_date_required_error': 'Aloituspäivä on pakollinen',
-			'end_date_after_start_error': 'Lopetuspäivän täytyy olla aloituspäivän jälkeen',
-			'url_invalid_error': 'URL:n täytyy alkaa http:// tai https://',
-			'latitude_invalid_error': 'Leveysasteen täytyy olla välillä -90 ja 90',
-			'longitude_invalid_error': 'Pituusasteen täytyy olla välillä -180 ja 180'
+			title_required_error: 'Otsikko on pakollinen',
+			start_date_required_error: 'Aloituspäivä on pakollinen',
+			end_date_after_start_error: 'Lopetuspäivän täytyy olla aloituspäivän jälkeen',
+			url_invalid_error: 'URL:n täytyy alkaa http:// tai https://',
+			latitude_invalid_error: 'Leveysasteen täytyy olla välillä -90 ja 90',
+			longitude_invalid_error: 'Pituusasteen täytyy olla välillä -180 ja 180'
 		};
 		return translations[key] || key;
 	})

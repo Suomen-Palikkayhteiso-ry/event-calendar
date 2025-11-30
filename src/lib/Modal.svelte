@@ -101,7 +101,7 @@
 
 <style>
 	.modal-backdrop {
-		@apply fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4;
+		@apply bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black p-4;
 	}
 
 	.modal-content {
@@ -133,7 +133,7 @@
 	}
 
 	.modal-close {
-		@apply flex h-8 w-8 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-primary;
+		@apply flex h-8 w-8 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600 focus:ring-2 focus:ring-brand-primary focus:outline-none;
 	}
 
 	.modal-body {

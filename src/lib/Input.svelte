@@ -66,4 +66,4 @@
 	onchange={(e) => dispatch('change', e)}
 	onblur={(e) => dispatch('blur', e)}
 	onfocus={(e) => dispatch('focus', e)}
->
+/>

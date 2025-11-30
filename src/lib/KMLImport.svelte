@@ -29,11 +29,7 @@
 			class="form-input"
 		/>
 	</div>
-	<button
-		onclick={handleImport}
-		disabled={!kmlFile || isImporting}
-		class="btn-primary"
-	>
+	<button onclick={handleImport} disabled={!kmlFile || isImporting} class="btn-primary">
 		{isImporting ? 'Importing...' : 'Import KML'}
 	</button>
 </div>

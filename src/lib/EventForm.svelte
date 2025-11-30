@@ -291,7 +291,8 @@
 			value={formState.formData.image_description}
 			placeholder={$_('image_description_optional')}
 			disabled={isSubmitting}
-			oninput={(e) => formStore.updateField('image_description', (e.target as HTMLInputElement).value)}
+			oninput={(e) =>
+				formStore.updateField('image_description', (e.target as HTMLInputElement).value)}
 		/>
 	</div>
 
@@ -359,7 +360,11 @@
 			id="state"
 			value={formState.formData.state}
 			disabled={isSubmitting}
-			onchange={(e) => formStore.updateField('state', (e.target as HTMLSelectElement).value as EventFormData['state'])}
+			onchange={(e) =>
+				formStore.updateField(
+					'state',
+					(e.target as HTMLSelectElement).value as EventFormData['state']
+				)}
 		>
 			<option value="draft">{$_('draft')}</option>
 			<option value="pending">{$_('pending')}</option>
