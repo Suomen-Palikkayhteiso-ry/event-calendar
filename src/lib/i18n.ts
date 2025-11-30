@@ -113,7 +113,19 @@ addMessages('fi', {
 	completing_login: 'Viimeistellään kirjautumista...',
 	// Non-member instructions
 	non_member_prefix: 'Jos et ole Suomen Palikkayhteisö ry:n jäsen, ',
-	send_event_email: 'lähetä tapahtumasi meille sähköpostilla'
+	send_event_email: 'lähetä tapahtumasi meille sähköpostilla',
+	// Error page
+	error_page_title: 'Virhe',
+	something_went_wrong: 'Jotain meni pieleen',
+	page_not_found: 'Sivua ei löytynyt',
+	page_not_found_description: 'Etsimääsi sivua ei löytynyt.',
+	error_page_description: 'Tapahtui odottamaton virhe. Yritä myöhemmin uudelleen.',
+	error_details: 'Virheen tiedot',
+	reload_page: 'Lataa sivu uudelleen',
+	// Error boundary
+	component_error_title: 'Komponentin virhe',
+	component_error_description: 'Tässä komponentissa tapahtui virhe.',
+	try_again: 'Yritä uudelleen'
 });
 
 init({
