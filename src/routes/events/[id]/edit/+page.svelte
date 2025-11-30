@@ -11,6 +11,7 @@
 	import EventForm from '$lib/EventForm.svelte';
 	import { prepareEventSubmitData } from '$lib/form-utils';
 	import { eventsStore } from '$lib/stores/events';
+	import { eventToFormData } from '$lib/event-utils';
 
 	let event = $state<Event | null>(null);
 	let isSubmitting = $state(false);
@@ -91,24 +92,7 @@
 	<EventForm
 		mode="edit"
 		{isSubmitting}
-		initialData={{
-			title: event.title,
-			start_date: event.start_date,
-			end_date: event.end_date || event.start_date,
-			all_day: event.all_day,
-			location: event.location || '',
-			description: event.description || '',
-			url: event.url || '',
-			image: null,
-			image_description: event.image_description || '',
-			state: event.state,
-			point: event.point
-				? {
-						lat: parseFloat(event.point.lat.toFixed(6)),
-						lon: parseFloat(event.point.lon.toFixed(6))
-					}
-				: null
-		}}
+		initialData={eventToFormData(event)}
 		currentImage={event.image}
 		onSubmit={saveEdit}
 		onCancel={cancelEdit}

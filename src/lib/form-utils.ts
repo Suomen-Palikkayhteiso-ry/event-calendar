@@ -46,9 +46,9 @@ export function validateEventForm(formData: EventFormData): Record<string, strin
 export function prepareEventSubmitData(formData: EventFormData): FormData {
 	const submitData = new FormData();
 	submitData.append('title', formData.title);
-	if (formData.location) submitData.append('location', formData.location);
-	if (formData.description) submitData.append('description', formData.description);
-	if (formData.url) submitData.append('url', formData.url);
+	submitData.append('location', formData.location);
+	submitData.append('description', formData.description);
+	submitData.append('url', formData.url);
 	submitData.append(
 		'start_date',
 		formData.all_day
@@ -67,8 +67,7 @@ export function prepareEventSubmitData(formData: EventFormData): FormData {
 	);
 	submitData.append('all_day', formData.all_day.toString());
 	if (formData.image) submitData.append('image', formData.image);
-	if (formData.image_description)
-		submitData.append('image_description', formData.image_description);
+	submitData.append('image_description', formData.image_description);
 	submitData.append('state', formData.state);
 	if (formData.point) submitData.append('point', JSON.stringify(formData.point));
 

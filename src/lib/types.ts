@@ -28,3 +28,50 @@ export interface EventFormData {
 	state: 'draft' | 'pending' | 'published' | 'deleted';
 	point: { lat: number; lon: number } | null;
 }
+
+export interface CalendarOptions {
+	view: string;
+	events: any[];
+	date: Date;
+	locale: string;
+	firstDay: number;
+	buttonText: Record<string, string>;
+	headerToolbar: { start: string; center: string; end: string };
+	eventClassNames?: (info: any) => string[];
+	eventDidMount?: (info: any) => void;
+	eventClick?: (info: any) => void;
+	dateClick?: (info: any) => void;
+}
+
+export interface ParsedEventName {
+	title: string;
+	country?: string;
+	dates?: string;
+}
+
+export interface KMLPlacemark {
+	name: string;
+	description: string;
+	coordinates: {
+		lat: number;
+		lon: number;
+	};
+}
+
+export interface ApiResponse<T> {
+	data: T;
+	message?: string;
+}
+
+export interface PaginatedResponse<T> {
+	items: T[];
+	totalItems: number;
+	totalPages: number;
+	page: number;
+	perPage: number;
+}
+
+export interface PocketBaseEvent extends Event {
+	collectionId: string;
+	collectionName: string;
+}

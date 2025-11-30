@@ -1,6 +1,7 @@
 import { pb } from '$lib/pocketbase';
 import { localDateToUTC, dateToHelsinkiDateString } from '$lib/date-utils';
 import { toast } from '@zerodevx/svelte-toast';
+import type { ParsedEventName, KMLPlacemark } from '$lib/types';
 
 const months: Record<string, number> = {
 	january: 0,
@@ -38,7 +39,7 @@ const countryMap: Record<string, string> = {
 	DNK: 'Denmark'
 };
 
-export function parseEventName(name: string) {
+export function parseEventName(name: string): ParsedEventName {
 	const match = name.match(/^(.+?)\s*\(([^)]+)\)\s*(.+)?$/);
 	if (match) {
 		return { title: match[1].trim(), country: match[2], dates: match[3]?.trim() };
