@@ -2,10 +2,9 @@ import { describe, it, expect, vi } from 'vitest';
 import { validateEventForm, prepareEventSubmitData } from '$lib/form-utils';
 import type { EventFormData } from '$lib/types';
 
-// Mock svelte-i18n
-vi.mock('svelte-i18n', () => ({
-	_: { subscribe: vi.fn() },
-	get: vi.fn((store) => (key: string) => {
+// Mock svelte/store get function
+vi.mock('svelte/store', () => ({
+	get: vi.fn((store) => {
 		const translations: Record<string, string> = {
 			title_required_error: 'Otsikko on pakollinen',
 			start_date_required_error: 'Aloituspäivä on pakollinen',
@@ -14,8 +13,13 @@ vi.mock('svelte-i18n', () => ({
 			latitude_invalid_error: 'Leveysasteen täytyy olla välillä -90 ja 90',
 			longitude_invalid_error: 'Pituusasteen täytyy olla välillä -180 ja 180'
 		};
-		return translations[key] || key;
+		return (key: string) => translations[key] || key;
 	})
+}));
+
+// Mock svelte-i18n
+vi.mock('svelte-i18n', () => ({
+	_: { subscribe: vi.fn() }
 }));
 
 describe('form-utils', () => {
