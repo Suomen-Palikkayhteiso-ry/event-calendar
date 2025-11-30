@@ -119,6 +119,6 @@
 	});
 </script>
 
-<div bind:this={calendarWrapper}>
+<div bind:this={calendarWrapper} role="application" aria-label={$_('event_calendar')}>
 	<Calendar plugins={[List, DayGrid]} options={calendarOptions} />
 </div>

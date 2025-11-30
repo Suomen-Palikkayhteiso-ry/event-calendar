@@ -82,10 +82,19 @@
 		locale="fi"
 		firstDayOfWeek={1}
 		{disabled}
-		on:change={(e) => { dateObj = e.detail; }}
+		on:change={(e) => {
+			dateObj = e.detail;
+		}}
 	/>
 	{#if !allDay}
-		<Timepicker id="{id}Time" value={timeString} {disabled} on:change={(e) => { timeString = e.detail; }} />
+		<Timepicker
+			id="{id}Time"
+			value={timeString}
+			{disabled}
+			on:change={(e) => {
+				timeString = e.detail;
+			}}
+		/>
 	{/if}
 </div>
 

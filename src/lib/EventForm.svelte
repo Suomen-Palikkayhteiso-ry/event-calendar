@@ -134,7 +134,7 @@
 				type="button"
 				class="cursor-pointer rounded border border-gray-300 p-3 text-xl hover:bg-gray-50 focus:ring-2 focus:ring-brand-primary focus:outline-none"
 				onclick={() => (geocodingEnabled = !geocodingEnabled)}
-				title={geocodingEnabled ? $_('disable_geocoding') : $_('enable_geocoding')}
+				aria-label={geocodingEnabled ? $_('disable_geocoding') : $_('enable_geocoding')}
 			>
 				{geocodingEnabled ? '🌍' : '📍'}
 			</button>
@@ -232,13 +232,19 @@
 			id="image"
 			accept="image/*"
 			disabled={isSubmitting}
+			aria-describedby="imageHelp"
 			onchange={(e) => {
 				const target = e.target as HTMLInputElement;
 				formData.image = target.files?.[0] || null;
 			}}
 		/>
 		{#if currentImage}
-			<p class="my-2 text-sm text-gray-600 italic">{$_('current_image')} {currentImage}</p>
+			<p id="imageHelp" class="my-2 text-sm text-gray-600 italic">
+				{$_('current_image')}
+				{currentImage}
+			</p>
+		{:else}
+			<p id="imageHelp" class="my-2 text-sm text-gray-600">{$_('image_help_text')}</p>
 		{/if}
 	</div>
 
@@ -262,7 +268,10 @@
 				id="startDate"
 				label={$_('start_date_required')}
 				value={formData.start_date}
-				onChange={(value) => { formData.start_date = value; delete errors.start_date; }}
+				onChange={(value) => {
+					formData.start_date = value;
+					delete errors.start_date;
+				}}
 				disabled={isSubmitting}
 				allDay={formData.all_day}
 			/>
@@ -276,7 +285,10 @@
 				id="endDate"
 				label={$_('end_date')}
 				value={formData.end_date}
-				onChange={(value) => { formData.end_date = value; delete errors.end_date; }}
+				onChange={(value) => {
+					formData.end_date = value;
+					delete errors.end_date;
+				}}
 				disabled={isSubmitting || !formData.all_day}
 				allDay={formData.all_day}
 			/>
@@ -287,9 +299,10 @@
 	</div>
 
 	<div class="mb-4">
-		<label class="flex cursor-pointer items-center gap-2 font-normal">
+		<label for="allDay" class="flex cursor-pointer items-center gap-2 font-normal">
 			<input
 				type="checkbox"
+				id="allDay"
 				bind:checked={formData.all_day}
 				disabled={isSubmitting}
 				onchange={(e) => {
@@ -323,6 +336,7 @@
 		<button
 			type="submit"
 			disabled={isSubmitting || !formData.title || !formData.start_date}
+			aria-disabled={isSubmitting || !formData.title || !formData.start_date}
 			class="cursor-pointer rounded border border-primary-500 bg-primary-500 px-6 py-3 text-base text-white transition-colors hover:bg-primary-600 disabled:cursor-not-allowed disabled:border-gray-400 disabled:bg-gray-200 disabled:text-gray-600 disabled:hover:bg-gray-300"
 		>
 			{isSubmitting

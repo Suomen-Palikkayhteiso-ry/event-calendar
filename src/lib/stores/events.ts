@@ -27,7 +27,7 @@ function createEventsStore() {
 		update,
 
 		async fetchEvents(page = 1, pageSize = 100) {
-			update(state => ({ ...state, isLoading: true }));
+			update((state) => ({ ...state, isLoading: true }));
 
 			try {
 				const result = await pb.collection('events').getList(page, pageSize, {
@@ -47,7 +47,7 @@ function createEventsStore() {
 				return newState;
 			} catch (error) {
 				console.error('Error fetching events:', error);
-				update(state => ({ ...state, isLoading: false }));
+				update((state) => ({ ...state, isLoading: false }));
 				throw error;
 			}
 		},

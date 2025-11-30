@@ -26,11 +26,14 @@
 		const eventId = $page.params.id;
 		if (!eventId) return;
 
-		eventsStore.getEventById(eventId).then((loadedEvent) => {
-			event = loadedEvent;
-		}).catch(() => {
-			goto(resolve('/events'));
-		});
+		eventsStore
+			.getEventById(eventId)
+			.then((loadedEvent) => {
+				event = loadedEvent;
+			})
+			.catch(() => {
+				goto(resolve('/events'));
+			});
 
 		// Add key listeners
 		const handleKeydown = (e: KeyboardEvent) => {

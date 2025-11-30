@@ -16,8 +16,16 @@
 		loading?: boolean;
 	}
 
-	let { events, totalEvents, currentPage, pageSize, onUpdateState, onNextPage, onPrevPage, loading = false }: Props =
-		$props();
+	let {
+		events,
+		totalEvents,
+		currentPage,
+		pageSize,
+		onUpdateState,
+		onNextPage,
+		onPrevPage,
+		loading = false
+	}: Props = $props();
 </script>
 
 <div class="events-list">
@@ -25,7 +33,12 @@
 	{#if loading}
 		<p>{$_('loading_events')}</p>
 	{:else}
-		<table class="w-full table-auto border-collapse border border-gray-300">
+		<table
+			class="w-full table-auto border-collapse border border-gray-300"
+			role="table"
+			aria-label={$_('events_table')}
+		>
+			<caption class="sr-only">{$_('existing_events')}</caption>
 			<thead>
 				<tr class="bg-gray-100">
 					<th class="border border-gray-300 px-4 py-2 text-left">{$_('title')}</th>
@@ -48,6 +61,7 @@
 										target="_blank"
 										rel="noopener noreferrer"
 										class="text-brand-primary"
+										aria-label="{$_('view_on_map')} {event.location || event.title}"
 										>📍
 									</a>
 								{/if}
@@ -79,6 +93,7 @@
 							<button
 								class="rounded bg-brand-primary px-3 py-1 text-sm text-white hover:bg-brand-dark"
 								onclick={() => goto(resolve(`/events/${event.id}/edit`))}
+								aria-label="{$_('edit_event')} {event.title}"
 							>
 								{$_('edit')}
 							</button>
@@ -94,6 +109,7 @@
 					class="cursor-pointer rounded border-none bg-primary-700 px-4 py-2 text-sm text-white transition-colors hover:bg-primary-600 disabled:cursor-not-allowed disabled:bg-gray-400"
 					disabled={currentPage === 1}
 					onclick={onPrevPage}
+					aria-label={$_('previous_page')}
 				>
 					{$_('previous')}
 				</button>
@@ -111,6 +127,7 @@
 					class="cursor-pointer rounded border-none bg-primary-700 px-4 py-2 text-sm text-white transition-colors hover:bg-primary-600 disabled:cursor-not-allowed disabled:bg-gray-400"
 					disabled={currentPage === Math.ceil(totalEvents / pageSize)}
 					onclick={onNextPage}
+					aria-label={$_('next_page')}
 				>
 					{$_('next_button')}
 				</button>

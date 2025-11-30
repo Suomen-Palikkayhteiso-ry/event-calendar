@@ -32,15 +32,18 @@
 			return;
 		}
 
-		eventsStore.getEventById(eventId).then((loadedEvent) => {
-			console.log('Edit form: Event loaded successfully:', loadedEvent);
-			event = loadedEvent;
-			console.log('Edit form: Event assigned, calling initializeEditForm');
-		}).catch((error) => {
-			console.error('Edit form: Error loading event:', error);
-			toast.push($_('failed_load_event'));
-			goto(resolve('/events'));
-		});
+		eventsStore
+			.getEventById(eventId)
+			.then((loadedEvent) => {
+				console.log('Edit form: Event loaded successfully:', loadedEvent);
+				event = loadedEvent;
+				console.log('Edit form: Event assigned, calling initializeEditForm');
+			})
+			.catch((error) => {
+				console.error('Edit form: Error loading event:', error);
+				toast.push($_('failed_load_event'));
+				goto(resolve('/events'));
+			});
 
 		// Add ESC key listener
 		const handleKeydown = (event: KeyboardEvent) => {

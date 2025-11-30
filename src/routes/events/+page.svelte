@@ -34,8 +34,14 @@
 	});
 
 	// Subscribe to events store
-	let eventsState: EventsState = $state({ events: [], totalEvents: 0, currentPage: 1, pageSize: 100, isLoading: false });
-	eventsStore.subscribe(state => {
+	let eventsState: EventsState = $state({
+		events: [],
+		totalEvents: 0,
+		currentPage: 1,
+		pageSize: 100,
+		isLoading: false
+	});
+	eventsStore.subscribe((state) => {
 		eventsState = state;
 	});
 

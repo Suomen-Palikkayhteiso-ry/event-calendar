@@ -16,7 +16,9 @@ export function validateEventForm(formData: EventFormData): Record<string, strin
 
 	// If end date is provided, it must be after start date
 	if (formData.end_date && formData.start_date) {
-		const start = new Date(formData.all_day ? formData.start_date.split('T')[0] : formData.start_date);
+		const start = new Date(
+			formData.all_day ? formData.start_date.split('T')[0] : formData.start_date
+		);
 		const end = new Date(formData.all_day ? formData.end_date.split('T')[0] : formData.end_date);
 		if (end < start) {
 			errors.end_date = 'Lopetuspäivän täytyy olla aloituspäivän jälkeen';
