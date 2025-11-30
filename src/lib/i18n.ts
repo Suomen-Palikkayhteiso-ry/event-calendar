@@ -125,7 +125,14 @@ addMessages('fi', {
 	// Error boundary
 	component_error_title: 'Komponentin virhe',
 	component_error_description: 'Tässä komponentissa tapahtui virhe.',
-	try_again: 'Yritä uudelleen'
+	try_again: 'Yritä uudelleen',
+	// Validation messages
+	title_required_error: 'Otsikko on pakollinen',
+	start_date_required_error: 'Aloituspäivä on pakollinen',
+	end_date_after_start_error: 'Lopetuspäivän täytyy olla aloituspäivän jälkeen',
+	url_invalid_error: 'URL:n täytyy alkaa http:// tai https://',
+	latitude_invalid_error: 'Leveysasteen täytyy olla välillä -90 ja 90',
+	longitude_invalid_error: 'Pituusasteen täytyy olla välillä -180 ja 180'
 });
 
 init({

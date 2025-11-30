@@ -1,5 +1,6 @@
 import type { EventFormData } from '$lib/types';
 import { localDateToUTC, localDateTimeToUTC } from '$lib/date-utils';
+import { _, get } from 'svelte-i18n';
 
 /**
  * Validates event form data and returns an object with field errors
@@ -8,15 +9,16 @@ import { localDateToUTC, localDateTimeToUTC } from '$lib/date-utils';
  */
 export function validateEventForm(formData: EventFormData): Record<string, string> {
 	const errors: Record<string, string> = {};
+	const t = get(_);
 
 	// Title is required
 	if (!formData.title.trim()) {
-		errors.title = 'Otsikko on pakollinen';
+		errors.title = t('title_required_error');
 	}
 
 	// Start date is required
 	if (!formData.start_date) {
-		errors.start_date = 'Aloituspäivä on pakollinen';
+		errors.start_date = t('start_date_required_error');
 	}
 
 	// If end date is provided, it must be after start date
@@ -26,22 +28,22 @@ export function validateEventForm(formData: EventFormData): Record<string, strin
 		);
 		const end = new Date(formData.all_day ? formData.end_date.split('T')[0] : formData.end_date);
 		if (end < start) {
-			errors.end_date = 'Lopetuspäivän täytyy olla aloituspäivän jälkeen';
+			errors.end_date = t('end_date_after_start_error');
 		}
 	}
 
 	// URL validation if provided
 	if (formData.url && !/^https?:\/\/.+/.test(formData.url)) {
-		errors.url = 'URL:n täytyy alkaa http:// tai https://';
+		errors.url = t('url_invalid_error');
 	}
 
 	// Latitude and longitude validation if point is provided
 	if (formData.point) {
 		if (formData.point.lat < -90 || formData.point.lat > 90) {
-			errors.point = 'Leveysasteen täytyy olla välillä -90 ja 90';
+			errors.point = t('latitude_invalid_error');
 		}
 		if (formData.point.lon < -180 || formData.point.lon > 180) {
-			errors.point = 'Pituusasteen täytyy olla välillä -180 ja 180';
+			errors.point = t('longitude_invalid_error');
 		}
 	}
 

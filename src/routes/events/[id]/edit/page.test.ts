@@ -37,7 +37,8 @@ vi.mock('$lib/pocketbase', () => {
 
 // Mock svelte-i18n
 vi.mock('svelte-i18n', () => ({
-	_: writable((key: string) => key)
+	_: writable((key: string) => key),
+	get: (store: any) => (key: string) => key
 }));
 
 // Mock $app/navigation
