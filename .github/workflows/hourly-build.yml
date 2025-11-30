@@ -39,7 +39,7 @@ jobs:
             build-main-
 
       - name: Update build
-        run: make dist
+        run: make build
 
       - name: Setup Pages
         uses: actions/configure-pages@v5

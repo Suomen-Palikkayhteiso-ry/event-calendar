@@ -43,4 +43,4 @@ jobs:
           name: codecov-umbrella
 
       - name: Build (verification only)
-        run: make clean dist
+        run: make clean build
