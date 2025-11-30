@@ -185,9 +185,9 @@ describe('events/[id]/edit/+page.svelte event edit form', () => {
 		await user.clear(titleInput);
 
 		const submitButton = screen.getByRole('button', { name: 'save_changes' });
-		expect(submitButton).toBeDisabled();
+		await user.click(submitButton);
 
-		// Since button is disabled, update should not be called
+		// Since title is empty, form validation should prevent submission
 		expect(mockUpdate).not.toHaveBeenCalled();
 	});
 

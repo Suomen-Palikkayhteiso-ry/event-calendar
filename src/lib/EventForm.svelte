@@ -42,6 +42,16 @@
 		}
 	});
 
+	// Reset form when initialData changes
+	$effect(() => {
+		if (initialData) {
+			formStore.reset(initialData);
+			if (initialData.point) {
+				mapCenter = [initialData.point.lat, initialData.point.lon];
+			}
+		}
+	});
+
 	async function handleSubmit(e: SubmitEvent) {
 		e.preventDefault();
 
