@@ -57,10 +57,6 @@ test-coverage: node_modules
 test-e2e: node_modules
 	$(PNPM) test:e2e
 
-.PHONY: storybook
-storybook: install
-	$(PNPM) storybook
-
 .PHONY: format
 format:
 	$(PNPM) format
