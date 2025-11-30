@@ -4,7 +4,9 @@ import {
 	formatDateInHelsinki,
 	localDateToUTC,
 	localDateTimeToUTC,
-	dateToHelsinkiDateString
+	dateToHelsinkiDateString,
+	utcToHelsinkiDateTimeLocal,
+	utcToHelsinkiDate
 } from '$lib/date-utils';
 
 describe('date-utils', () => {
@@ -75,6 +77,45 @@ describe('date-utils', () => {
 			const date = new Date('2024-01-01T22:00:00Z'); // UTC
 			const result = dateToHelsinkiDateString(date);
 			expect(result).toBe('2024-01-02'); // Next day in Helsinki
+		});
+	});
+
+	describe('utcToHelsinkiDateTimeLocal', () => {
+		it('should convert UTC to Helsinki datetime-local format during standard time', () => {
+			const result = utcToHelsinkiDateTimeLocal('2024-01-01T08:30:00Z');
+			expect(result).toBe('2024-01-01T10:30'); // EET +02:00
+		});
+
+		it('should convert UTC to Helsinki datetime-local format during DST', () => {
+			const result = utcToHelsinkiDateTimeLocal('2024-06-15T07:30:00Z');
+			expect(result).toBe('2024-06-15T10:30'); // EEST +03:00
+		});
+
+		it('should handle midnight UTC', () => {
+			const result = utcToHelsinkiDateTimeLocal('2024-01-01T00:00:00Z');
+			expect(result).toBe('2024-01-01T02:00'); // EET +02:00
+		});
+	});
+
+	describe('utcToHelsinkiDate', () => {
+		it('should convert UTC to Helsinki date string during standard time', () => {
+			const result = utcToHelsinkiDate('2024-01-01T08:30:00Z');
+			expect(result).toBe('2024-01-01');
+		});
+
+		it('should convert UTC to Helsinki date string during DST', () => {
+			const result = utcToHelsinkiDate('2024-06-15T07:30:00Z');
+			expect(result).toBe('2024-06-15');
+		});
+
+		it('should handle date change at midnight UTC', () => {
+			const result = utcToHelsinkiDate('2024-01-01T00:00:00Z');
+			expect(result).toBe('2024-01-01');
+		});
+
+		it('should handle date change when UTC is late', () => {
+			const result = utcToHelsinkiDate('2024-01-01T22:00:00Z');
+			expect(result).toBe('2024-01-02');
 		});
 	});
 });
