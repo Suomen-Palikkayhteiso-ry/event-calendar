@@ -1,6 +1,7 @@
 import type { EventFormData } from '$lib/types';
 import { localDateToUTC, localDateTimeToUTC } from '$lib/date-utils';
-import { _, get } from 'svelte-i18n';
+import { _ } from 'svelte-i18n';
+import { get as getStoreValue } from 'svelte/store';
 
 /**
  * Validates event form data and returns an object with field errors
@@ -9,7 +10,7 @@ import { _, get } from 'svelte-i18n';
  */
 export function validateEventForm(formData: EventFormData): Record<string, string> {
 	const errors: Record<string, string> = {};
-	const t = get(_);
+	const t = getStoreValue(_);
 
 	// Title is required
 	if (!formData.title.trim()) {

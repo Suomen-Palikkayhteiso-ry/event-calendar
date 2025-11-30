@@ -10,5 +10,5 @@
  * Color configuration has been moved to src/app.css @theme block.
  */
 export default {
-	content: ['./src/**/*.{html,js,svelte,ts}']
+	content: ['./src/**/*.{html,js,svelte,ts}', './src/lib/ui.ts']
 };

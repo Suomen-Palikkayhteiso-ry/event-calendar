@@ -5,13 +5,6 @@
 
 @import './fonts/outfit.css';
 
-@import 'tailwindcss';
-
-@plugin '@tailwindcss/forms';
-@plugin '@tailwindcss/typography';
-
-@import './fonts/outfit.css';
-
 /* Tailwind v4 theme configuration - generates utility classes */
 @theme {
 	/* Primary color scale (dark violet) - generates bg-primary-*, text-primary-*, etc. */

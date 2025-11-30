@@ -32,12 +32,13 @@
 </button>
 
 <style>
+	@reference "tailwindcss";
 	.btn {
 		@apply cursor-pointer rounded border border-solid transition-colors focus:ring-2 focus:outline-none disabled:cursor-not-allowed;
 	}
 
 	.btn-primary {
-		@apply border-primary-500 bg-primary-500 text-white hover:bg-primary-600 focus:ring-primary-500 disabled:border-gray-400 disabled:bg-gray-200 disabled:text-gray-600 disabled:hover:bg-gray-300;
+		@apply border-blue-500 bg-blue-500 text-white hover:bg-blue-600 focus:ring-blue-500 disabled:border-gray-400 disabled:bg-gray-200 disabled:text-gray-600 disabled:hover:bg-gray-300;
 	}
 
 	.btn-secondary {
@@ -45,7 +46,7 @@
 	}
 
 	.btn-icon {
-		@apply flex h-12 w-12 flex-shrink-0 items-center justify-center border-none bg-primary-500 text-xl font-bold text-white hover:bg-primary-600 focus:ring-primary-500;
+		@apply flex h-12 w-12 flex-shrink-0 items-center justify-center border-none bg-blue-500 text-xl font-bold text-white hover:bg-blue-600 focus:ring-blue-500;
 	}
 
 	.btn-sm {
