@@ -4,6 +4,10 @@
 
 [Proposed | Accepted | Rejected | Deprecated | Superseded]
 
+## Date
+
+[YYYY-MM-DD]
+
 ## Context
 
 [Describe the context and problem statement that led to this decision.]

@@ -4,6 +4,10 @@
 
 Accepted
 
+## Date
+
+2025-11-30
+
 ## Context
 
 The project requires a modern web framework for building an event calendar application with the following requirements:

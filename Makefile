@@ -53,6 +53,10 @@ test: node_modules
 test-coverage: node_modules
 	$(PNPM) test:coverage
 
+.PHONY: test-e2e
+test-e2e: node_modules
+	$(PNPM) test:e2e
+
 .PHONY: storybook
 storybook: install
 	$(PNPM) storybook

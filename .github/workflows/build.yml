@@ -30,6 +30,12 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Run tests
+        run: pnpm test:run
+
+      - name: Run test coverage
+        run: pnpm test:coverage
+
       - name: Build
         run: make clean dist
 

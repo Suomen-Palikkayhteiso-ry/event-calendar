@@ -4,6 +4,10 @@
 
 Accepted
 
+## Date
+
+2025-11-30
+
 ## Context
 
 The application needs to generate static feeds for:

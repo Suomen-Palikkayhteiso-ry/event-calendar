@@ -39,6 +39,19 @@ All commands should be prefixed with `devenv shell --`:
 - **Print Width**: 100 characters
 - Formatting automated with Prettier
 
+## Testing Practices
+
+Follow Test-Driven Development (TDD) principles:
+
+- Write tests before implementing features
+- Maintain 70% minimum test coverage
+- Run tests before commits: `pnpm test`
+- Component tests are currently unavailable due to Svelte 5 compatibility issues
+- Focus on unit tests for utilities and integration tests for data flow
+- Use Playwright for critical E2E workflows
+
+See [ADR 0011](./agents/adr/0011-testing-strategy.md) for detailed testing strategy.
+
 ## Important Notes
 
 - TODO.md tracks active tasks (local, uncommitted)
