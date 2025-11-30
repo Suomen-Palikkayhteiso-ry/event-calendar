@@ -2,14 +2,22 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { geocodeLocation, reverseGeocode } from '$lib/geocode';
 
 describe('geocode', () => {
-	let fetchMock: any;
+	let fetchMock: ReturnType<typeof vi.fn>;
+	let dateNowSpy: ReturnType<typeof vi.spyOn>;
+	let currentTime = 0;
 
 	beforeEach(() => {
+		// Mock Date.now() to control rate limiting - each test starts with a fresh "time"
+		// that's far enough in the future to avoid rate limiting delays
+		currentTime += 10000; // Jump forward 10 seconds for each test
+		dateNowSpy = vi.spyOn(Date, 'now').mockReturnValue(currentTime);
+
 		fetchMock = vi.fn();
 		global.fetch = fetchMock;
 	});
 
 	afterEach(() => {
+		dateNowSpy.mockRestore();
 		vi.restoreAllMocks();
 	});
 
