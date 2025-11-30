@@ -31,10 +31,17 @@ jobs:
         run: pnpm install
 
       - name: Run tests
-        run: pnpm test:run
+        run: pnpm test
 
       - name: Run test coverage
         run: pnpm test:coverage
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./coverage/coverage-final.json
+          flags: unittests
+          name: codecov-umbrella
 
       - name: Build
         run: make clean dist
