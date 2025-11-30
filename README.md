@@ -1,5 +1,7 @@
 # Event Calendar
 
+[![Test Coverage](https://img.shields.io/badge/coverage-74%25-brightgreen)](https://github.com/your-username/event-calendar/actions)
+
 This is a simple event calendar application built with SvelteKit, PocketBase, and Tailwind CSS. It allows users to view and manage events, and it generates RSS and iCal feeds for the events.
 
 ## Features
@@ -77,4 +79,16 @@ This will create a `build` directory with the static files that can be deployed 
 
   ```sh
   pnpm run format
+  ```
+
+- **Testing:**
+
+  ```sh
+  pnpm test:run
+  ```
+
+- **Test coverage:**
+
+  ```sh
+  pnpm test:coverage
   ```

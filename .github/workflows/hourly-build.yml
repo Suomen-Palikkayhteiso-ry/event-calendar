@@ -34,12 +34,12 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ./build
-          key: build-${{ github.sha }}
+          key: build-main-${{ github.sha }}
           restore-keys: |
-            build-
+            build-main-
 
       - name: Update build
-        run: make dist
+        run: make build
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
