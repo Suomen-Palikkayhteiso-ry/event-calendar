@@ -1,18 +1,12 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Event Creation Workflow', () => {
-  test('should redirect to home when not authenticated', async ({ page }) => {
+
+  test('should show login required message for non-authenticated users on events page', async ({ page }) => {
     await page.goto('/events');
 
-    // Should redirect to home page
-    await expect(page).toHaveURL('/');
-  });
-
-  test('should show login required message for non-authenticated users', async ({ page }) => {
-    await page.goto('/');
-
-    // Check for non-member message
-    await expect(page.locator('text=non_member_prefix')).toBeVisible();
+    // Should show login required message
+    await expect(page.locator('text=Sinun täytyy kirjautua sisään hallitaksesi tapahtumia.')).toBeVisible();
   });
 
   // Note: For authenticated tests, we would need to set up authentication
