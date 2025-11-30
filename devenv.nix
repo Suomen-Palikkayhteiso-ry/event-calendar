@@ -1,28 +1,34 @@
-{ pkgs, ... }:
+{ pkgs, lib, config, inputs, ... }:
 
-{
-  # https://devenv.sh/basics/
-  env.GREET = "devenv";
+let
+  playwrightBrowsersCompat = pkgs.runCommand "playwright-browsers-compat" {} ''
+    mkdir -p $out
+    for dir in ${pkgs.playwright-driver.browsers}/*; do
+      base="$(basename "$dir")"
+      ln -s "$dir" "$out/$base"
+    done
 
-  # https://devenv.sh/packages/
-  packages = [ pkgs.nodejs pkgs.pnpm ];
-
-  # https://devenv.sh/scripts/
-  scripts.hello.exec = "echo hello from $GREET";
-
-  enterShell = ''
-    hello
-    pnpm --version
+    # Vitest 3.2.4 + Playwright 1.56 expect revision 1194, which isn't yet packaged in nixpkgs.
+    ln -s ${pkgs.playwright-driver.browsers}/chromium-1181 $out/chromium-1194
+    ln -s ${pkgs.playwright-driver.browsers}/chromium_headless_shell-1181 $out/chromium_headless_shell-1194
   '';
+in
+{
+  languages.javascript.enable = true;
+  languages.javascript.pnpm.enable = true;
 
-  # https://devenv.sh/languages/
-  # languages.nix.enable = true;
+  packages = with pkgs; [
+    chromium
+    playwright-driver
+    playwright-driver.browsers
+    playwrightBrowsersCompat
+    python3
+    nodejs
+  ];
 
-  # https://devenv.sh/pre-commit-hooks/
-  # pre-commit.hooks.shellcheck.enable = true;
+  dotenv.disableHint = true;
 
-  # https://devenv.sh/processes/
-  # processes.ping.exec = "ping example.com";
-
-  # See full reference at https://devenv.sh/reference/options/
+  # Point Playwright to the Nix-provided browser bundle so Vitest doesn't try to download one.
+  env.PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD = "1";
+  env.PLAYWRIGHT_BROWSERS_PATH = "${playwrightBrowsersCompat}";
 }
