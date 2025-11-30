@@ -23,8 +23,6 @@ See [Development Setup](./agents/development-setup.md) for environment setup and
 
 ## Key Commands
 
-All commands should be prefixed with `devenv shell --`:
-
 - `pnpm install` - Install dependencies
 - `pnpm dev` - Start development server
 - `pnpm build` - Build for production
