@@ -56,3 +56,4 @@ See [ADR 0011](./agents/adr/0011-testing-strategy.md) for detailed testing strat
 - Follow ADR process for significant technical decisions
 - Test authentication flows thoroughly
 - Validate static generation after data changes
+- Do not commit and push until all QA tasks pass

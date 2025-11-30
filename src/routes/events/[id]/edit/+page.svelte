@@ -5,16 +5,11 @@
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import {
-		localDateToUTC,
-		parseUTCDate,
-		localDateTimeToUTC,
-		utcToHelsinkiDate
-	} from '$lib/date-utils';
 	import { user } from '$lib/auth';
 	import { _ } from 'svelte-i18n';
 	import { toast } from '@zerodevx/svelte-toast';
 	import EventForm from '$lib/EventForm.svelte';
+	import { prepareEventSubmitData } from '$lib/form-utils';
 
 	let event = $state<Event | null>(null);
 	let isSubmitting = $state(false);
@@ -74,32 +69,7 @@
 
 		isSubmitting = true;
 		try {
-			const submitData = new FormData();
-			submitData.append('title', formData.title);
-			submitData.append('location', formData.location);
-			submitData.append('description', formData.description);
-			submitData.append('url', formData.url);
-			if (formData.image) submitData.append('image', formData.image);
-			submitData.append('image_description', formData.image_description);
-			if (formData.point) submitData.append('point', JSON.stringify(formData.point));
-			submitData.append(
-				'start_date',
-				formData.all_day
-					? localDateToUTC(formData.start_date.split('T')[0])
-					: localDateTimeToUTC(formData.start_date)
-			);
-			submitData.append(
-				'end_date',
-				formData.end_date
-					? formData.all_day
-						? localDateToUTC(formData.end_date.split('T')[0])
-						: localDateTimeToUTC(formData.end_date)
-					: formData.all_day
-						? localDateToUTC(formData.start_date.split('T')[0])
-						: localDateTimeToUTC(formData.start_date)
-			);
-			submitData.append('all_day', formData.all_day.toString());
-			submitData.append('state', formData.state);
+			const submitData = prepareEventSubmitData(formData);
 
 			await pb.collection('events').update(event.id, submitData);
 
