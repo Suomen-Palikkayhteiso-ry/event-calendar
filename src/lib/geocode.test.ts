@@ -70,8 +70,11 @@ describe('geocode', () => {
 			consoleSpy.mockRestore();
 		});
 
-		it('should handle network errors', async () => {
-			fetchMock.mockRejectedValue(new Error('Network error'));
+		it('should handle JSON parsing errors', async () => {
+			fetchMock.mockResolvedValue({
+				ok: true,
+				json: () => Promise.reject(new Error('JSON parse error'))
+			});
 
 			const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 			const result = await geocodeLocation('Helsinki');
@@ -116,6 +119,20 @@ describe('geocode', () => {
 			fetchMock.mockResolvedValue({
 				ok: false,
 				status: 404
+			});
+
+			const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+			const result = await reverseGeocode(60.16985569999999, 24.9383791);
+			expect(result).toBeNull();
+			expect(consoleSpy).toHaveBeenCalled();
+
+			consoleSpy.mockRestore();
+		});
+
+		it('should handle JSON parsing errors', async () => {
+			fetchMock.mockResolvedValue({
+				ok: true,
+				json: () => Promise.reject(new Error('JSON parse error'))
 			});
 
 			const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
