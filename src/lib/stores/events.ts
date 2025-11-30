@@ -10,6 +10,11 @@ export interface EventsState {
 	isLoading: boolean;
 }
 
+interface CacheEntry {
+	data: EventsState;
+	timestamp: number;
+}
+
 function createEventsStore() {
 	const initialState: EventsState = {
 		events: [],
@@ -21,12 +26,26 @@ function createEventsStore() {
 
 	const { subscribe, set, update } = writable(initialState);
 
+	// Simple in-memory cache
+	const cache = new Map<string, CacheEntry>();
+	const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
 	return {
 		subscribe,
 		set,
 		update,
 
 		async fetchEvents(page = 1, pageSize = 50) {
+			const cacheKey = `events_${page}_${pageSize}`;
+			const now = Date.now();
+
+			// Check cache
+			const cached = cache.get(cacheKey);
+			if (cached && (now - cached.timestamp) < CACHE_DURATION) {
+				set(cached.data);
+				return cached.data;
+			}
+
 			update((state) => ({ ...state, isLoading: true }));
 
 			try {
@@ -43,6 +62,9 @@ function createEventsStore() {
 					isLoading: false
 				};
 
+				// Cache the result
+				cache.set(cacheKey, { data: newState, timestamp: now });
+
 				set(newState);
 				return newState;
 			} catch (error) {
@@ -55,6 +77,8 @@ function createEventsStore() {
 		async createEvent(eventData: any) {
 			try {
 				const newEvent = await pb.collection('events').create(eventData);
+				// Invalidate cache
+				cache.clear();
 				return newEvent;
 			} catch (error) {
 				console.error('Error creating event:', error);
@@ -65,6 +89,8 @@ function createEventsStore() {
 		async updateEvent(eventId: string, eventData: any) {
 			try {
 				const updatedEvent = await pb.collection('events').update(eventId, eventData);
+				// Invalidate cache
+				cache.clear();
 				return updatedEvent;
 			} catch (error) {
 				console.error('Error updating event:', error);
@@ -73,12 +99,15 @@ function createEventsStore() {
 		},
 
 		async updateEventState(eventId: string, newState: string) {
-			return this.updateEvent(eventId, { state: newState });
+			const result = await this.updateEvent(eventId, { state: newState });
+			return result;
 		},
 
 		async deleteEvent(eventId: string) {
 			try {
 				await pb.collection('events').update(eventId, { state: 'deleted' });
+				// Invalidate cache
+				cache.clear();
 			} catch (error) {
 				console.error('Error deleting event:', error);
 				throw error;

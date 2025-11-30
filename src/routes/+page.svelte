@@ -73,7 +73,7 @@
 		<button
 			class="btn-icon"
 			onclick={() =>
-				goto(resolve(`/events?date=${dateToHelsinkiDateString($calendarStore.selectedDate)}`))}
+				goto(resolve('/events'))}
 			title="Add new event"
 			>+
 		</button>
