@@ -41,7 +41,7 @@ export const createMockPocketBase = () => {
 	const mockCollection = {
 		getFullList: vi.fn().mockResolvedValue(mockEvents),
 		getOne: vi.fn().mockImplementation((id: string) => {
-			const event = mockEvents.find(e => e.id === id);
+			const event = mockEvents.find((e) => e.id === id);
 			if (!event) throw new Error('Event not found');
 			return Promise.resolve(event);
 		}),
@@ -56,7 +56,7 @@ export const createMockPocketBase = () => {
 			return Promise.resolve(newEvent);
 		}),
 		update: vi.fn().mockImplementation((id: string, data: any) => {
-			const index = mockEvents.findIndex(e => e.id === id);
+			const index = mockEvents.findIndex((e) => e.id === id);
 			if (index === -1) throw new Error('Event not found');
 			mockEvents[index] = { ...mockEvents[index], ...data, updated: new Date().toISOString() };
 			return Promise.resolve(mockEvents[index]);
@@ -76,9 +76,11 @@ export const createMockPocketBase = () => {
 		collection: vi.fn().mockReturnValue(mockCollection),
 		authStore: mockAuthStore,
 		files: {
-			getUrl: vi.fn().mockImplementation((record: any, filename: string) => 
-				`https://mock-pb.com/files/${record.id}/${filename}`
-			)
+			getUrl: vi
+				.fn()
+				.mockImplementation(
+					(record: any, filename: string) => `https://mock-pb.com/files/${record.id}/${filename}`
+				)
 		}
 	};
 

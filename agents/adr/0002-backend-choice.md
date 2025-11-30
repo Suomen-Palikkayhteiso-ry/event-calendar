@@ -11,6 +11,7 @@ Accepted
 ## Context
 
 The application requires a backend for:
+
 - Data persistence (events, users)
 - Authentication and authorization
 - File storage (event images)
@@ -19,6 +20,7 @@ The application requires a backend for:
 - API for static generation
 
 Key requirements:
+
 - Easy deployment and maintenance
 - Good developer experience
 - Secure authentication
@@ -33,6 +35,7 @@ We chose PocketBase as the backend solution.
 ## Consequences
 
 ### Positive
+
 - Self-hosted with single binary deployment
 - Built-in authentication (OAuth2, email/password)
 - Admin dashboard for content management
@@ -44,6 +47,7 @@ We chose PocketBase as the backend solution.
 - Active development and community
 
 ### Negative
+
 - Newer project with evolving API
 - Limited advanced querying compared to PostgreSQL
 - Single binary may have resource constraints for high traffic
@@ -51,18 +55,22 @@ We chose PocketBase as the backend solution.
 ## Alternatives Considered
 
 ### Supabase
+
 - Considered for its PostgreSQL foundation and features
 - Rejected due to preference for self-hosted solution and simpler deployment
 
 ### Firebase
+
 - Considered for its real-time capabilities
 - Rejected due to vendor lock-in and cost concerns
 
 ### Directus
+
 - Considered for its headless CMS features
 - Rejected due to more complex setup compared to PocketBase
 
 ### Custom Node.js/Express API
+
 - Considered for maximum control
 - Rejected due to increased development and maintenance overhead
 

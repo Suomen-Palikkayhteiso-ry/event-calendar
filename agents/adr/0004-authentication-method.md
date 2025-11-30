@@ -11,11 +11,13 @@ Accepted
 ## Context
 
 The application requires user authentication for:
+
 - Event creation and management
 - Admin access to content
 - Secure API access
 
 Requirements:
+
 - Industry-standard security
 - Single sign-on capability
 - Integration with existing identity providers
@@ -29,6 +31,7 @@ We chose OAuth2 with OpenID Connect (OIDC) for authentication.
 ## Consequences
 
 ### Positive
+
 - Industry-standard security protocol
 - Single sign-on across multiple applications
 - Delegation of authentication to trusted providers
@@ -37,6 +40,7 @@ We chose OAuth2 with OpenID Connect (OIDC) for authentication.
 - Scalable and future-proof
 
 ### Negative
+
 - Dependency on external identity provider
 - More complex setup than simple email/password
 - User experience depends on provider's interface
@@ -44,18 +48,22 @@ We chose OAuth2 with OpenID Connect (OIDC) for authentication.
 ## Alternatives Considered
 
 ### Email/Password Authentication
+
 - Considered for simplicity
 - Rejected due to security concerns and user experience
 
 ### Social Login (Google, Facebook)
+
 - Considered for ease of use
 - Rejected due to privacy concerns and limited control
 
 ### SAML
+
 - Considered for enterprise integration
 - Rejected due to complexity for this use case
 
 ### PocketBase Built-in Auth
+
 - Considered as fallback
 - Rejected in favor of centralized identity management
 

@@ -30,6 +30,7 @@ This is a SvelteKit application for an event calendar. It serves as the digital 
 ## Architecture
 
 The application follows a hybrid architecture:
+
 - **Dynamic App**: SvelteKit handles user interactions, authentication, and event management
 - **Static Generation**: Custom Node.js scripts generate feeds and static content from PocketBase data
 - **Backend**: PocketBase provides data persistence, authentication, and file storage

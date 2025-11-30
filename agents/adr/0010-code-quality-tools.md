@@ -11,12 +11,14 @@ Accepted
 ## Context
 
 The project requires code quality tools for:
+
 - Consistent code formatting
 - Linting for potential issues
 - TypeScript checking
 - Automated quality enforcement
 
 Requirements:
+
 - Svelte support
 - TypeScript integration
 - Pre-commit hooks capability
@@ -29,6 +31,7 @@ We chose ESLint for linting and Prettier for code formatting.
 ## Consequences
 
 ### Positive
+
 - Industry-standard tools
 - Excellent Svelte and TypeScript support
 - Automated code quality
@@ -37,6 +40,7 @@ We chose ESLint for linting and Prettier for code formatting.
 - Pre-commit hook integration
 
 ### Negative
+
 - Configuration complexity
 - Occasional false positives
 - Learning curve for rules
@@ -44,14 +48,17 @@ We chose ESLint for linting and Prettier for code formatting.
 ## Alternatives Considered
 
 ### TSLint (deprecated)
+
 - Considered for TypeScript
 - Rejected due to deprecation
 
 ### Standard JS
+
 - Considered for zero config
 - Rejected due to less customization
 
 ### Custom linting
+
 - Considered for specific needs
 - Rejected due to maintenance overhead
 

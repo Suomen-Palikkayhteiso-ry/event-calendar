@@ -5,6 +5,7 @@ This document explains how to set up and maintain Playwright for E2E testing on 
 ## Overview
 
 On NixOS, we cannot use `playwright install` to download browsers because:
+
 1. Downloaded binaries won't work due to missing dynamic libraries
 2. NixOS requires all binaries to be managed through Nix
 
@@ -61,6 +62,7 @@ devenv shell -- ls -la $PLAYWRIGHT_BROWSERS_PATH
 ```
 
 Example output:
+
 ```
 chromium-1181
 chromium_headless_shell-1181
@@ -84,6 +86,7 @@ devenv shell -- pnpm test:e2e --project=chromium 2>&1 | head -20
 ```
 
 If you see errors like:
+
 ```
 Executable doesn't exist at .../chromium_headless_shell-1155/...
 ```
@@ -98,16 +101,17 @@ Update package.json to use the exact version from nixpkgs:
 
 ```json
 {
-  "devDependencies": {
-    "@playwright/test": "1.50.1",
-    "playwright": "1.50.1"
-  }
+	"devDependencies": {
+		"@playwright/test": "1.50.1",
+		"playwright": "1.50.1"
+	}
 }
 ```
 
 **Important**: Use exact versions without `^` to prevent automatic updates.
 
 Then reinstall:
+
 ```bash
 devenv shell -- pnpm install
 ```
@@ -149,6 +153,7 @@ Run the verification script to check compatibility:
 ```
 
 This script will:
+
 1. Check the nixpkgs playwright-driver version
 2. Check package.json versions
 3. List available browser revisions
@@ -161,6 +166,7 @@ This script will:
 This means Playwright expects a browser revision that doesn't exist in your browsers path.
 
 **Solution**: Either:
+
 1. Pin package.json Playwright version to match nixpkgs
 2. Add a symlink in devenv.nix mapping expected → available revision
 
@@ -169,6 +175,7 @@ This means Playwright expects a browser revision that doesn't exist in your brow
 The `PLAYWRIGHT_BROWSERS_PATH` environment variable might not be set correctly.
 
 **Solution**: Verify the path is set in devenv shell:
+
 ```bash
 devenv shell -- echo $PLAYWRIGHT_BROWSERS_PATH
 devenv shell -- ls $PLAYWRIGHT_BROWSERS_PATH
@@ -183,12 +190,14 @@ Ensure CI also uses devenv or has matching Playwright/browser versions.
 When updating Playwright:
 
 1. Check nixpkgs for available versions:
+
    ```bash
    # Current channel
    devenv shell -- nix-instantiate --eval -E '(import <nixpkgs> {}).playwright-driver.version'
    ```
 
 2. Update package.json to match:
+
    ```bash
    # Edit package.json with the version from step 1
    ```
@@ -203,6 +212,7 @@ When updating Playwright:
 ## Current Configuration
 
 As of this writing:
+
 - **nixpkgs playwright-driver**: 1.50.1
 - **package.json versions**: 1.50.1
 - **Browser revisions available**: chromium-1181, firefox-1489, webkit-2191

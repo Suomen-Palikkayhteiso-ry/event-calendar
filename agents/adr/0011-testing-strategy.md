@@ -13,6 +13,7 @@ Accepted
 The project requires a robust testing strategy to ensure code quality, prevent regressions, and enable confident refactoring. The application has multiple layers (frontend, backend integration, static generation) that need comprehensive testing.
 
 Requirements:
+
 - Unit tests for utility functions and business logic
 - Integration tests for data flow and API interactions
 - End-to-end tests for user workflows
@@ -32,12 +33,14 @@ We adopt Test-Driven Development (TDD) as our primary development approach:
 ## Consequences
 
 ### Positive
+
 - Higher code quality and fewer bugs
 - Confidence in refactoring and feature development
 - Documentation of expected behavior through tests
 - Early detection of integration issues
 
 ### Negative
+
 - Development time overhead
 - Test maintenance required when code changes
 - Complex setup for E2E tests with authentication

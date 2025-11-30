@@ -11,6 +11,7 @@ Accepted
 ## Context
 
 The application requires a build system for:
+
 - Fast development server
 - Optimized production builds
 - Static site generation
@@ -18,6 +19,7 @@ The application requires a build system for:
 - TypeScript compilation
 
 Requirements:
+
 - Good developer experience
 - Fast builds
 - SvelteKit integration
@@ -30,6 +32,7 @@ We chose Vite as the build tool with SvelteKit's static adapter.
 ## Consequences
 
 ### Positive
+
 - Extremely fast development server
 - Optimized production builds
 - Native ES modules support
@@ -38,20 +41,24 @@ We chose Vite as the build tool with SvelteKit's static adapter.
 - Static adapter enables deployment to any static host
 
 ### Negative
+
 - Vite-specific configuration
 - Learning curve for advanced features
 
 ## Alternatives Considered
 
 ### Webpack
+
 - Considered for customization
 - Rejected due to complexity and slower builds
 
 ### Rollup
+
 - Considered as Svelte's default
 - Rejected in favor of Vite's speed
 
 ### esbuild
+
 - Considered for speed
 - Rejected due to less mature ecosystem
 

@@ -11,6 +11,7 @@ Accepted
 ## Context
 
 The application needs to generate static feeds for:
+
 - RSS/Atom feeds for syndication
 - ICS calendar files for import
 - JSON/GeoJSON for data access
@@ -18,6 +19,7 @@ The application needs to generate static feeds for:
 - Individual event pages
 
 Requirements:
+
 - Automated generation from PocketBase data
 - Multiple output formats
 - SEO-friendly
@@ -31,6 +33,7 @@ We implemented custom static generation scripts using Node.js.
 ## Consequences
 
 ### Positive
+
 - Full control over output formats
 - Optimized for specific use cases
 - No build-time dependencies
@@ -38,6 +41,7 @@ We implemented custom static generation scripts using Node.js.
 - Custom formatting and features
 
 ### Negative
+
 - Custom development required
 - Maintenance overhead
 - Potential for inconsistencies
@@ -45,14 +49,17 @@ We implemented custom static generation scripts using Node.js.
 ## Alternatives Considered
 
 ### SvelteKit's built-in SSG
+
 - Considered for integration
 - Rejected due to complex data requirements
 
 ### Eleventy or similar SSG
+
 - Considered for content focus
 - Rejected due to data-driven nature
 
 ### PocketBase webhooks
+
 - Considered for automation
 - Rejected due to deployment complexity
 

@@ -11,12 +11,14 @@
 This project uses `devenv` to provide a reproducible development environment.
 
 1. **Install devenv** (if not already installed):
+
    ```bash
    # Using nix (recommended)
    nix-env -iA devenv
    ```
 
 2. **Clone the repository**:
+
    ```bash
    git clone <repository-url>
    cd event-calendar
@@ -32,28 +34,35 @@ This project uses `devenv` to provide a reproducible development environment.
 All package management commands should be run within the devenv shell.
 
 ### Install Dependencies
+
 ```bash
 pnpm install
 ```
 
 ### Development Server
+
 ```bash
 pnpm dev
 ```
+
 Starts the development server at `http://localhost:5173`
 
 ### Build for Production
+
 ```bash
 pnpm build
 ```
 
 ### Static Generation
+
 ```bash
 pnpm generate-statics
 ```
+
 Generates RSS, Atom, JSON, GeoJSON, ICS, and HTML feeds.
 
 ### Code Quality
+
 ```bash
 # Lint and format
 pnpm lint
@@ -111,6 +120,7 @@ agents/            # Documentation and ADRs
 ## Testing
 
 ### Unit Tests
+
 ```bash
 pnpm test           # Run once and exit
 pnpm test:watch     # Watch mode for development
@@ -119,6 +129,7 @@ pnpm test:ui        # Interactive UI mode
 ```
 
 ### E2E Tests (Playwright)
+
 ```bash
 pnpm test:e2e       # Run all E2E tests
 pnpm test:e2e:ui    # Interactive UI mode
@@ -129,6 +140,7 @@ pnpm test:e2e:ui    # Interactive UI mode
 This project uses Playwright for E2E testing. On NixOS, browsers are provided by nixpkgs rather than downloaded by Playwright.
 
 **Verify Playwright setup:**
+
 ```bash
 devenv shell -- ./scripts/check-playwright-compat.sh
 ```

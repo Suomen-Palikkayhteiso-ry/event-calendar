@@ -24,13 +24,13 @@ vi.mock('$lib/pocketbase', () => {
 	const mockUpdate = vi.fn().mockResolvedValue({});
 	const mockGetUrl = vi.fn().mockReturnValue('mock-image-url');
 	const collection = vi.fn(() => ({ getOne: mockGetOne, update: mockUpdate }));
-	return { 
-		pb: { 
+	return {
+		pb: {
 			collection,
 			files: {
 				getUrl: mockGetUrl
 			}
-		} 
+		}
 	};
 });
 
@@ -177,7 +177,10 @@ describe('events/[id]/+page.svelte event display', () => {
 		await waitFor(() => {
 			const locationLink = screen.getByRole('link', { name: 'Helsinki' });
 			expect(locationLink).toBeInTheDocument();
-			expect(locationLink).toHaveAttribute('href', 'https://www.openstreetmap.org/?mlat=60.1699&mlon=24.9384&zoom=15');
+			expect(locationLink).toHaveAttribute(
+				'href',
+				'https://www.openstreetmap.org/?mlat=60.1699&mlon=24.9384&zoom=15'
+			);
 			expect(locationLink).toHaveAttribute('target', '_blank');
 		});
 	});

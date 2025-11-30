@@ -11,6 +11,7 @@ Accepted
 ## Context
 
 The application needs a CSS framework that:
+
 - Provides consistent design system
 - Supports responsive design
 - Has good developer experience
@@ -20,6 +21,7 @@ The application needs a CSS framework that:
 - Has active maintenance
 
 Design requirements:
+
 - Custom color palette (brand colors)
 - Responsive calendar interface
 - Accessible components
@@ -32,6 +34,7 @@ We chose Tailwind CSS v4 for styling.
 ## Consequences
 
 ### Positive
+
 - Utility-first approach reduces CSS bundle size
 - Excellent responsive design utilities
 - Custom theme configuration via CSS variables
@@ -41,6 +44,7 @@ We chose Tailwind CSS v4 for styling.
 - Active development and community
 
 ### Negative
+
 - Learning curve for utility classes
 - HTML can become verbose with many classes
 - Requires purging unused styles (handled automatically)
@@ -48,18 +52,22 @@ We chose Tailwind CSS v4 for styling.
 ## Alternatives Considered
 
 ### CSS Modules
+
 - Considered for scoped styling
 - Rejected due to more complex setup and maintenance
 
 ### Styled Components
+
 - Considered for component-scoped styles
 - Rejected due to runtime overhead and complexity
 
 ### Bootstrap
+
 - Considered for pre-built components
 - Rejected due to larger bundle size and less customization
 
 ### Vanilla CSS with PostCSS
+
 - Considered for maximum control
 - Rejected due to development overhead
 

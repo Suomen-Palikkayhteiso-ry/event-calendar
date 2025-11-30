@@ -91,4 +91,3 @@ describe('Header', () => {
 		expect(authModule.logout).toHaveBeenCalledOnce();
 	});
 });
-

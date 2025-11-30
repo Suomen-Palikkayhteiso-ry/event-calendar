@@ -11,6 +11,7 @@ Accepted
 ## Context
 
 The application requires a calendar component for:
+
 - Monthly calendar view
 - Event display and navigation
 - Date selection
@@ -19,6 +20,7 @@ The application requires a calendar component for:
 - Accessibility
 
 Requirements:
+
 - Svelte compatible
 - Customizable styling
 - Good performance
@@ -31,6 +33,7 @@ We chose @event-calendar/core for the calendar component.
 ## Consequences
 
 ### Positive
+
 - Native Svelte support
 - Highly customizable
 - Good performance
@@ -39,6 +42,7 @@ We chose @event-calendar/core for the calendar component.
 - Multiple view options (month, list)
 
 ### Negative
+
 - Relatively new library
 - Some TypeScript definitions incomplete
 - Learning curve for advanced customization
@@ -46,14 +50,17 @@ We chose @event-calendar/core for the calendar component.
 ## Alternatives Considered
 
 ### FullCalendar
+
 - Considered for feature completeness
 - Rejected due to React/Angular focus and complexity
 
 ### Custom calendar implementation
+
 - Considered for full control
 - Rejected due to development time
 
 ### react-calendar
+
 - Considered for React ecosystem
 - Rejected due to framework mismatch
 

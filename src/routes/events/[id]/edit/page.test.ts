@@ -25,13 +25,13 @@ const mockEvent = {
 // Mock PocketBase
 vi.mock('$lib/pocketbase', () => {
 	const collection = vi.fn(() => ({ getOne: mockGetOne, update: mockUpdate }));
-	return { 
-		pb: { 
+	return {
+		pb: {
 			collection,
 			files: {
 				getUrl: vi.fn(() => 'mock-image-url')
 			}
-		} 
+		}
 	};
 });
 
@@ -77,8 +77,14 @@ vi.mock('$lib/date-utils', () => ({
 
 // Mock flowbite-svelte components
 vi.mock('flowbite-svelte', () => ({
-	Datepicker: vi.fn(() => ({ component: 'Datepicker', $$render: () => ({ html: '<div>Mock Datepicker</div>' }) })),
-	Timepicker: vi.fn(() => ({ component: 'Timepicker', $$render: () => ({ html: '<div>Mock Timepicker</div>' }) }))
+	Datepicker: vi.fn(() => ({
+		component: 'Datepicker',
+		$$render: () => ({ html: '<div>Mock Datepicker</div>' })
+	})),
+	Timepicker: vi.fn(() => ({
+		component: 'Timepicker',
+		$$render: () => ({ html: '<div>Mock Timepicker</div>' })
+	}))
 }));
 
 // Mock Map component

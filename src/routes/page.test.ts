@@ -207,7 +207,12 @@ describe('+page.svelte calendar view', () => {
 	});
 
 	it('shows datepicker and add button for logged in user', async () => {
-		getMockUserStore().set({ collectionId: 'users', collectionName: 'users', id: 'test-user', name: 'Test User' });
+		getMockUserStore().set({
+			collectionId: 'users',
+			collectionName: 'users',
+			id: 'test-user',
+			name: 'Test User'
+		});
 
 		render(Page);
 
@@ -277,7 +282,12 @@ describe('+page.svelte calendar view', () => {
 
 	it('navigates to event creation with selected date', async () => {
 		const user = userEvent.setup();
-		getMockUserStore().set({ collectionId: 'users', collectionName: 'users', id: 'test-user', name: 'Test User' });
+		getMockUserStore().set({
+			collectionId: 'users',
+			collectionName: 'users',
+			id: 'test-user',
+			name: 'Test User'
+		});
 
 		render(Page);
 
@@ -306,7 +316,12 @@ describe('+page.svelte calendar view', () => {
 			getFullList: vi.fn().mockResolvedValue(mockEvents)
 		});
 
-		getMockUserStore().set({ collectionId: 'users', collectionName: 'users', id: 'test-user', name: 'Test User' });
+		getMockUserStore().set({
+			collectionId: 'users',
+			collectionName: 'users',
+			id: 'test-user',
+			name: 'Test User'
+		});
 		render(Page);
 
 		await tick();
@@ -334,7 +349,12 @@ describe('+page.svelte calendar view', () => {
 			getFullList: vi.fn().mockResolvedValue(mockEvents)
 		});
 
-		getMockUserStore().set({ collectionId: 'users', collectionName: 'users', id: 'test-user', name: 'Test User' });
+		getMockUserStore().set({
+			collectionId: 'users',
+			collectionName: 'users',
+			id: 'test-user',
+			name: 'Test User'
+		});
 		render(Page);
 
 		await tick();
@@ -361,7 +381,12 @@ describe('+page.svelte calendar view', () => {
 			getFullList: vi.fn().mockResolvedValue(mockEvents)
 		});
 
-		getMockUserStore().set({ collectionId: 'users', collectionName: 'users', id: 'test-user', name: 'Test User' });
+		getMockUserStore().set({
+			collectionId: 'users',
+			collectionName: 'users',
+			id: 'test-user',
+			name: 'Test User'
+		});
 		render(Page);
 
 		await tick();
@@ -380,7 +405,12 @@ describe('+page.svelte calendar view', () => {
 			writable: true
 		});
 
-		getMockUserStore().set({ collectionId: 'users', collectionName: 'users', id: 'test-user', name: 'Test User' });
+		getMockUserStore().set({
+			collectionId: 'users',
+			collectionName: 'users',
+			id: 'test-user',
+			name: 'Test User'
+		});
 		render(Page);
 
 		await tick();
@@ -420,7 +450,12 @@ describe('+page.svelte calendar view', () => {
 			getFullList: vi.fn().mockResolvedValue(mockEvents)
 		});
 
-		getMockUserStore().set({ collectionId: 'users', collectionName: 'users', id: 'test-user', name: 'Test User' });
+		getMockUserStore().set({
+			collectionId: 'users',
+			collectionName: 'users',
+			id: 'test-user',
+			name: 'Test User'
+		});
 		render(Page);
 
 		await tick();
@@ -429,7 +464,8 @@ describe('+page.svelte calendar view', () => {
 		// This is tested indirectly through the calendar rendering
 		const calendarWrapper = document.querySelector('div:last-child');
 		expect(calendarWrapper).toBeInTheDocument();
-	});	it('sets event tooltips for events with descriptions', async () => {
+	});
+	it('sets event tooltips for events with descriptions', async () => {
 		const mockEvents = [
 			{
 				id: 'event-with-desc',
@@ -445,7 +481,12 @@ describe('+page.svelte calendar view', () => {
 			getFullList: vi.fn().mockResolvedValue(mockEvents)
 		});
 
-		getMockUserStore().set({ collectionId: 'users', collectionName: 'users', id: 'test-user', name: 'Test User' });
+		getMockUserStore().set({
+			collectionId: 'users',
+			collectionName: 'users',
+			id: 'test-user',
+			name: 'Test User'
+		});
 		render(Page);
 
 		await tick();
@@ -457,7 +498,12 @@ describe('+page.svelte calendar view', () => {
 
 	it('handles event click navigation', async () => {
 		const user = userEvent.setup();
-		getMockUserStore().set({ collectionId: 'users', collectionName: 'users', id: 'test-user', name: 'Test User' });
+		getMockUserStore().set({
+			collectionId: 'users',
+			collectionName: 'users',
+			id: 'test-user',
+			name: 'Test User'
+		});
 
 		render(Page);
 
@@ -472,7 +518,12 @@ describe('+page.svelte calendar view', () => {
 	it('ignores clicks on selected-day background event', async () => {
 		// Test that clicking on selected-day event doesn't navigate
 		// This is covered by the eventClick function's early return
-		getMockUserStore().set({ collectionId: 'users', collectionName: 'users', id: 'test-user', name: 'Test User' });
+		getMockUserStore().set({
+			collectionId: 'users',
+			collectionName: 'users',
+			id: 'test-user',
+			name: 'Test User'
+		});
 		render(Page);
 
 		await tick();
@@ -483,7 +534,12 @@ describe('+page.svelte calendar view', () => {
 
 	it('handles date click to update selected date', async () => {
 		const user = userEvent.setup();
-		getMockUserStore().set({ collectionId: 'users', collectionName: 'users', id: 'test-user', name: 'Test User' });
+		getMockUserStore().set({
+			collectionId: 'users',
+			collectionName: 'users',
+			id: 'test-user',
+			name: 'Test User'
+		});
 
 		render(Page);
 

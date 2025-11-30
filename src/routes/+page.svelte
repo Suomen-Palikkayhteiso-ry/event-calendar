@@ -102,5 +102,5 @@
 {/if}
 
 <div>
-	<Calendar {events} {selectedDate} onDateClick={(date) => selectedDate = date} />
+	<Calendar {events} {selectedDate} onDateClick={(date) => (selectedDate = date)} />
 </div>
