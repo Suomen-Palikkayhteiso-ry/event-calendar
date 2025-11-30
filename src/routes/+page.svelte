@@ -11,9 +11,9 @@
 	import { page } from '$app/stores';
 	import { browser } from '$app/environment';
 	import Calendar from '$lib/Calendar.svelte';
+	import { calendarStore } from '$lib/stores/calendar';
 
 	let events = $state<Event[]>([]);
-	let selectedDate = $state(new Date());
 
 	if (browser) {
 		const searchParams = new URLSearchParams(window.location.search);
@@ -21,7 +21,7 @@
 		if (dateParam) {
 			const paramDate = new Date(`${dateParam}T00:00:00`);
 			if (!Number.isNaN(paramDate.getTime())) {
-				selectedDate = paramDate;
+				calendarStore.setSelectedDate(paramDate);
 			}
 		}
 	}
@@ -38,8 +38,8 @@
 		if (!dateParam) return;
 
 		const paramDate = new Date(`${dateParam}T00:00:00`);
-		if (!Number.isNaN(paramDate.getTime()) && paramDate.getTime() !== selectedDate.getTime()) {
-			selectedDate = paramDate;
+		if (!Number.isNaN(paramDate.getTime())) {
+			calendarStore.setSelectedDate(paramDate);
 		}
 		// Clear the date from querystring after consuming it
 		const newUrl = new URL($page.url);
@@ -60,11 +60,11 @@
 			<label for="datepicker" class="invisible block text-sm font-medium text-gray-700"
 				>{$_('select_date')}</label
 			>
-			{#key selectedDate.getTime()}
+			{#key $calendarStore.selectedDate.getTime()}
 				<Datepicker
 					id="datepicker"
-					bind:value={selectedDate}
-					defaultDate={selectedDate}
+					bind:value={$calendarStore.selectedDate}
+					defaultDate={$calendarStore.selectedDate}
 					locale="fi"
 					firstDayOfWeek={1}
 				/>
@@ -72,7 +72,7 @@
 		</div>
 		<button
 			class="flex h-12 w-12 flex-shrink-0 cursor-pointer items-center justify-center rounded-full border-none bg-primary-500 text-xl font-bold text-white transition-colors duration-200 hover:bg-primary-600"
-			onclick={() => goto(`/events?date=${dateToHelsinkiDateString(selectedDate)}` as any)}
+			onclick={() => goto(`/events?date=${dateToHelsinkiDateString($calendarStore.selectedDate)}` as any)}
 			title="Add new event"
 			>+
 		</button>
@@ -89,11 +89,11 @@
 		<label for="datepicker" class="invisible block text-sm font-medium text-gray-700"
 			>{$_('select_date')}</label
 		>
-		{#key selectedDate.getTime()}
+		{#key $calendarStore.selectedDate.getTime()}
 			<Datepicker
 				id="datepicker"
-				bind:value={selectedDate}
-				defaultDate={selectedDate}
+				bind:value={$calendarStore.selectedDate}
+				defaultDate={$calendarStore.selectedDate}
 				locale="fi"
 				firstDayOfWeek={1}
 			/>
@@ -102,5 +102,5 @@
 {/if}
 
 <div>
-	<Calendar {events} {selectedDate} onDateClick={(date) => (selectedDate = date)} />
+	<Calendar {events} selectedDate={$calendarStore.selectedDate} onDateClick={(date) => calendarStore.setSelectedDate(date)} />
 </div>
