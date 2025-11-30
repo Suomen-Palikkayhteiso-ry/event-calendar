@@ -38,7 +38,7 @@
 		events: [],
 		totalEvents: 0,
 		currentPage: 1,
-		pageSize: 100,
+		pageSize: 50,
 		isLoading: false
 	});
 	eventsStore.subscribe((state) => {

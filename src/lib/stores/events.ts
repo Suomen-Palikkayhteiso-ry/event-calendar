@@ -15,7 +15,7 @@ function createEventsStore() {
 		events: [],
 		totalEvents: 0,
 		currentPage: 1,
-		pageSize: 100,
+		pageSize: 50,
 		isLoading: false
 	};
 
@@ -26,7 +26,7 @@ function createEventsStore() {
 		set,
 		update,
 
-		async fetchEvents(page = 1, pageSize = 100) {
+		async fetchEvents(page = 1, pageSize = 50) {
 			update((state) => ({ ...state, isLoading: true }));
 
 			try {
