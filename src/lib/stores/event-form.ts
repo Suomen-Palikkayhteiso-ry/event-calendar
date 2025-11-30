@@ -4,7 +4,7 @@ import { validateEventForm } from '$lib/form-utils';
 
 export interface EventFormState {
 	formData: EventFormData;
-	errors: Record<string, string>;
+	errors: Partial<Record<string, string>>;
 	isDirty: boolean;
 }
 
@@ -47,7 +47,7 @@ function createEventFormStore(initialData?: Partial<EventFormData>) {
 			});
 		},
 
-		setErrors(errors: Record<string, string>) {
+		setErrors(errors: Partial<Record<string, string>>) {
 			update((state) => ({ ...state, errors }));
 		},
 

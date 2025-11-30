@@ -42,7 +42,6 @@ describe('event-utils', () => {
 				id: 'test-id',
 				title: 'Test Event',
 				start_date: '2024-01-01T10:00:00Z',
-				end_date: null,
 				all_day: true,
 				state: 'draft',
 				created: '2024-01-01T09:00:00Z',

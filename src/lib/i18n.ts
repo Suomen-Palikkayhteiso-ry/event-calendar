@@ -80,7 +80,6 @@ addMessages('fi', {
 	event_deleted_successfully: 'Tapahtuma poistettu onnistuneesti.',
 	confirm_delete_event: 'Haluatko varmasti poistaa tämän tapahtuman?',
 	// Event edit
-	edit_event: 'Muokkaa tapahtumaa',
 	current_image: 'Nykyinen kuva:',
 	saving: 'Tallennetaan...',
 	save_changes: 'Tallenna muutokset',

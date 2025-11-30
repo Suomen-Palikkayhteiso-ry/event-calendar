@@ -115,5 +115,5 @@ export function isRetryableError(error: unknown): boolean {
 	const parsed = parseApiError(error);
 
 	// Retry on network errors or server errors
-	return parsed.code === 'network_error' || (parsed.status && parsed.status >= 500);
+	return parsed.code === 'network_error' || !!(parsed.status && parsed.status >= 500);
 }

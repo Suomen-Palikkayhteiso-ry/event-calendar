@@ -35,7 +35,6 @@
 	{:else}
 		<table
 			class="w-full table-auto border-collapse border border-gray-300"
-			role="table"
 			aria-label={$_('events_table')}
 		>
 			<caption class="sr-only">{$_('existing_events')}</caption>

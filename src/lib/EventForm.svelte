@@ -332,7 +332,7 @@
 			id="state"
 			value={formState.formData.state}
 			disabled={isSubmitting}
-			onchange={(e) => formStore.updateField('state', (e.target as HTMLSelectElement).value)}
+			onchange={(e) => formStore.updateField('state', (e.target as HTMLSelectElement).value as EventFormData['state'])}
 			class="focus:ring-opacity-25 box-border w-full rounded border border-gray-300 p-3 text-base focus:border-brand-primary focus:ring-2 focus:ring-brand-primary focus:outline-none"
 		>
 			<option value="draft">{$_('draft')}</option>
