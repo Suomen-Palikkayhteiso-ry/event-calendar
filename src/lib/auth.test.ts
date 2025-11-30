@@ -29,6 +29,17 @@ describe('auth', () => {
 		it('should initialize with null user', () => {
 			expect(get(user)).toBeNull();
 		});
+
+		it('should update when authStore changes', async () => {
+			const { pb } = await import('$lib/pocketbase');
+			const mockUser = { id: 'test-user', name: 'Test User' };
+			
+			// Simulate authStore change
+			pb.authStore.model = mockUser;
+			pb.authStore._callback(); // Trigger the onChange callback
+
+			expect(get(user)).toEqual(mockUser);
+		});
 	});
 
 	describe('login', () => {
