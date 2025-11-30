@@ -82,13 +82,16 @@
 			value={formState.formData.title}
 			placeholder={$_('event_title')}
 			required
+			aria-required="true"
+			aria-invalid={formState.errors.title ? 'true' : 'false'}
+			aria-describedby={formState.errors.title ? 'error-title' : undefined}
 			autofocus={mode === 'create'}
 			disabled={isSubmitting}
 			oninput={(e) => formStore.updateField('title', (e.target as HTMLInputElement).value)}
 			class="focus:ring-opacity-25 box-border w-full rounded border border-gray-300 p-3 text-base focus:border-brand-primary focus:ring-2 focus:ring-brand-primary focus:outline-none"
 		/>
 		{#if formState.errors.title}
-			<p class="mt-1 text-sm text-red-600">{formState.errors.title}</p>
+			<p id="error-title" class="mt-1 text-sm text-red-600">{formState.errors.title}</p>
 		{/if}
 	</div>
 
@@ -166,6 +169,8 @@
 					max="90"
 					value={formState.formData.point?.lat}
 					disabled={isSubmitting}
+					aria-invalid={formState.errors.point ? 'true' : 'false'}
+					aria-describedby={formState.errors.point ? 'error-point' : undefined}
 					oninput={(e) => {
 						const lat = parseFloat((e.target as HTMLInputElement).value);
 						formStore.updateField('point', {
@@ -186,6 +191,8 @@
 					max="180"
 					value={formState.formData.point?.lon}
 					disabled={isSubmitting}
+					aria-invalid={formState.errors.point ? 'true' : 'false'}
+					aria-describedby={formState.errors.point ? 'error-point' : undefined}
 					oninput={(e) => {
 						const lon = parseFloat((e.target as HTMLInputElement).value);
 						formStore.updateField('point', {
@@ -198,7 +205,7 @@
 			</div>
 		</div>
 		{#if formState.errors.point}
-			<p class="mb-4 text-sm text-red-600">{formState.errors.point}</p>
+			<p id="error-point" class="mb-4 text-sm text-red-600">{formState.errors.point}</p>
 		{/if}
 	{/if}
 
@@ -226,11 +233,13 @@
 			placeholder={$_('url_optional')}
 			disabled={isSubmitting}
 			pattern="https?://.+"
+			aria-invalid={formState.errors.url ? 'true' : 'false'}
+			aria-describedby={formState.errors.url ? 'error-url' : undefined}
 			oninput={(e) => formStore.updateField('url', (e.target as HTMLInputElement).value)}
 			class="focus:ring-opacity-25 box-border w-full rounded border border-gray-300 p-3 text-base focus:border-brand-primary focus:ring-2 focus:ring-brand-primary focus:outline-none"
 		/>
 		{#if formState.errors.url}
-			<p class="mt-1 text-sm text-red-600">{formState.errors.url}</p>
+			<p id="error-url" class="mt-1 text-sm text-red-600">{formState.errors.url}</p>
 		{/if}
 	</div>
 
@@ -283,9 +292,11 @@
 				}}
 				disabled={isSubmitting}
 				allDay={formState.formData.all_day}
+				ariaInvalid={formState.errors.start_date ? 'true' : 'false'}
+				ariaDescribedBy={formState.errors.start_date ? 'error-start-date' : undefined}
 			/>
 			{#if formState.errors.start_date}
-				<p class="mt-1 text-sm text-red-600">{formState.errors.start_date}</p>
+				<p id="error-start-date" class="mt-1 text-sm text-red-600">{formState.errors.start_date}</p>
 			{/if}
 		</div>
 
@@ -299,9 +310,11 @@
 				}}
 				disabled={isSubmitting || !formState.formData.all_day}
 				allDay={formState.formData.all_day}
+				ariaInvalid={formState.errors.end_date ? 'true' : 'false'}
+				ariaDescribedBy={formState.errors.end_date ? 'error-end-date' : undefined}
 			/>
 			{#if formState.errors.end_date}
-				<p class="mt-1 text-sm text-red-600">{formState.errors.end_date}</p>
+				<p id="error-end-date" class="mt-1 text-sm text-red-600">{formState.errors.end_date}</p>
 			{/if}
 		</div>
 	</div>

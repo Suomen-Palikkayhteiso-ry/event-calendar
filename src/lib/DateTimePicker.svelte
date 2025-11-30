@@ -10,9 +10,11 @@
 		allDay?: boolean;
 		label: string;
 		id: string;
+		ariaInvalid?: string;
+		ariaDescribedBy?: string;
 	}
 
-	let { value, onChange, disabled = false, allDay = true, label, id }: Props = $props();
+	let { value, onChange, disabled = false, allDay = true, label, id, ariaInvalid, ariaDescribedBy }: Props = $props();
 
 	// Internal state
 	let dateObj = $state(new Date());
@@ -82,6 +84,8 @@
 		locale="fi"
 		firstDayOfWeek={1}
 		{disabled}
+		aria-invalid={ariaInvalid}
+		aria-describedby={ariaDescribedBy}
 		on:change={(e) => {
 			dateObj = e.detail;
 		}}
@@ -91,6 +95,8 @@
 			id="{id}Time"
 			value={timeString}
 			{disabled}
+			aria-invalid={ariaInvalid}
+			aria-describedby={ariaDescribedBy}
 			on:change={(e) => {
 				timeString = e.detail;
 			}}
