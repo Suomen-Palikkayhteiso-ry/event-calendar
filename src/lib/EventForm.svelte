@@ -31,6 +31,20 @@
 	let geocodingEnabled = $state(true);
 	let MapComponent = $state<any>(null);
 
+	// Check if point coordinates are valid (not 0 or NaN)
+	let isPointValid = $derived(() => {
+		const point = formState.formData.point;
+		if (!point) return true;
+		return !(point.lat === 0 || isNaN(point.lat) || point.lon === 0 || isNaN(point.lon));
+	});
+
+	// Disable geocoding when point coordinates are invalid
+	$effect(() => {
+		if (!isPointValid) {
+			geocodingEnabled = false;
+		}
+	});
+
 	// Initialize form data from initialData
 	onMount(async () => {
 		// Wait for the component to be fully rendered
@@ -155,7 +169,8 @@
 			/>
 			<button
 				type="button"
-				class="cursor-pointer rounded border border-gray-300 p-3 text-xl hover:bg-gray-50 focus:ring-2 focus:ring-brand-primary focus:outline-none"
+				class="cursor-pointer rounded border border-gray-300 p-3 text-xl hover:bg-gray-50 focus:ring-2 focus:ring-brand-primary focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+				disabled={!isPointValid}
 				onclick={() => (geocodingEnabled = !geocodingEnabled)}
 				aria-label={geocodingEnabled ? $_('disable_geocoding') : $_('enable_geocoding')}
 			>
