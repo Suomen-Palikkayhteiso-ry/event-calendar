@@ -69,43 +69,40 @@
 		}
 	});
 
-	function updateCalendarEvents() {
-		calendarOptions.events = [
-			...events.map((event, index) => ({
-				id: event.id,
-				title: event.location ? `${event.title} / ${event.location}` : event.title,
-				start: parseUTCDate(event.start_date),
-				end: (() => {
-					const baseEnd = event.end_date
-						? parseUTCDate(event.end_date)
-						: parseUTCDate(event.start_date);
-					if (event.all_day) {
-						const adjusted = new Date(baseEnd);
-						adjusted.setDate(adjusted.getDate() + 1);
-						return adjusted;
-					}
-					return baseEnd;
-				})(),
-				allDay: event.all_day,
-				display: event.all_day ? 'block' : 'auto',
-				extendedProps: {
-					description: event.description || '',
-					order: index + 1
+	let calendarEvents = $derived.by(() => [
+		...events.map((event, index) => ({
+			id: event.id,
+			title: event.location ? `${event.title} / ${event.location}` : event.title,
+			start: parseUTCDate(event.start_date),
+			end: (() => {
+				const baseEnd = event.end_date
+					? parseUTCDate(event.end_date)
+					: parseUTCDate(event.start_date);
+				if (event.all_day) {
+					const adjusted = new Date(baseEnd);
+					adjusted.setDate(adjusted.getDate() + 1);
+					return adjusted;
 				}
-			})),
-			{
-				id: 'selected-day',
-				start: dateToHelsinkiDateString(selectedDate),
-				end: dateToHelsinkiDateString(selectedDate),
-				display: 'background',
-				backgroundColor: '#e0f7fa',
-				borderColor: '#00bcd4'
+				return baseEnd;
+			})(),
+			allDay: event.all_day,
+			display: event.all_day ? 'block' : 'auto',
+			extendedProps: {
+				description: event.description || '',
+				order: index + 1
 			}
-		];
-	}
+		})),
+		{
+			id: 'selected-day',
+			start: dateToHelsinkiDateString(selectedDate),
+			end: dateToHelsinkiDateString(selectedDate),
+			display: 'background',
+			backgroundColor: '#e0f7fa',
+			borderColor: '#00bcd4'
+		}
+	]);
 
 	onMount(() => {
-		updateCalendarEvents();
 		// Focus the Next button after calendar is rendered
 		setTimeout(() => {
 			const nextBtn = calendarWrapper?.querySelector('.ec-next') as HTMLElement;
@@ -115,7 +112,10 @@
 
 	$effect(() => {
 		calendarOptions.date = selectedDate;
-		updateCalendarEvents();
+	});
+
+	$effect(() => {
+		calendarOptions.events = calendarEvents;
 	});
 </script>
 

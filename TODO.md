@@ -9,8 +9,8 @@ Commit without chaining shell commands with "&&".
 ## Tasks
 
 * [x] Extract business logic from components into custom stores or hooks
-* [ ] Implement proper state management for complex forms with validation
-* [ ] Create reusable UI components (buttons, inputs, modals) in a design system
+* [x] Implement proper state management for complex forms with validation
+* [x] Create reusable UI components (buttons, inputs, modals) in a design system
 
 ## Specific Refactoring Tasks from Code Review
 
@@ -23,8 +23,8 @@ Commit without chaining shell commands with "&&".
 ### State Management
 
 ### Performance Optimizations
-* [ ] Add virtual scrolling for large event lists
-* [ ] Optimize calendar event rendering with memoization
+* [x] Add virtual scrolling for large event lists
+* [x] Optimize calendar event rendering with memoization
 
 ### Accessibility Improvements
 * [ ] Improve keyboard navigation in calendar
