@@ -22,6 +22,8 @@
 	// Create form store instance
 	const formStore = createEventFormStore(initialData);
 
+	let formState = $formStore;
+
 	let mapCenter = $state<[number, number]>([60.1699, 24.9384]); // Helsinki default
 	let mapZoom = $state(10);
 	let isGeocoding = $state(false);
@@ -44,19 +46,19 @@
 		e.preventDefault();
 
 		// Ensure end_date is set if not provided
-		if (!formStore.state.formData.end_date) {
-			formStore.updateField('end_date', formStore.state.formData.start_date);
+		if (!formState.formData.end_date) {
+			formStore.updateField('end_date', formState.formData.start_date);
 		}
 
 		if (!formStore.validate()) {
 			// Focus on first error field
-			const firstErrorField = Object.keys(formStore.state.errors)[0];
+			const firstErrorField = Object.keys(formState.errors)[0];
 			const element = document.getElementById(firstErrorField);
 			if (element) element.focus();
 			return;
 		}
 
-		await onSubmit(formStore.state.formData);
+		await onSubmit(formState.formData);
 	}
 </script>
 
@@ -67,16 +69,16 @@
 		<input
 			type="text"
 			id="title"
-			bind:value={formStore.state.formData.title}
+			value={formState.formData.title}
 			placeholder={$_('event_title')}
 			required
 			autofocus={mode === 'create'}
 			disabled={isSubmitting}
-			oninput={() => formStore.clearError('title')}
+			oninput={(e) => formStore.updateField('title', (e.target as HTMLInputElement).value)}
 			class="focus:ring-opacity-25 box-border w-full rounded border border-gray-300 p-3 text-base focus:border-brand-primary focus:ring-2 focus:ring-brand-primary focus:outline-none"
 		/>
-		{#if formStore.state.errors.title}
-			<p class="mt-1 text-sm text-red-600">{formStore.state.errors.title}</p>
+		{#if formState.errors.title}
+			<p class="mt-1 text-sm text-red-600">{formState.errors.title}</p>
 		{/if}
 	</div>
 
@@ -87,20 +89,21 @@
 			<input
 				type="text"
 				id="location"
-				bind:value={formStore.state.formData.location}
+				value={formState.formData.location}
 				placeholder={$_('location_optional')}
 				disabled={isSubmitting}
+				oninput={(e) => formStore.updateField('location', (e.target as HTMLInputElement).value)}
 				onblur={async () => {
-					if (formStore.state.formData.location && !isGeocoding && geocodingEnabled) {
+					if (formState.formData.location && !isGeocoding && geocodingEnabled) {
 						isGeocoding = true;
 						try {
-							const coords = await geocodeLocation(formStore.state.formData.location);
+							const coords = await geocodeLocation(formState.formData.location);
 							if (coords) {
 								formStore.updateField('point', {
 									lat: parseFloat(coords[0].toFixed(6)),
 									lon: parseFloat(coords[1].toFixed(6))
 								}); // rounded
-								mapCenter = [formStore.state.formData.point!.lat, formStore.state.formData.point!.lon];
+								mapCenter = [formState.formData.point!.lat, formState.formData.point!.lon];
 								mapZoom = 15; // Zoom in closer after geocoding
 							}
 						} catch (error) {
@@ -124,24 +127,24 @@
 		</div>
 	</div>
 
-	{#if formStore.state.formData.location}
+	{#if formState.formData.location}
 		<div class="mb-4">
 			<Map
 				center={mapCenter}
 				zoom={mapZoom}
-				markerPosition={formStore.state.formData.point ? [formStore.state.formData.point.lat, formStore.state.formData.point.lon] : null}
+				markerPosition={formState.formData.point ? [formState.formData.point.lat, formState.formData.point.lon] : null}
 				onMarkerMove={(latlng) => {
 					formStore.updateField('point', {
 						lat: parseFloat(latlng[0].toFixed(6)),
 						lon: parseFloat(latlng[1].toFixed(6))
 					});
-					mapCenter = [formStore.state.formData.point!.lat, formStore.state.formData.point!.lon];
+					mapCenter = [formState.formData.point!.lat, formState.formData.point!.lon];
 				}}
 			/>
 		</div>
 	{/if}
 
-	{#if formStore.state.formData.point}
+	{#if formState.formData.point}
 		<div class="mb-4 flex gap-4">
 			<div class="flex-1">
 				<label for="lat" class="mb-2 block font-medium text-gray-700">{$_('latitude')}</label>
@@ -151,9 +154,15 @@
 					step="0.000001"
 					min="-90"
 					max="90"
-					bind:value={formStore.state.formData.point.lat}
+					value={formState.formData.point?.lat}
 					disabled={isSubmitting}
-					oninput={() => formStore.clearError('point')}
+					oninput={(e) => {
+						const lat = parseFloat((e.target as HTMLInputElement).value);
+						formStore.updateField('point', {
+							lat: lat,
+							lon: formState.formData.point?.lon || 0
+						});
+					}}
 					class="focus:ring-opacity-25 box-border w-full rounded border border-gray-300 p-3 text-base focus:border-brand-primary focus:ring-2 focus:ring-brand-primary focus:outline-none"
 				/>
 			</div>
@@ -165,15 +174,21 @@
 					step="0.000001"
 					min="-180"
 					max="180"
-					bind:value={formStore.state.formData.point.lon}
+					value={formState.formData.point?.lon}
 					disabled={isSubmitting}
-					oninput={() => formStore.clearError('point')}
+					oninput={(e) => {
+						const lon = parseFloat((e.target as HTMLInputElement).value);
+						formStore.updateField('point', {
+							lat: formState.formData.point?.lat || 0,
+							lon: lon
+						});
+					}}
 					class="focus:ring-opacity-25 box-border w-full rounded border border-gray-300 p-3 text-base focus:border-brand-primary focus:ring-2 focus:ring-brand-primary focus:outline-none"
 				/>
 			</div>
 		</div>
-		{#if formStore.state.errors.point}
-			<p class="mb-4 text-sm text-red-600">{formStore.state.errors.point}</p>
+		{#if formState.errors.point}
+			<p class="mb-4 text-sm text-red-600">{formState.errors.point}</p>
 		{/if}
 	{/if}
 
@@ -183,10 +198,11 @@
 		>
 		<textarea
 			id="description"
-			bind:value={formStore.state.formData.description}
+			value={formState.formData.description}
 			placeholder={$_('description_optional')}
 			rows="3"
 			disabled={isSubmitting}
+			oninput={(e) => formStore.updateField('description', (e.target as HTMLTextAreaElement).value)}
 			class="focus:ring-opacity-25 box-border w-full rounded border border-gray-300 p-3 text-base focus:border-brand-primary focus:ring-2 focus:ring-brand-primary focus:outline-none"
 		></textarea>
 	</div>
@@ -196,15 +212,15 @@
 		<input
 			type="url"
 			id="url"
-			bind:value={formStore.state.formData.url}
+			value={formState.formData.url}
 			placeholder={$_('url_optional')}
 			disabled={isSubmitting}
 			pattern="https?://.+"
-			oninput={() => formStore.clearError('url')}
+			oninput={(e) => formStore.updateField('url', (e.target as HTMLInputElement).value)}
 			class="focus:ring-opacity-25 box-border w-full rounded border border-gray-300 p-3 text-base focus:border-brand-primary focus:ring-2 focus:ring-brand-primary focus:outline-none"
 		/>
-		{#if formStore.state.errors.url}
-			<p class="mt-1 text-sm text-red-600">{formStore.state.errors.url}</p>
+		{#if formState.errors.url}
+			<p class="mt-1 text-sm text-red-600">{formState.errors.url}</p>
 		{/if}
 	</div>
 
@@ -238,9 +254,10 @@
 		<input
 			type="text"
 			id="imageDescription"
-			bind:value={formStore.state.formData.image_description}
+			value={formState.formData.image_description}
 			placeholder={$_('image_description_optional')}
 			disabled={isSubmitting}
+			oninput={(e) => formStore.updateField('image_description', (e.target as HTMLInputElement).value)}
 			class="focus:ring-opacity-25 box-border w-full rounded border border-gray-300 p-3 text-base focus:border-brand-primary focus:ring-2 focus:ring-brand-primary focus:outline-none"
 		/>
 	</div>
@@ -250,15 +267,15 @@
 			<DateTimePicker
 				id="startDate"
 				label={$_('start_date_required')}
-				value={formStore.state.formData.start_date}
+				value={formState.formData.start_date}
 				onChange={(value) => {
 					formStore.updateField('start_date', value);
 				}}
 				disabled={isSubmitting}
-				allDay={formStore.state.formData.all_day}
+				allDay={formState.formData.all_day}
 			/>
-			{#if formStore.state.errors.start_date}
-				<p class="mt-1 text-sm text-red-600">{formStore.state.errors.start_date}</p>
+			{#if formState.errors.start_date}
+				<p class="mt-1 text-sm text-red-600">{formState.errors.start_date}</p>
 			{/if}
 		</div>
 
@@ -266,15 +283,15 @@
 			<DateTimePicker
 				id="endDate"
 				label={$_('end_date')}
-				value={formStore.state.formData.end_date}
+				value={formState.formData.end_date}
 				onChange={(value) => {
 					formStore.updateField('end_date', value);
 				}}
-				disabled={isSubmitting || !formStore.state.formData.all_day}
-				allDay={formStore.state.formData.all_day}
+				disabled={isSubmitting || !formState.formData.all_day}
+				allDay={formState.formData.all_day}
 			/>
-			{#if formStore.state.errors.end_date}
-				<p class="mt-1 text-sm text-red-600">{formStore.state.errors.end_date}</p>
+			{#if formState.errors.end_date}
+				<p class="mt-1 text-sm text-red-600">{formState.errors.end_date}</p>
 			{/if}
 		</div>
 	</div>
@@ -284,14 +301,14 @@
 			<input
 				type="checkbox"
 				id="allDay"
-				bind:checked={formStore.state.formData.all_day}
+				checked={formState.formData.all_day}
 				disabled={isSubmitting}
 				onchange={(e) => {
 					const target = e.target as HTMLInputElement;
 					formStore.updateField('all_day', target.checked);
 					if (!target.checked) {
 						// For timed events, force end date to match start date
-						formStore.updateField('end_date', formStore.state.formData.start_date);
+						formStore.updateField('end_date', formState.formData.start_date);
 					}
 				}}
 			/>
@@ -303,8 +320,9 @@
 		<label for="state" class="mb-2 block font-medium text-gray-700">{$_('status')}</label>
 		<select
 			id="state"
-			bind:value={formStore.state.formData.state}
+			value={formState.formData.state}
 			disabled={isSubmitting}
+			onchange={(e) => formStore.updateField('state', (e.target as HTMLSelectElement).value)}
 			class="focus:ring-opacity-25 box-border w-full rounded border border-gray-300 p-3 text-base focus:border-brand-primary focus:ring-2 focus:ring-brand-primary focus:outline-none"
 		>
 			<option value="draft">{$_('draft')}</option>
@@ -317,8 +335,8 @@
 	<div class="mt-6 flex gap-2">
 		<button
 			type="submit"
-			disabled={isSubmitting || !formStore.state.formData.title || !formStore.state.formData.start_date}
-			aria-disabled={isSubmitting || !formStore.state.formData.title || !formStore.state.formData.start_date}
+			disabled={isSubmitting || !formState.formData.title || !formState.formData.start_date}
+			aria-disabled={isSubmitting || !formState.formData.title || !formState.formData.start_date}
 			class="cursor-pointer rounded border border-primary-500 bg-primary-500 px-6 py-3 text-base text-white transition-colors hover:bg-primary-600 disabled:cursor-not-allowed disabled:border-gray-400 disabled:bg-gray-200 disabled:text-gray-600 disabled:hover:bg-gray-300"
 		>
 			{isSubmitting

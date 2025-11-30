@@ -1,4 +1,4 @@
-import { get } from 'svelte/store';
+import { writable, get } from 'svelte/store';
 import type { EventFormData } from '$lib/types';
 import { validateEventForm } from '$lib/form-utils';
 
@@ -30,46 +30,49 @@ function createEventFormStore(initialData?: Partial<EventFormData>) {
 		isDirty: false
 	};
 
-	// Using Svelte 5 runes for state management
-	let state = $state(initialState);
+	const { subscribe, set, update } = writable(initialState);
 
 	return {
-		get state() {
-			return state;
-		},
+		subscribe,
 
 		updateField<K extends keyof EventFormData>(field: K, value: EventFormData[K]) {
-			state.formData[field] = value;
-			state.isDirty = true;
-			// Clear error for this field
-			if (state.errors[field]) {
-				delete state.errors[field];
-			}
+			update((state) => {
+				const newFormData = { ...state.formData, [field]: value };
+				return {
+					...state,
+					formData: newFormData,
+					isDirty: true,
+					errors: { ...state.errors, [field]: undefined }
+				};
+			});
 		},
 
 		setErrors(errors: Record<string, string>) {
-			state.errors = errors;
+			update((state) => ({ ...state, errors }));
 		},
 
 		clearError(field: keyof EventFormData) {
-			if (state.errors[field]) {
-				delete state.errors[field];
-			}
+			update((state) => {
+				const newErrors = { ...state.errors };
+				delete newErrors[field];
+				return { ...state, errors: newErrors };
+			});
 		},
 
 		validate() {
+			const state = get({ subscribe });
 			const validationErrors = validateEventForm(state.formData);
-			state.errors = validationErrors;
+			update((s) => ({ ...s, errors: validationErrors }));
 			return Object.keys(validationErrors).length === 0;
 		},
 
 		reset(newInitialData?: Partial<EventFormData>) {
 			const newFormData = { ...initialFormData, ...newInitialData };
-			state = {
+			set({
 				formData: newFormData,
 				errors: {},
 				isDirty: false
-			};
+			});
 		}
 	};
 }
