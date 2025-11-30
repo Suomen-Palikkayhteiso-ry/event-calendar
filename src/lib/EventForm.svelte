@@ -83,7 +83,7 @@
 
 <form onsubmit={handleSubmit}>
 	<div class="mb-4">
-		<label for="title" class="mb-2 block font-medium text-gray-700">{$_('title_required')}</label>
+		<label for="title" class="form-label">{$_('title_required')}</label>
 		<!-- svelte-ignore a11y_autofocus -->
 		<input
 			type="text"
@@ -97,16 +97,15 @@
 			autofocus={mode === 'create'}
 			disabled={isSubmitting}
 			oninput={(e) => formStore.updateField('title', (e.target as HTMLInputElement).value)}
-			class="focus:ring-opacity-25 box-border w-full rounded border border-gray-300 p-3 text-base focus:border-brand-primary focus:ring-2 focus:ring-brand-primary focus:outline-none"
+			class="form-input"
 		/>
 		{#if formState.errors.title}
-			<p id="error-title" class="mt-1 text-sm text-red-600">{formState.errors.title}</p>
+			<p id="error-title" class="form-error">{formState.errors.title}</p>
 		{/if}
 	</div>
 
 	<div class="mb-4">
-		<label for="location" class="mb-2 block font-medium text-gray-700">{$_('location_label')}</label
-		>
+		<label for="location" class="form-label">{$_('location_label')}</label>
 		<div class="flex items-center gap-2">
 			<input
 				type="text"
@@ -136,7 +135,7 @@
 						}
 					}
 				}}
-				class="focus:ring-opacity-25 box-border flex-1 rounded border border-gray-300 p-3 text-base focus:border-brand-primary focus:ring-2 focus:ring-brand-primary focus:outline-none"
+				class="form-input flex-1"
 			/>
 			<button
 				type="button"
@@ -175,7 +174,7 @@
 	{#if formState.formData.point}
 		<div class="mb-4 flex gap-4">
 			<div class="flex-1">
-				<label for="lat" class="mb-2 block font-medium text-gray-700">{$_('latitude')}</label>
+				<label for="lat" class="form-label">{$_('latitude')}</label>
 				<input
 					type="number"
 					id="lat"
@@ -193,11 +192,11 @@
 							lon: formState.formData.point?.lon || 0
 						});
 					}}
-					class="focus:ring-opacity-25 box-border w-full rounded border border-gray-300 p-3 text-base focus:border-brand-primary focus:ring-2 focus:ring-brand-primary focus:outline-none"
+					class="form-input"
 				/>
 			</div>
 			<div class="flex-1">
-				<label for="lng" class="mb-2 block font-medium text-gray-700">{$_('longitude')}</label>
+				<label for="lng" class="form-label">{$_('longitude')}</label>
 				<input
 					type="number"
 					id="lng"
@@ -215,19 +214,17 @@
 							lon: lon
 						});
 					}}
-					class="focus:ring-opacity-25 box-border w-full rounded border border-gray-300 p-3 text-base focus:border-brand-primary focus:ring-2 focus:ring-brand-primary focus:outline-none"
+					class="form-input"
 				/>
 			</div>
 		</div>
 		{#if formState.errors.point}
-			<p id="error-point" class="mb-4 text-sm text-red-600">{formState.errors.point}</p>
+			<p id="error-point" class="form-error">{formState.errors.point}</p>
 		{/if}
 	{/if}
 
 	<div class="mb-4">
-		<label for="description" class="mb-2 block font-medium text-gray-700"
-			>{$_('description_label')}</label
-		>
+		<label for="description" class="form-label">{$_('description_label')}</label>
 		<textarea
 			id="description"
 			value={formState.formData.description}
@@ -235,12 +232,12 @@
 			rows="3"
 			disabled={isSubmitting}
 			oninput={(e) => formStore.updateField('description', (e.target as HTMLTextAreaElement).value)}
-			class="focus:ring-opacity-25 box-border w-full rounded border border-gray-300 p-3 text-base focus:border-brand-primary focus:ring-2 focus:ring-brand-primary focus:outline-none"
+			class="form-input"
 		></textarea>
 	</div>
 
 	<div class="mb-4">
-		<label for="url" class="mb-2 block font-medium text-gray-700">{$_('url_label')}</label>
+		<label for="url" class="form-label">{$_('url_label')}</label>
 		<input
 			type="url"
 			id="url"
@@ -251,15 +248,15 @@
 			aria-invalid={formState.errors.url ? 'true' : 'false'}
 			aria-describedby={formState.errors.url ? 'error-url' : undefined}
 			oninput={(e) => formStore.updateField('url', (e.target as HTMLInputElement).value)}
-			class="focus:ring-opacity-25 box-border w-full rounded border border-gray-300 p-3 text-base focus:border-brand-primary focus:ring-2 focus:ring-brand-primary focus:outline-none"
+			class="form-input"
 		/>
 		{#if formState.errors.url}
-			<p id="error-url" class="mt-1 text-sm text-red-600">{formState.errors.url}</p>
+			<p id="error-url" class="form-error">{formState.errors.url}</p>
 		{/if}
 	</div>
 
 	<div class="mb-4">
-		<label for="image" class="mb-2 block font-medium text-gray-700">{$_('image_label')}</label>
+		<label for="image" class="form-label">{$_('image_label')}</label>
 		<input
 			type="file"
 			id="image"
@@ -272,19 +269,17 @@
 			}}
 		/>
 		{#if currentImage}
-			<p id="imageHelp" class="my-2 text-sm text-gray-600 italic">
+			<p id="imageHelp" class="form-help italic">
 				{$_('current_image')}
 				{currentImage}
 			</p>
 		{:else}
-			<p id="imageHelp" class="my-2 text-sm text-gray-600">{$_('image_help_text')}</p>
+			<p id="imageHelp" class="form-help">{$_('image_help_text')}</p>
 		{/if}
 	</div>
 
 	<div class="mb-4">
-		<label for="imageDescription" class="mb-2 block font-medium text-gray-700"
-			>{$_('image_description_label')}</label
-		>
+		<label for="imageDescription" class="form-label">{$_('image_description_label')}</label>
 		<input
 			type="text"
 			id="imageDescription"
@@ -293,7 +288,7 @@
 			disabled={isSubmitting}
 			oninput={(e) =>
 				formStore.updateField('image_description', (e.target as HTMLInputElement).value)}
-			class="focus:ring-opacity-25 box-border w-full rounded border border-gray-300 p-3 text-base focus:border-brand-primary focus:ring-2 focus:ring-brand-primary focus:outline-none"
+			class="form-input"
 		/>
 	</div>
 
@@ -312,7 +307,7 @@
 				ariaDescribedBy={formState.errors.start_date ? 'error-start-date' : undefined}
 			/>
 			{#if formState.errors.start_date}
-				<p id="error-start-date" class="mt-1 text-sm text-red-600">{formState.errors.start_date}</p>
+				<p id="error-start-date" class="form-error">{formState.errors.start_date}</p>
 			{/if}
 		</div>
 
@@ -330,7 +325,7 @@
 				ariaDescribedBy={formState.errors.end_date ? 'error-end-date' : undefined}
 			/>
 			{#if formState.errors.end_date}
-				<p id="error-end-date" class="mt-1 text-sm text-red-600">{formState.errors.end_date}</p>
+				<p id="error-end-date" class="form-error">{formState.errors.end_date}</p>
 			{/if}
 		</div>
 	</div>
@@ -356,7 +351,7 @@
 	</div>
 
 	<div class="mb-4">
-		<label for="state" class="mb-2 block font-medium text-gray-700">{$_('status')}</label>
+		<label for="state" class="form-label">{$_('status')}</label>
 		<select
 			id="state"
 			value={formState.formData.state}
@@ -366,7 +361,7 @@
 					'state',
 					(e.target as HTMLSelectElement).value as EventFormData['state']
 				)}
-			class="focus:ring-opacity-25 box-border w-full rounded border border-gray-300 p-3 text-base focus:border-brand-primary focus:ring-2 focus:ring-brand-primary focus:outline-none"
+			class="form-input"
 		>
 			<option value="draft">{$_('draft')}</option>
 			<option value="pending">{$_('pending')}</option>
@@ -380,7 +375,7 @@
 			type="submit"
 			disabled={isSubmitting || !formState.formData.title || !formState.formData.start_date}
 			aria-disabled={isSubmitting || !formState.formData.title || !formState.formData.start_date}
-			class="cursor-pointer rounded border border-primary-500 bg-primary-500 px-6 py-3 text-base text-white transition-colors hover:bg-primary-600 disabled:cursor-not-allowed disabled:border-gray-400 disabled:bg-gray-200 disabled:text-gray-600 disabled:hover:bg-gray-300"
+			class="btn-primary"
 		>
 			{isSubmitting
 				? mode === 'create'
@@ -392,7 +387,7 @@
 		</button>
 		<button
 			type="button"
-			class="cursor-pointer rounded border-none bg-gray-600 px-6 py-3 text-base text-white transition-colors hover:bg-gray-700 disabled:cursor-not-allowed disabled:bg-gray-400"
+			class="btn-secondary"
 			onclick={() => (onCancel ? onCancel() : history.back())}
 			disabled={isSubmitting}
 		>

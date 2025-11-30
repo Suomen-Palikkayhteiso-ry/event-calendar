@@ -71,7 +71,7 @@
 			{/key}
 		</div>
 		<button
-			class="flex h-12 w-12 flex-shrink-0 cursor-pointer items-center justify-center rounded-full border-none bg-primary-500 text-xl font-bold text-white transition-colors duration-200 hover:bg-primary-600"
+			class="btn-icon"
 			onclick={() =>
 				goto(`/events?date=${dateToHelsinkiDateString($calendarStore.selectedDate)}` as any)}
 			title="Add new event"
