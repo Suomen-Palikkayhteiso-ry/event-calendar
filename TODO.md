@@ -27,15 +27,15 @@ Commit without chaining shell commands with "&&".
 * [x] Optimize calendar event rendering with memoization
 
 ### Accessibility Improvements
-* [ ] Improve keyboard navigation in calendar
-* [ ] Add screen reader support for event details
+* [x] Improve keyboard navigation in calendar
+* [x] Add screen reader support for event details
 
 ### Error Handling
-* [ ] Create error logging system
+* [x] Create error logging system
 
 ### Testing
 * [ ] Add component tests for new extracted components
 
 ### Code Quality
-* [ ] Standardize error handling patterns across components
-* [ ] Implement consistent naming conventions
+* [x] Standardize error handling patterns across components
+* [x] Implement consistent naming conventions
