@@ -2,6 +2,7 @@ import { writable, get } from 'svelte/store';
 import { pb } from '$lib/pocketbase';
 import type { Event } from '$lib/types';
 import { logger } from '$lib/logger';
+import { retryApiCall } from '$lib/api-utils';
 
 export interface EventsState {
 	events: Event[];
@@ -52,10 +53,12 @@ function createEventsStore() {
 
 			try {
 				logger.info('Fetching events from API', { page, pageSize });
-				const result = await pb.collection('events').getList(page, pageSize, {
-					sort: '-start_date',
-					filter: 'state = "published" || state = "draft"'
-				});
+				const result = await retryApiCall(() =>
+					pb.collection('events').getList(page, pageSize, {
+						sort: '-start_date',
+						filter: 'state = "published" || state = "draft"'
+					})
+				);
 
 				const newState: EventsState = {
 					events: result.items as unknown as Event[],
@@ -81,7 +84,7 @@ function createEventsStore() {
 		async createEvent(eventData: any) {
 			try {
 				logger.info('Creating new event', { title: eventData.title });
-				const newEvent = await pb.collection('events').create(eventData);
+				const newEvent = await retryApiCall(() => pb.collection('events').create(eventData));
 				// Invalidate cache
 				cache.clear();
 				logger.info('Event created successfully', { id: newEvent.id });
@@ -95,7 +98,7 @@ function createEventsStore() {
 		async updateEvent(eventId: string, eventData: any) {
 			try {
 				logger.info('Updating event', { eventId, changes: Object.keys(eventData) });
-				const updatedEvent = await pb.collection('events').update(eventId, eventData);
+				const updatedEvent = await retryApiCall(() => pb.collection('events').update(eventId, eventData));
 				// Invalidate cache
 				cache.clear();
 				logger.info('Event updated successfully', { eventId });
@@ -114,7 +117,7 @@ function createEventsStore() {
 		async deleteEvent(eventId: string) {
 			try {
 				logger.info('Deleting event (marking as deleted)', { eventId });
-				await pb.collection('events').update(eventId, { state: 'deleted' });
+				await retryApiCall(() => pb.collection('events').update(eventId, { state: 'deleted' }));
 				// Invalidate cache
 				cache.clear();
 				logger.info('Event deleted successfully', { eventId });
@@ -127,7 +130,7 @@ function createEventsStore() {
 		async getEventById(eventId: string): Promise<Event> {
 			try {
 				logger.debug('Fetching single event', { eventId });
-				const event = await pb.collection('events').getOne(eventId);
+				const event = await retryApiCall(() => pb.collection('events').getOne(eventId));
 				logger.debug('Event fetched successfully', { eventId });
 				return event as unknown as Event;
 			} catch (error) {
