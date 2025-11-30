@@ -10,6 +10,7 @@
 	import { toast } from '@zerodevx/svelte-toast';
 	import EventForm from '$lib/EventForm.svelte';
 	import { prepareEventSubmitData } from '$lib/form-utils';
+	import { eventsStore } from '$lib/stores/events';
 
 	let event = $state<Event | null>(null);
 	let isSubmitting = $state(false);
@@ -31,20 +32,15 @@
 			return;
 		}
 
-		// Load event
-		console.log('Edit form: Loading event from PocketBase...');
-		pb.collection('events')
-			.getOne(eventId)
-			.then((loadedEvent) => {
-				console.log('Edit form: Event loaded successfully:', loadedEvent);
-				event = loadedEvent as unknown as Event;
-				console.log('Edit form: Event assigned, calling initializeEditForm');
-			})
-			.catch((error) => {
-				console.error('Edit form: Error loading event:', error);
-				toast.push($_('failed_load_event'));
-				goto(resolve('/events'));
-			});
+		eventsStore.getEventById(eventId).then((loadedEvent) => {
+			console.log('Edit form: Event loaded successfully:', loadedEvent);
+			event = loadedEvent;
+			console.log('Edit form: Event assigned, calling initializeEditForm');
+		}).catch((error) => {
+			console.error('Edit form: Error loading event:', error);
+			toast.push($_('failed_load_event'));
+			goto(resolve('/events'));
+		});
 
 		// Add ESC key listener
 		const handleKeydown = (event: KeyboardEvent) => {
@@ -73,15 +69,12 @@
 		isSubmitting = true;
 		try {
 			const submitData = prepareEventSubmitData(formData);
-
-			await pb.collection('events').update(event.id, submitData);
-
+			await eventsStore.updateEvent(event.id, submitData);
 			toast.push($_('event_updated_successfully'));
 
 			// Redirect back to view
 			goto(resolve(`/events/${event.id}`));
 		} catch (error) {
-			console.error('Error updating event:', error);
 			toast.push($_('failed_update_event'));
 		} finally {
 			isSubmitting = false;

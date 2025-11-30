@@ -12,14 +12,11 @@
 	import KMLImport from '$lib/KMLImport.svelte';
 	import { importKML } from '$lib/kml-utils';
 	import { prepareEventSubmitData } from '$lib/form-utils';
+	import { eventsStore, type EventsState } from '$lib/stores/events';
 
-	let events = $state<Event[]>([]);
-	let currentPage = $state(1);
-	let pageSize = 100;
 	let isSubmitting = $state(false);
 	let kmlFile: File | null = $state(null);
 	let isImporting = $state(false);
-	let isLoadingEvents = $state(false);
 
 	// Form data object for create form
 	let createFormData = $state({
@@ -36,7 +33,11 @@
 		point: null as { lat: number; lon: number } | null
 	});
 
-	let totalEvents = $state(0);
+	// Subscribe to events store
+	let eventsState: EventsState = $state({ events: [], totalEvents: 0, currentPage: 1, pageSize: 100, isLoading: false });
+	eventsStore.subscribe(state => {
+		eventsState = state;
+	});
 
 	// Check authentication
 	$effect(() => {
@@ -45,29 +46,8 @@
 		}
 	});
 
-	async function fetchEvents(page = 1) {
-		if (!$user) return;
-
-		isLoadingEvents = true;
-		try {
-			const result = await pb.collection('events').getList(page, pageSize, {
-				sort: '-start_date',
-				filter: 'state = "published" || state = "draft"'
-			});
-
-			events = result.items as unknown as Event[];
-			totalEvents = result.totalItems;
-			currentPage = page;
-		} catch (error) {
-			console.error('Error fetching events:', error);
-			toast.push($_('failed_fetch_events'));
-		} finally {
-			isLoadingEvents = false;
-		}
-	}
-
 	onMount(async () => {
-		await fetchEvents();
+		await eventsStore.fetchEvents();
 	});
 
 	// Add ESC key listener
@@ -90,9 +70,7 @@
 		isSubmitting = true;
 		try {
 			const submitData = prepareEventSubmitData(formData);
-
-			await pb.collection('events').create(submitData);
-
+			await eventsStore.createEvent(submitData);
 			toast.push($_('event_created_successfully'));
 
 			// Reset form
@@ -107,9 +85,8 @@
 			createFormData.point = null;
 
 			// Refresh events list
-			await fetchEvents(currentPage);
+			await eventsStore.fetchEvents(eventsState.currentPage, eventsState.pageSize);
 		} catch (error) {
-			console.error('Error creating event:', error);
 			toast.push($_('failed_create_event'));
 		} finally {
 			isSubmitting = false;
@@ -118,12 +95,11 @@
 
 	async function updateEventState(eventId: string, newState: string) {
 		try {
-			await pb.collection('events').update(eventId, { state: newState });
-			// Refresh the events list
-			await fetchEvents(currentPage);
+			await eventsStore.updateEventState(eventId, newState);
 			toast.push($_('event_updated_successfully'));
+			// Refresh the events list
+			await eventsStore.fetchEvents(eventsState.currentPage, eventsState.pageSize);
 		} catch (error) {
-			console.error('Error updating event state:', error);
 			toast.push($_('failed_update_event'));
 		}
 	}
@@ -133,16 +109,11 @@
 	}
 
 	async function nextPage() {
-		const maxPage = Math.ceil(totalEvents / pageSize);
-		if (currentPage < maxPage) {
-			await fetchEvents(currentPage + 1);
-		}
+		eventsStore.nextPage();
 	}
 
 	async function prevPage() {
-		if (currentPage > 1) {
-			await fetchEvents(currentPage - 1);
-		}
+		eventsStore.prevPage();
 	}
 
 	async function handleKMLImport() {
@@ -152,7 +123,7 @@
 		try {
 			await importKML(kmlFile, () => {
 				kmlFile = null;
-				fetchEvents(currentPage);
+				eventsStore.fetchEvents(eventsState.currentPage, eventsState.pageSize);
 			});
 			toast.push($_('kml_import_successful'));
 		} catch (error) {
@@ -179,14 +150,14 @@
 	/>
 
 	<EventList
-		{events}
-		{totalEvents}
-		{currentPage}
-		{pageSize}
+		events={eventsState.events}
+		totalEvents={eventsState.totalEvents}
+		currentPage={eventsState.currentPage}
+		pageSize={eventsState.pageSize}
 		onUpdateState={updateEventState}
 		onNextPage={nextPage}
 		onPrevPage={prevPage}
-		loading={isLoadingEvents}
+		loading={eventsState.isLoading}
 	/>
 {/if}
 
