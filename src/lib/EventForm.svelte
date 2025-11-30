@@ -6,6 +6,7 @@
 	import DateTimePicker from '$lib/DateTimePicker.svelte';
 	import { geocodeLocation } from '$lib/geocode';
 	import { createEventFormStore } from '$lib/stores/event-form';
+	import { Button, Input, Textarea, Label, Select } from '$lib/ui';
 
 	interface Props {
 		initialData?: Partial<EventFormData>;
@@ -83,11 +84,11 @@
 
 <form onsubmit={handleSubmit}>
 	<div class="mb-4">
-		<label for="title" class="form-label">{$_('title_required')}</label>
+		<Label htmlFor="title" required>{$_('title_required')}</Label>
 		<!-- svelte-ignore a11y_autofocus -->
-		<input
-			type="text"
+		<Input
 			id="title"
+			type="text"
 			value={formState.formData.title}
 			placeholder={$_('event_title')}
 			required
@@ -96,8 +97,10 @@
 			aria-describedby={formState.errors.title ? 'error-title' : undefined}
 			autofocus={mode === 'create'}
 			disabled={isSubmitting}
-			oninput={(e) => formStore.updateField('title', (e.target as HTMLInputElement).value)}
-			class="form-input"
+			oninput={(e) => {
+				formStore.updateField('title', (e.target as HTMLInputElement).value);
+				formStore.clearError('title');
+			}}
 		/>
 		{#if formState.errors.title}
 			<p id="error-title" class="form-error">{formState.errors.title}</p>
@@ -105,15 +108,18 @@
 	</div>
 
 	<div class="mb-4">
-		<label for="location" class="form-label">{$_('location_label')}</label>
+		<Label htmlFor="location">{$_('location_label')}</Label>
 		<div class="flex items-center gap-2">
-			<input
-				type="text"
+			<Input
 				id="location"
+				type="text"
 				value={formState.formData.location}
 				placeholder={$_('location_optional')}
 				disabled={isSubmitting}
-				oninput={(e) => formStore.updateField('location', (e.target as HTMLInputElement).value)}
+				oninput={(e) => {
+					formStore.updateField('location', (e.target as HTMLInputElement).value);
+					formStore.clearError('location');
+				}}
 				onblur={async () => {
 					if (formState.formData.location && !isGeocoding && geocodingEnabled) {
 						isGeocoding = true;
@@ -135,7 +141,7 @@
 						}
 					}
 				}}
-				class="form-input flex-1"
+				class="flex-1"
 			/>
 			<button
 				type="button"
@@ -174,10 +180,10 @@
 	{#if formState.formData.point}
 		<div class="mb-4 flex gap-4">
 			<div class="flex-1">
-				<label for="lat" class="form-label">{$_('latitude')}</label>
-				<input
-					type="number"
+				<Label htmlFor="lat">{$_('latitude')}</Label>
+				<Input
 					id="lat"
+					type="number"
 					step="0.000001"
 					min="-90"
 					max="90"
@@ -185,21 +191,20 @@
 					disabled={isSubmitting}
 					aria-invalid={formState.errors.point ? 'true' : 'false'}
 					aria-describedby={formState.errors.point ? 'error-point' : undefined}
-					oninput={(e) => {
+					on:input={(e) => {
 						const lat = parseFloat((e.target as HTMLInputElement).value);
 						formStore.updateField('point', {
 							lat: lat,
 							lon: formState.formData.point?.lon || 0
 						});
 					}}
-					class="form-input"
 				/>
 			</div>
 			<div class="flex-1">
-				<label for="lng" class="form-label">{$_('longitude')}</label>
-				<input
-					type="number"
+				<Label htmlFor="lng">{$_('longitude')}</Label>
+				<Input
 					id="lng"
+					type="number"
 					step="0.000001"
 					min="-180"
 					max="180"
@@ -207,14 +212,13 @@
 					disabled={isSubmitting}
 					aria-invalid={formState.errors.point ? 'true' : 'false'}
 					aria-describedby={formState.errors.point ? 'error-point' : undefined}
-					oninput={(e) => {
+					on:input={(e) => {
 						const lon = parseFloat((e.target as HTMLInputElement).value);
 						formStore.updateField('point', {
 							lat: formState.formData.point?.lat || 0,
 							lon: lon
 						});
 					}}
-					class="form-input"
 				/>
 			</div>
 		</div>
@@ -224,31 +228,32 @@
 	{/if}
 
 	<div class="mb-4">
-		<label for="description" class="form-label">{$_('description_label')}</label>
-		<textarea
+		<Label htmlFor="description">{$_('description_label')}</Label>
+		<Textarea
 			id="description"
 			value={formState.formData.description}
 			placeholder={$_('description_optional')}
 			rows="3"
 			disabled={isSubmitting}
 			oninput={(e) => formStore.updateField('description', (e.target as HTMLTextAreaElement).value)}
-			class="form-input"
-		></textarea>
+		/>
 	</div>
 
 	<div class="mb-4">
-		<label for="url" class="form-label">{$_('url_label')}</label>
-		<input
-			type="url"
+		<Label htmlFor="url">{$_('url_label')}</Label>
+		<Input
 			id="url"
+			type="url"
 			value={formState.formData.url}
 			placeholder={$_('url_optional')}
 			disabled={isSubmitting}
 			pattern="https?://.+"
 			aria-invalid={formState.errors.url ? 'true' : 'false'}
 			aria-describedby={formState.errors.url ? 'error-url' : undefined}
-			oninput={(e) => formStore.updateField('url', (e.target as HTMLInputElement).value)}
-			class="form-input"
+			oninput={(e) => {
+				formStore.updateField('url', (e.target as HTMLInputElement).value);
+				formStore.clearError('url');
+			}}
 		/>
 		{#if formState.errors.url}
 			<p id="error-url" class="form-error">{formState.errors.url}</p>
@@ -256,7 +261,7 @@
 	</div>
 
 	<div class="mb-4">
-		<label for="image" class="form-label">{$_('image_label')}</label>
+		<Label htmlFor="image">{$_('image_label')}</Label>
 		<input
 			type="file"
 			id="image"
@@ -279,16 +284,14 @@
 	</div>
 
 	<div class="mb-4">
-		<label for="imageDescription" class="form-label">{$_('image_description_label')}</label>
-		<input
-			type="text"
+		<Label htmlFor="imageDescription">{$_('image_description_label')}</Label>
+		<Input
 			id="imageDescription"
+			type="text"
 			value={formState.formData.image_description}
 			placeholder={$_('image_description_optional')}
 			disabled={isSubmitting}
-			oninput={(e) =>
-				formStore.updateField('image_description', (e.target as HTMLInputElement).value)}
-			class="form-input"
+			oninput={(e) => formStore.updateField('image_description', (e.target as HTMLInputElement).value)}
 		/>
 	</div>
 
@@ -351,31 +354,26 @@
 	</div>
 
 	<div class="mb-4">
-		<label for="state" class="form-label">{$_('status')}</label>
-		<select
+		<Label htmlFor="state">{$_('status')}</Label>
+		<Select
 			id="state"
 			value={formState.formData.state}
 			disabled={isSubmitting}
-			onchange={(e) =>
-				formStore.updateField(
-					'state',
-					(e.target as HTMLSelectElement).value as EventFormData['state']
-				)}
-			class="form-input"
+			onchange={(e) => formStore.updateField('state', (e.target as HTMLSelectElement).value as EventFormData['state'])}
 		>
 			<option value="draft">{$_('draft')}</option>
 			<option value="pending">{$_('pending')}</option>
 			<option value="published">{$_('published')}</option>
 			<option value="deleted">{$_('deleted')}</option>
-		</select>
+		</Select>
 	</div>
 
 	<div class="mt-6 flex gap-2">
-		<button
+		<Button
 			type="submit"
+			variant="primary"
 			disabled={isSubmitting || !formState.formData.title || !formState.formData.start_date}
 			aria-disabled={isSubmitting || !formState.formData.title || !formState.formData.start_date}
-			class="btn-primary"
 		>
 			{isSubmitting
 				? mode === 'create'
@@ -384,14 +382,14 @@
 				: mode === 'create'
 					? $_('create_event')
 					: $_('save_changes')}
-		</button>
-		<button
+		</Button>
+		<Button
 			type="button"
-			class="btn-secondary"
+			variant="secondary"
 			onclick={() => (onCancel ? onCancel() : history.back())}
 			disabled={isSubmitting}
 		>
 			{$_('cancel')}
-		</button>
+		</Button>
 	</div>
 </form>
