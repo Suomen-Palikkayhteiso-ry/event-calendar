@@ -7,6 +7,7 @@
 	import { geocodeLocation } from '$lib/geocode';
 	import { createEventFormStore } from '$lib/stores/event-form';
 	import { Button, Input, Textarea, Label, Select } from '$lib/ui';
+	import { logger } from '$lib/logger';
 
 	interface Props {
 		initialData?: Partial<EventFormData>;
@@ -65,12 +66,15 @@
 	async function handleSubmit(e: SubmitEvent) {
 		e.preventDefault();
 
+		logger.info('Form submission started', { mode, title: formState.formData.title });
+
 		// Ensure end_date is set if not provided
 		if (!formState.formData.end_date) {
 			formStore.updateField('end_date', formState.formData.start_date);
 		}
 
 		if (!formStore.validate()) {
+			logger.warn('Form validation failed', { errors: formState.errors });
 			// Focus on first error field
 			const firstErrorField = Object.keys(formState.errors)[0];
 			const element = document.getElementById(firstErrorField);
@@ -78,7 +82,13 @@
 			return;
 		}
 
-		await onSubmit(formState.formData);
+		try {
+			await onSubmit(formState.formData);
+			logger.info('Form submission successful', { mode, title: formState.formData.title });
+		} catch (error) {
+			logger.error('Form submission failed', { error, mode, title: formState.formData.title });
+			throw error;
+		}
 	}
 </script>
 
@@ -134,7 +144,7 @@
 								mapZoom = 15; // Zoom in closer after geocoding
 							}
 						} catch (error) {
-							console.error('Geocoding failed:', error);
+							logger.error('Geocoding failed during form submission', { error, location: formState.formData.location });
 							toast.push($_('geocoding_failed'));
 						} finally {
 							isGeocoding = false;

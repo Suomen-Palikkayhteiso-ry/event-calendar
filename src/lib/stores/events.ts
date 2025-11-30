@@ -1,6 +1,7 @@
 import { writable, get } from 'svelte/store';
 import { pb } from '$lib/pocketbase';
 import type { Event } from '$lib/types';
+import { logger } from '$lib/logger';
 
 export interface EventsState {
 	events: Event[];
@@ -42,6 +43,7 @@ function createEventsStore() {
 			// Check cache
 			const cached = cache.get(cacheKey);
 			if (cached && now - cached.timestamp < CACHE_DURATION) {
+				logger.debug('Using cached events data', { page, pageSize });
 				set(cached.data);
 				return cached.data;
 			}
@@ -49,6 +51,7 @@ function createEventsStore() {
 			update((state) => ({ ...state, isLoading: true }));
 
 			try {
+				logger.info('Fetching events from API', { page, pageSize });
 				const result = await pb.collection('events').getList(page, pageSize, {
 					sort: '-start_date',
 					filter: 'state = "published" || state = "draft"'
@@ -65,10 +68,11 @@ function createEventsStore() {
 				// Cache the result
 				cache.set(cacheKey, { data: newState, timestamp: now });
 
+				logger.info('Events fetched successfully', { count: result.items.length, total: result.totalItems });
 				set(newState);
 				return newState;
 			} catch (error) {
-				console.error('Error fetching events:', error);
+				logger.error('Error fetching events', { error, page, pageSize });
 				update((state) => ({ ...state, isLoading: false }));
 				throw error;
 			}
@@ -76,24 +80,28 @@ function createEventsStore() {
 
 		async createEvent(eventData: any) {
 			try {
+				logger.info('Creating new event', { title: eventData.title });
 				const newEvent = await pb.collection('events').create(eventData);
 				// Invalidate cache
 				cache.clear();
+				logger.info('Event created successfully', { id: newEvent.id });
 				return newEvent;
 			} catch (error) {
-				console.error('Error creating event:', error);
+				logger.error('Error creating event', { error, eventData });
 				throw error;
 			}
 		},
 
 		async updateEvent(eventId: string, eventData: any) {
 			try {
+				logger.info('Updating event', { eventId, changes: Object.keys(eventData) });
 				const updatedEvent = await pb.collection('events').update(eventId, eventData);
 				// Invalidate cache
 				cache.clear();
+				logger.info('Event updated successfully', { eventId });
 				return updatedEvent;
 			} catch (error) {
-				console.error('Error updating event:', error);
+				logger.error('Error updating event', { error, eventId, eventData });
 				throw error;
 			}
 		},
@@ -105,21 +113,25 @@ function createEventsStore() {
 
 		async deleteEvent(eventId: string) {
 			try {
+				logger.info('Deleting event (marking as deleted)', { eventId });
 				await pb.collection('events').update(eventId, { state: 'deleted' });
 				// Invalidate cache
 				cache.clear();
+				logger.info('Event deleted successfully', { eventId });
 			} catch (error) {
-				console.error('Error deleting event:', error);
+				logger.error('Error deleting event', { error, eventId });
 				throw error;
 			}
 		},
 
 		async getEventById(eventId: string): Promise<Event> {
 			try {
+				logger.debug('Fetching single event', { eventId });
 				const event = await pb.collection('events').getOne(eventId);
+				logger.debug('Event fetched successfully', { eventId });
 				return event as unknown as Event;
 			} catch (error) {
-				console.error('Error fetching event:', error);
+				logger.error('Error fetching event', { error, eventId });
 				throw error;
 			}
 		},
