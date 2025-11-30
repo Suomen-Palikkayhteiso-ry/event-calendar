@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { Datepicker, Timepicker } from 'flowbite-svelte';
+	const DatepickerTyped = Datepicker as any;
+	const TimepickerTyped = Timepicker as any;
 	import { parseUTCDate, utcToHelsinkiDate } from '$lib/date-utils';
 
 	interface Props {
@@ -10,7 +12,7 @@
 		allDay?: boolean;
 		label: string;
 		id: string;
-		ariaInvalid?: string;
+		ariaInvalid?: boolean;
 		ariaDescribedBy?: string;
 	}
 
@@ -77,7 +79,8 @@
 
 <div class="mb-4">
 	<label for={id} class="mb-2 block font-medium text-gray-700">{label}</label>
-	<Datepicker
+	<!-- @ts-ignore -->
+	<DatepickerTyped
 		{id}
 		value={dateObj}
 		defaultDate={dateObj}
@@ -86,21 +89,19 @@
 		{disabled}
 		aria-invalid={ariaInvalid}
 		aria-describedby={ariaDescribedBy}
-		on:change={(e) => {
+		on:change={(e: any) => {
 			dateObj = e.detail;
 		}}
-	/>
+	></DatepickerTyped>
 	{#if !allDay}
-		<Timepicker
+		<TimepickerTyped
 			id="{id}Time"
 			value={timeString}
 			{disabled}
-			aria-invalid={ariaInvalid}
-			aria-describedby={ariaDescribedBy}
-			on:change={(e) => {
+			on:change={(e: any) => {
 				timeString = e.detail;
 			}}
-		/>
+		></TimepickerTyped>
 	{/if}
 </div>
 

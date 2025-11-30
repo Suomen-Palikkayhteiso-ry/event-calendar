@@ -12,7 +12,7 @@ build: install
 
 .PHONY: clean
 clean:
-	rm -rf dist
+	rm -rf build
 	rm -rf node_modules
 
 .PHONY: install

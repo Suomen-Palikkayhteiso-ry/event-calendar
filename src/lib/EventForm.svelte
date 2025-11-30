@@ -292,7 +292,7 @@
 				}}
 				disabled={isSubmitting}
 				allDay={formState.formData.all_day}
-				ariaInvalid={formState.errors.start_date ? 'true' : 'false'}
+				ariaInvalid={!!formState.errors.start_date}
 				ariaDescribedBy={formState.errors.start_date ? 'error-start-date' : undefined}
 			/>
 			{#if formState.errors.start_date}
@@ -310,7 +310,7 @@
 				}}
 				disabled={isSubmitting || !formState.formData.all_day}
 				allDay={formState.formData.all_day}
-				ariaInvalid={formState.errors.end_date ? 'true' : 'false'}
+				ariaInvalid={!!formState.errors.end_date}
 				ariaDescribedBy={formState.errors.end_date ? 'error-end-date' : undefined}
 			/>
 			{#if formState.errors.end_date}
