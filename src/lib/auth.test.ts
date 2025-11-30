@@ -1,15 +1,26 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { user, login, logout } from '$lib/auth';
 import { get } from 'svelte/store';
 
+// Define mock type
+interface MockPb {
+	authStore: {
+		model: { id: string; name: string } | null;
+		onChange: ReturnType<typeof vi.fn>;
+		clear: ReturnType<typeof vi.fn>;
+	};
+	collection: ReturnType<typeof vi.fn>;
+}
+
 // Mock the pocketbase module
 vi.mock('$lib/pocketbase', () => {
-	const mockPb = {
+	// Store auth callback reference in globalThis
+	const mockPb: MockPb = {
 		authStore: {
 			model: null,
-			onChange: vi.fn().mockImplementation((callback) => {
-				// Store the callback for testing
-				mockPb.authStore._callback = callback;
+			onChange: vi.fn().mockImplementation((callback: () => void) => {
+				// Store the callback for testing in globalThis
+				(globalThis as Record<string, unknown>).__authChangeCallback = callback;
 				return () => {}; // Return unsubscribe function
 			}),
 			clear: vi.fn()
@@ -25,18 +36,22 @@ vi.mock('$lib/pocketbase', () => {
 });
 
 describe('auth', () => {
+	const getAuthCallback = () =>
+		(globalThis as Record<string, unknown>).__authChangeCallback as (() => void) | undefined;
+
 	describe('user store', () => {
 		it('should initialize with null user', () => {
 			expect(get(user)).toBeNull();
 		});
 
 		it('should update when authStore changes', async () => {
-			const { pb } = await import('$lib/pocketbase');
+			const { pb } = (await import('$lib/pocketbase')) as unknown as { pb: MockPb };
 			const mockUser = { id: 'test-user', name: 'Test User' };
-			
+
 			// Simulate authStore change
 			pb.authStore.model = mockUser;
-			pb.authStore._callback(); // Trigger the onChange callback
+			const callback = getAuthCallback();
+			if (callback) callback(); // Trigger the onChange callback
 
 			expect(get(user)).toEqual(mockUser);
 		});
@@ -44,7 +59,7 @@ describe('auth', () => {
 
 	describe('login', () => {
 		it('should call authWithOAuth2 with correct provider', async () => {
-			const { pb } = await import('$lib/pocketbase');
+			const { pb } = (await import('$lib/pocketbase')) as unknown as { pb: MockPb };
 			const mockAuthWithOAuth2 = vi.fn().mockResolvedValue({});
 			pb.collection.mockReturnValue({
 				authWithOAuth2: mockAuthWithOAuth2
@@ -58,7 +73,7 @@ describe('auth', () => {
 
 	describe('logout', () => {
 		it('should call authStore.clear', async () => {
-			const { pb } = await import('$lib/pocketbase');
+			const { pb } = (await import('$lib/pocketbase')) as unknown as { pb: MockPb };
 
 			logout();
 

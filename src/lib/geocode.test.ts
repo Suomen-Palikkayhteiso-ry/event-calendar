@@ -13,7 +13,7 @@ describe('geocode', () => {
 		dateNowSpy = vi.spyOn(Date, 'now').mockReturnValue(currentTime);
 
 		fetchMock = vi.fn();
-		global.fetch = fetchMock;
+		global.fetch = fetchMock as typeof fetch;
 	});
 
 	afterEach(() => {

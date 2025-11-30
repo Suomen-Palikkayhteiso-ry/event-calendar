@@ -1,13 +1,15 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/svelte';
-import { writable, type Writable } from 'svelte/store';
+import { writable } from 'svelte/store';
 import userEvent from '@testing-library/user-event';
 import { tick } from 'svelte';
+import type { RecordModel } from 'pocketbase';
 
 // Define mocks before vi.mock calls
 
 // Mock @event-calendar/core
 vi.mock('@event-calendar/core', () => {
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const MockCalendar = (options: any) => {
 		return {
 			$$: {
@@ -55,18 +57,21 @@ vi.mock('@event-calendar/core', () => {
 // Mock @event-calendar/core/index.css
 vi.mock('@event-calendar/core/index.css', () => ({}));
 
-// Mock PocketBase
+// Mock PocketBase - use globalThis to store references
 vi.mock('$lib/pocketbase', () => {
-	const getFullList = vi.fn(() => Promise.resolve([]));
-	const collection = vi.fn(() => ({ getFullList }));
+	const mockGetFullList = vi.fn().mockResolvedValue([]);
+	const mockCollection = vi.fn(() => ({ getFullList: mockGetFullList }));
+	// Store in globalThis for test access
+	(globalThis as Record<string, unknown>).__mockGetFullList = mockGetFullList;
+	(globalThis as Record<string, unknown>).__mockCollection = mockCollection;
 	return {
-		pb: { collection }
+		pb: { collection: mockCollection }
 	};
 });
 
 // Mock svelte-i18n
-vi.mock('svelte-i18n', () => {
-	const { writable } = require('svelte/store');
+vi.mock('svelte-i18n', async () => {
+	const { writable } = await import('svelte/store');
 	return {
 		_: writable((key: string) => key)
 	};
@@ -82,21 +87,25 @@ vi.mock('$app/paths', () => ({
 	resolve: vi.fn((path: string) => path)
 }));
 
-// Mock $lib/auth
-vi.mock('$lib/auth', () => {
-	const { writable } = require('svelte/store');
+// Mock $lib/auth - use globalThis for the user store
+vi.mock('$lib/auth', async () => {
+	const { writable } = await import('svelte/store');
+	const userStore = writable<RecordModel | null>(null);
+	(globalThis as Record<string, unknown>).__mockUserStore = userStore;
 	return {
-		user: writable(null)
+		user: userStore
 	};
 });
 
-// Mock $app/stores
-vi.mock('$app/stores', () => {
-	const { writable } = require('svelte/store');
+// Mock $app/stores - use globalThis for the page store
+vi.mock('$app/stores', async () => {
+	const { writable } = await import('svelte/store');
+	const pageStore = writable({
+		url: new URL('http://localhost')
+	});
+	(globalThis as Record<string, unknown>).__mockPageStore = pageStore;
 	return {
-		page: writable({
-			url: new URL('http://localhost')
-		})
+		page: pageStore
 	};
 });
 
@@ -134,17 +143,24 @@ vi.mock('$lib/date-utils', () => ({
 }));
 
 import Page from './+page.svelte';
-import * as auth from '$lib/auth';
-import * as stores from '$app/stores';
-import * as pbModule from '$lib/pocketbase';
 import * as navigation from '$app/navigation';
-import { browser } from '$app/environment';
+import type { Writable } from 'svelte/store';
+
+// Helper functions to get mocks from globalThis
+const getMockUserStore = () =>
+	(globalThis as Record<string, unknown>).__mockUserStore as Writable<RecordModel | null>;
+const getMockPageStore = () =>
+	(globalThis as Record<string, unknown>).__mockPageStore as Writable<{ url: URL }>;
+const getMockGetFullList = () =>
+	(globalThis as Record<string, unknown>).__mockGetFullList as ReturnType<typeof vi.fn>;
+const getMockCollection = () =>
+	(globalThis as Record<string, unknown>).__mockCollection as ReturnType<typeof vi.fn>;
 
 describe('+page.svelte calendar view', () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
-		auth.user.set(null);
-		stores.page.set({
+		getMockUserStore().set(null);
+		getMockPageStore().set({
 			url: new URL('http://localhost')
 		});
 	});
@@ -177,13 +193,13 @@ describe('+page.svelte calendar view', () => {
 			}
 		];
 
-		pbModule.pb.collection().getFullList.mockResolvedValue(mockEvents);
+		getMockGetFullList().mockResolvedValue(mockEvents);
 
 		render(Page);
 
 		await waitFor(() => {
-			expect(pbModule.pb.collection).toHaveBeenCalledWith('events');
-			expect(pbModule.pb.collection().getFullList).toHaveBeenCalledWith({
+			expect(getMockCollection()).toHaveBeenCalledWith('events');
+			expect(getMockGetFullList()).toHaveBeenCalledWith({
 				sort: 'start_date',
 				filter: 'state = "published"'
 			});
@@ -191,7 +207,7 @@ describe('+page.svelte calendar view', () => {
 	});
 
 	it('shows datepicker and add button for logged in user', async () => {
-		auth.user.set({ name: 'Test User' });
+		getMockUserStore().set({ collectionId: 'users', collectionName: 'users', id: 'test-user', name: 'Test User' });
 
 		render(Page);
 
@@ -206,7 +222,7 @@ describe('+page.svelte calendar view', () => {
 	});
 
 	it('shows email link for non-logged in user', async () => {
-		auth.user.set(null);
+		getMockUserStore().set(null);
 
 		render(Page);
 
@@ -219,7 +235,7 @@ describe('+page.svelte calendar view', () => {
 
 	it('handles date parameter from URL', async () => {
 		const testUrl = new URL('http://localhost?date=2023-12-01');
-		stores.page.set({
+		getMockPageStore().set({
 			url: testUrl
 		});
 
@@ -233,7 +249,7 @@ describe('+page.svelte calendar view', () => {
 
 	it('clears invalid date parameter from URL', async () => {
 		const testUrl = new URL('http://localhost?date=invalid-date');
-		stores.page.set({
+		getMockPageStore().set({
 			url: testUrl
 		});
 
@@ -247,7 +263,7 @@ describe('+page.svelte calendar view', () => {
 
 	it('does not clear date parameter if not present', async () => {
 		const testUrl = new URL('http://localhost');
-		stores.page.set({
+		getMockPageStore().set({
 			url: testUrl
 		});
 
@@ -261,7 +277,7 @@ describe('+page.svelte calendar view', () => {
 
 	it('navigates to event creation with selected date', async () => {
 		const user = userEvent.setup();
-		auth.user.set({ name: 'Test User' });
+		getMockUserStore().set({ collectionId: 'users', collectionName: 'users', id: 'test-user', name: 'Test User' });
 
 		render(Page);
 
@@ -286,11 +302,11 @@ describe('+page.svelte calendar view', () => {
 			}
 		];
 
-		pbModule.pb.collection.mockReturnValue({
+		getMockCollection().mockReturnValue({
 			getFullList: vi.fn().mockResolvedValue(mockEvents)
 		});
 
-		auth.user.set({ name: 'Test User' });
+		getMockUserStore().set({ collectionId: 'users', collectionName: 'users', id: 'test-user', name: 'Test User' });
 		render(Page);
 
 		await tick();
@@ -314,11 +330,11 @@ describe('+page.svelte calendar view', () => {
 			}
 		];
 
-		pbModule.pb.collection.mockReturnValue({
+		getMockCollection().mockReturnValue({
 			getFullList: vi.fn().mockResolvedValue(mockEvents)
 		});
 
-		auth.user.set({ name: 'Test User' });
+		getMockUserStore().set({ collectionId: 'users', collectionName: 'users', id: 'test-user', name: 'Test User' });
 		render(Page);
 
 		await tick();
@@ -341,11 +357,11 @@ describe('+page.svelte calendar view', () => {
 			}
 		];
 
-		pbModule.pb.collection.mockReturnValue({
+		getMockCollection().mockReturnValue({
 			getFullList: vi.fn().mockResolvedValue(mockEvents)
 		});
 
-		auth.user.set({ name: 'Test User' });
+		getMockUserStore().set({ collectionId: 'users', collectionName: 'users', id: 'test-user', name: 'Test User' });
 		render(Page);
 
 		await tick();
@@ -364,7 +380,7 @@ describe('+page.svelte calendar view', () => {
 			writable: true
 		});
 
-		auth.user.set({ name: 'Test User' });
+		getMockUserStore().set({ collectionId: 'users', collectionName: 'users', id: 'test-user', name: 'Test User' });
 		render(Page);
 
 		await tick();
@@ -400,11 +416,11 @@ describe('+page.svelte calendar view', () => {
 			}
 		];
 
-		pbModule.pb.collection.mockReturnValue({
+		getMockCollection().mockReturnValue({
 			getFullList: vi.fn().mockResolvedValue(mockEvents)
 		});
 
-		auth.user.set({ name: 'Test User' });
+		getMockUserStore().set({ collectionId: 'users', collectionName: 'users', id: 'test-user', name: 'Test User' });
 		render(Page);
 
 		await tick();
@@ -413,9 +429,7 @@ describe('+page.svelte calendar view', () => {
 		// This is tested indirectly through the calendar rendering
 		const calendarWrapper = document.querySelector('div:last-child');
 		expect(calendarWrapper).toBeInTheDocument();
-	});
-
-	it('sets event tooltips for events with descriptions', async () => {
+	});	it('sets event tooltips for events with descriptions', async () => {
 		const mockEvents = [
 			{
 				id: 'event-with-desc',
@@ -427,11 +441,11 @@ describe('+page.svelte calendar view', () => {
 			}
 		];
 
-		pbModule.pb.collection.mockReturnValue({
+		getMockCollection().mockReturnValue({
 			getFullList: vi.fn().mockResolvedValue(mockEvents)
 		});
 
-		auth.user.set({ name: 'Test User' });
+		getMockUserStore().set({ collectionId: 'users', collectionName: 'users', id: 'test-user', name: 'Test User' });
 		render(Page);
 
 		await tick();
@@ -443,7 +457,7 @@ describe('+page.svelte calendar view', () => {
 
 	it('handles event click navigation', async () => {
 		const user = userEvent.setup();
-		auth.user.set({ name: 'Test User' });
+		getMockUserStore().set({ collectionId: 'users', collectionName: 'users', id: 'test-user', name: 'Test User' });
 
 		render(Page);
 
@@ -458,7 +472,7 @@ describe('+page.svelte calendar view', () => {
 	it('ignores clicks on selected-day background event', async () => {
 		// Test that clicking on selected-day event doesn't navigate
 		// This is covered by the eventClick function's early return
-		auth.user.set({ name: 'Test User' });
+		getMockUserStore().set({ collectionId: 'users', collectionName: 'users', id: 'test-user', name: 'Test User' });
 		render(Page);
 
 		await tick();
@@ -469,7 +483,7 @@ describe('+page.svelte calendar view', () => {
 
 	it('handles date click to update selected date', async () => {
 		const user = userEvent.setup();
-		auth.user.set({ name: 'Test User' });
+		getMockUserStore().set({ collectionId: 'users', collectionName: 'users', id: 'test-user', name: 'Test User' });
 
 		render(Page);
 
