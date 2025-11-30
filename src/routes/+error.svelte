@@ -1,10 +1,9 @@
 <script lang="ts">
-	import { _ } from 'svelte-i18n';
-	import { goto } from '$app/navigation';
-
+	// eslint-disable-next-line svelte/valid-prop-names-in-kit-pages
 	let { status, error } = $props();
 
 	function goHome() {
+		// eslint-disable-next-line svelte/no-navigation-without-resolve
 		goto('/');
 	}
 </script>
@@ -35,15 +34,14 @@
 	</h1>
 
 	<p class="mb-8 max-w-md text-lg text-gray-600">
-		{status === 404
-			? $_('page_not_found_description')
-			: $_('error_page_description')}
+		{status === 404 ? $_('page_not_found_description') : $_('error_page_description')}
 	</p>
 
 	{#if error?.message}
 		<div class="mb-8 rounded-lg bg-red-50 p-4 text-left">
 			<p class="text-sm text-red-800">
-				<strong>{$_('error_details')}:</strong> {error.message}
+				<strong>{$_('error_details')}:</strong>
+				{error.message}
 			</p>
 		</div>
 	{/if}
@@ -51,7 +49,7 @@
 	<div class="flex gap-4">
 		<button
 			onclick={goHome}
-			class="rounded-lg bg-brand-primary px-6 py-2 text-white transition-colors hover:bg-brand-primary-dark"
+			class="hover:bg-brand-primary-dark rounded-lg bg-brand-primary px-6 py-2 text-white transition-colors"
 		>
 			{$_('back_to_calendar')}
 		</button>

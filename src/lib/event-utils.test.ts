@@ -1,5 +1,11 @@
 import { describe, it, expect, vi } from 'vitest';
-import { eventToFormData, formatEventForDisplay, isEventOngoing, isEventUpcoming, isEventPast } from '$lib/event-utils';
+import {
+	eventToFormData,
+	formatEventForDisplay,
+	isEventOngoing,
+	isEventUpcoming,
+	isEventPast
+} from '$lib/event-utils';
 import type { Event } from '$lib/types';
 
 describe('event-utils', () => {

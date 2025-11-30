@@ -72,7 +72,8 @@
 		</div>
 		<button
 			class="flex h-12 w-12 flex-shrink-0 cursor-pointer items-center justify-center rounded-full border-none bg-primary-500 text-xl font-bold text-white transition-colors duration-200 hover:bg-primary-600"
-			onclick={() => goto(`/events?date=${dateToHelsinkiDateString($calendarStore.selectedDate)}` as any)}
+			onclick={() =>
+				goto(`/events?date=${dateToHelsinkiDateString($calendarStore.selectedDate)}` as any)}
 			title="Add new event"
 			>+
 		</button>
@@ -102,5 +103,9 @@
 {/if}
 
 <div>
-	<Calendar {events} selectedDate={$calendarStore.selectedDate} onDateClick={(date) => calendarStore.setSelectedDate(date)} />
+	<Calendar
+		{events}
+		selectedDate={$calendarStore.selectedDate}
+		onDateClick={(date) => calendarStore.setSelectedDate(date)}
+	/>
 </div>

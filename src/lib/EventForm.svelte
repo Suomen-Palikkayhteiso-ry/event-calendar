@@ -155,7 +155,9 @@
 				<MapComponent
 					center={mapCenter}
 					zoom={mapZoom}
-					markerPosition={formState.formData.point ? [formState.formData.point.lat, formState.formData.point.lon] : null}
+					markerPosition={formState.formData.point
+						? [formState.formData.point.lat, formState.formData.point.lon]
+						: null}
 					onMarkerMove={(latlng: [number, number]) => {
 						formStore.updateField('point', {
 							lat: parseFloat(latlng[0].toFixed(6)),
@@ -289,7 +291,8 @@
 			value={formState.formData.image_description}
 			placeholder={$_('image_description_optional')}
 			disabled={isSubmitting}
-			oninput={(e) => formStore.updateField('image_description', (e.target as HTMLInputElement).value)}
+			oninput={(e) =>
+				formStore.updateField('image_description', (e.target as HTMLInputElement).value)}
 			class="focus:ring-opacity-25 box-border w-full rounded border border-gray-300 p-3 text-base focus:border-brand-primary focus:ring-2 focus:ring-brand-primary focus:outline-none"
 		/>
 	</div>
@@ -358,7 +361,11 @@
 			id="state"
 			value={formState.formData.state}
 			disabled={isSubmitting}
-			onchange={(e) => formStore.updateField('state', (e.target as HTMLSelectElement).value as EventFormData['state'])}
+			onchange={(e) =>
+				formStore.updateField(
+					'state',
+					(e.target as HTMLSelectElement).value as EventFormData['state']
+				)}
 			class="focus:ring-opacity-25 box-border w-full rounded border border-gray-300 p-3 text-base focus:border-brand-primary focus:ring-2 focus:ring-brand-primary focus:outline-none"
 		>
 			<option value="draft">{$_('draft')}</option>

@@ -16,7 +16,16 @@
 		ariaDescribedBy?: string;
 	}
 
-	let { value, onChange, disabled = false, allDay = true, label, id, ariaInvalid, ariaDescribedBy }: Props = $props();
+	let {
+		value,
+		onChange,
+		disabled = false,
+		allDay = true,
+		label,
+		id,
+		ariaInvalid,
+		ariaDescribedBy
+	}: Props = $props();
 
 	// Internal state
 	let dateObj = $state(new Date());
