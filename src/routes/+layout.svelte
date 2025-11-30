@@ -20,7 +20,7 @@
 				theme: {
 					'--toastFontSize': '2rem'
 				}
-			}}
+			} as any}
 		/>
 		{@render children()}
 	</main>

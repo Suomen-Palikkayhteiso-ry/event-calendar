@@ -5,6 +5,7 @@
 		disabled?: boolean;
 		type?: 'button' | 'submit' | 'reset';
 		ariaLabel?: string;
+		ariaDisabled?: boolean;
 		children?: any;
 		onclick?: (event: MouseEvent) => void;
 	}
@@ -15,6 +16,7 @@
 		disabled = false,
 		type = 'button',
 		ariaLabel,
+		ariaDisabled = false,
 		children,
 		onclick
 	}: Props = $props();
@@ -24,6 +26,7 @@
 	{type}
 	{disabled}
 	aria-label={ariaLabel}
+	aria-disabled={ariaDisabled}
 	class="btn btn-{variant} btn-{size}"
 	class:disabled
 	{onclick}

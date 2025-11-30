@@ -41,7 +41,7 @@ function createEventsStore() {
 
 			// Check cache
 			const cached = cache.get(cacheKey);
-			if (cached && (now - cached.timestamp) < CACHE_DURATION) {
+			if (cached && now - cached.timestamp < CACHE_DURATION) {
 				set(cached.data);
 				return cached.data;
 			}

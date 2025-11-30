@@ -33,7 +33,7 @@ Commit without chaining shell commands with "&&".
 - [x] Create reusable UI components (buttons, inputs, modals) in a design system
 - [x] Add internationalization support for error messages and validation (e4a8c52, tests fixed)
 - [x] Fix Tailwind CSS v4 compatibility issues with @reference directives and opacity syntax (37a5e88)
-* [ ] Implement caching strategies for API calls and static data
+- [x] Implement caching strategies for API calls and static data (a5f7cd7)
 * [ ] Add proper logging and monitoring for debugging and analytics
 - [x] Move toast into bottom center of the browser. Double their font size from the current. (450537a)
 - [x] Add new item button from the front page should navigate through goto(resolve(..)) to properly use hash routing (3f0ec0a)
@@ -94,6 +94,6 @@ Commit without chaining shell commands with "&&".
 ### Code Quality
 * [ ] Remove duplicate code between create and edit forms
 * [ ] Standardize error handling patterns across components
-* [ ] Add proper TypeScript types to all component props
+- [x] Add proper TypeScript types to all component props
 * [ ] Implement consistent naming conventions
 - [x] Add JSDoc comments to utility functions (9aca891)

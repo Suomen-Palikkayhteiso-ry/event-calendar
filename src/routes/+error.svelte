@@ -1,4 +1,7 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
+	import { _ } from 'svelte-i18n';
+
 	// eslint-disable-next-line svelte/valid-prop-names-in-kit-pages
 	let { status, error } = $props();
 

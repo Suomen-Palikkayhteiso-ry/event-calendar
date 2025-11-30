@@ -14,14 +14,17 @@ test.describe('Event Creation Workflow', () => {
 	test('should allow authenticated users to create events', async ({ page }) => {
 		// Mock authentication by setting user in localStorage
 		await page.addInitScript(() => {
-			localStorage.setItem('pb_auth_https://data.suomenpalikkayhteiso.fi', JSON.stringify({
-				token: 'test-token',
-				model: {
-					id: 'test-user-id',
-					email: 'test@example.com',
-					name: 'Test User'
-				}
-			}));
+			localStorage.setItem(
+				'pb_auth_https://data.suomenpalikkayhteiso.fi',
+				JSON.stringify({
+					token: 'test-token',
+					model: {
+						id: 'test-user-id',
+						email: 'test@example.com',
+						name: 'Test User'
+					}
+				})
+			);
 		});
 
 		await page.goto('/events');
@@ -44,14 +47,17 @@ test.describe('Event Creation Workflow', () => {
 	test.skip('should validate required fields', async ({ page }) => {
 		// Mock auth
 		await page.addInitScript(() => {
-			localStorage.setItem('pocketbase_auth', JSON.stringify({
-				token: 'test-token',
-				model: {
-					id: 'test-user-id',
-					email: 'test@example.com',
-					name: 'Test User'
-				}
-			}));
+			localStorage.setItem(
+				'pocketbase_auth',
+				JSON.stringify({
+					token: 'test-token',
+					model: {
+						id: 'test-user-id',
+						email: 'test@example.com',
+						name: 'Test User'
+					}
+				})
+			);
 		});
 
 		await page.goto('/events');

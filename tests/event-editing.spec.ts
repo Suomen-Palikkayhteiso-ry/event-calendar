@@ -4,14 +4,17 @@ test.describe('Event Editing and Deletion', () => {
 	test('should allow editing existing events', async ({ page }) => {
 		// Mock authentication
 		await page.addInitScript(() => {
-			localStorage.setItem('pb_auth_https://data.suomenpalikkayhteiso.fi', JSON.stringify({
-				token: 'test-token',
-				model: {
-					id: 'test-user-id',
-					email: 'test@example.com',
-					name: 'Test User'
-				}
-			}));
+			localStorage.setItem(
+				'pb_auth_https://data.suomenpalikkayhteiso.fi',
+				JSON.stringify({
+					token: 'test-token',
+					model: {
+						id: 'test-user-id',
+						email: 'test@example.com',
+						name: 'Test User'
+					}
+				})
+			);
 		});
 
 		// First create an event to edit
@@ -27,7 +30,11 @@ test.describe('Event Editing and Deletion', () => {
 		await expect(page.locator('.toast')).toContainText('Tapahtuma luotu onnistuneesti');
 
 		// Find the event in the list and click edit
-		await page.locator('text=Event to Edit').locator('xpath=ancestor::tr').locator('text=Muokkaa').click();
+		await page
+			.locator('text=Event to Edit')
+			.locator('xpath=ancestor::tr')
+			.locator('text=Muokkaa')
+			.click();
 
 		// Should be on edit page
 		await expect(page.locator('h1')).toContainText('Muokkaa tapahtumaa');
@@ -45,14 +52,17 @@ test.describe('Event Editing and Deletion', () => {
 	test('should allow deleting events', async ({ page }) => {
 		// Mock authentication
 		await page.addInitScript(() => {
-			localStorage.setItem('pb_auth_https://data.suomenpalikkayhteiso.fi', JSON.stringify({
-				token: 'test-token',
-				model: {
-					id: 'test-user-id',
-					email: 'test@example.com',
-					name: 'Test User'
-				}
-			}));
+			localStorage.setItem(
+				'pb_auth_https://data.suomenpalikkayhteiso.fi',
+				JSON.stringify({
+					token: 'test-token',
+					model: {
+						id: 'test-user-id',
+						email: 'test@example.com',
+						name: 'Test User'
+					}
+				})
+			);
 		});
 
 		await page.goto('/events');

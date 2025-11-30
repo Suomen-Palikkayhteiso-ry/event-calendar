@@ -92,12 +92,12 @@
 			value={formState.formData.title}
 			placeholder={$_('event_title')}
 			required
-			aria-required="true"
-			aria-invalid={formState.errors.title ? 'true' : 'false'}
-			aria-describedby={formState.errors.title ? 'error-title' : undefined}
+			ariaRequired={true}
+			ariaInvalid={formState.errors.title ? true : false}
+			ariaDescribedBy={formState.errors.title ? 'error-title' : undefined}
 			autofocus={mode === 'create'}
 			disabled={isSubmitting}
-			oninput={(e) => {
+			on:input={(e) => {
 				formStore.updateField('title', (e.target as HTMLInputElement).value);
 				formStore.clearError('title');
 			}}
@@ -116,11 +116,11 @@
 				value={formState.formData.location}
 				placeholder={$_('location_optional')}
 				disabled={isSubmitting}
-				oninput={(e) => {
+				on:input={(e) => {
 					formStore.updateField('location', (e.target as HTMLInputElement).value);
 					formStore.clearError('location');
 				}}
-				onblur={async () => {
+				on:blur={async () => {
 					if (formState.formData.location && !isGeocoding && geocodingEnabled) {
 						isGeocoding = true;
 						try {
@@ -189,8 +189,8 @@
 					max="90"
 					value={formState.formData.point?.lat}
 					disabled={isSubmitting}
-					aria-invalid={formState.errors.point ? 'true' : 'false'}
-					aria-describedby={formState.errors.point ? 'error-point' : undefined}
+					ariaInvalid={formState.errors.point ? true : false}
+					ariaDescribedBy={formState.errors.point ? 'error-point' : undefined}
 					on:input={(e) => {
 						const lat = parseFloat((e.target as HTMLInputElement).value);
 						formStore.updateField('point', {
@@ -210,8 +210,8 @@
 					max="180"
 					value={formState.formData.point?.lon}
 					disabled={isSubmitting}
-					aria-invalid={formState.errors.point ? 'true' : 'false'}
-					aria-describedby={formState.errors.point ? 'error-point' : undefined}
+					ariaInvalid={formState.errors.point ? true : false}
+					ariaDescribedBy={formState.errors.point ? 'error-point' : undefined}
 					on:input={(e) => {
 						const lon = parseFloat((e.target as HTMLInputElement).value);
 						formStore.updateField('point', {
@@ -233,9 +233,9 @@
 			id="description"
 			value={formState.formData.description}
 			placeholder={$_('description_optional')}
-			rows="3"
+			rows={3}
 			disabled={isSubmitting}
-			oninput={(e) => formStore.updateField('description', (e.target as HTMLTextAreaElement).value)}
+			on:input={(e) => formStore.updateField('description', (e.target as HTMLTextAreaElement).value)}
 		/>
 	</div>
 
@@ -248,9 +248,9 @@
 			placeholder={$_('url_optional')}
 			disabled={isSubmitting}
 			pattern="https?://.+"
-			aria-invalid={formState.errors.url ? 'true' : 'false'}
-			aria-describedby={formState.errors.url ? 'error-url' : undefined}
-			oninput={(e) => {
+			ariaInvalid={formState.errors.url ? true : false}
+			ariaDescribedBy={formState.errors.url ? 'error-url' : undefined}
+			on:input={(e) => {
 				formStore.updateField('url', (e.target as HTMLInputElement).value);
 				formStore.clearError('url');
 			}}
@@ -291,7 +291,7 @@
 			value={formState.formData.image_description}
 			placeholder={$_('image_description_optional')}
 			disabled={isSubmitting}
-			oninput={(e) =>
+			on:input={(e) =>
 				formStore.updateField('image_description', (e.target as HTMLInputElement).value)}
 		/>
 	</div>
@@ -360,7 +360,7 @@
 			id="state"
 			value={formState.formData.state}
 			disabled={isSubmitting}
-			onchange={(e) =>
+			on:change={(e) =>
 				formStore.updateField(
 					'state',
 					(e.target as HTMLSelectElement).value as EventFormData['state']
@@ -378,7 +378,7 @@
 			type="submit"
 			variant="primary"
 			disabled={isSubmitting || !formState.formData.title || !formState.formData.start_date}
-			aria-disabled={isSubmitting || !formState.formData.title || !formState.formData.start_date}
+			ariaDisabled={isSubmitting || !formState.formData.title || !formState.formData.start_date}
 		>
 			{isSubmitting
 				? mode === 'create'

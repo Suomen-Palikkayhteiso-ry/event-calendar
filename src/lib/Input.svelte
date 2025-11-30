@@ -11,6 +11,7 @@
 		ariaLabel?: string;
 		ariaDescribedBy?: string;
 		ariaInvalid?: boolean;
+		ariaRequired?: boolean;
 		id?: string;
 		name?: string;
 		pattern?: string;
@@ -18,6 +19,8 @@
 		max?: number | string;
 		step?: number | string;
 		accept?: string;
+		autofocus?: boolean;
+		class?: string;
 		children?: any;
 	}
 
@@ -31,6 +34,7 @@
 		ariaLabel,
 		ariaDescribedBy,
 		ariaInvalid = false,
+		ariaRequired = false,
 		id,
 		name,
 		pattern,
@@ -38,6 +42,8 @@
 		max,
 		step,
 		accept,
+		autofocus = false,
+		class: className,
 		children
 	}: Props = $props();
 
@@ -54,6 +60,7 @@
 	aria-label={ariaLabel}
 	aria-describedby={ariaDescribedBy}
 	aria-invalid={ariaInvalid}
+	aria-required={ariaRequired}
 	{id}
 	{name}
 	{pattern}
@@ -61,7 +68,8 @@
 	{max}
 	{step}
 	{accept}
-	class="form-input"
+	{autofocus}
+	class="form-input {className}"
 	oninput={(e) => dispatch('input', e)}
 	onchange={(e) => dispatch('change', e)}
 	onblur={(e) => dispatch('blur', e)}

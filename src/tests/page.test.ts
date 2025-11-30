@@ -142,7 +142,7 @@ vi.mock('$lib/date-utils', () => ({
 	dateToHelsinkiDateString: vi.fn((date: Date) => date.toISOString().split('T')[0])
 }));
 
-import Page from './+page.svelte';
+import Page from '../routes/+page.svelte';
 import * as navigation from '$app/navigation';
 import type { Writable } from 'svelte/store';
 
