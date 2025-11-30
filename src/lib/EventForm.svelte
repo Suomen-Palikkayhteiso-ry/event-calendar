@@ -6,6 +6,7 @@
 	import Map from '$lib/Map.svelte';
 	import DateTimePicker from '$lib/DateTimePicker.svelte';
 	import { geocodeLocation } from '$lib/geocode';
+	import { validateEventForm } from '$lib/form-utils';
 
 	interface Props {
 		initialData?: Partial<EventFormData>;
@@ -37,6 +38,7 @@
 	let mapZoom = $state(10);
 	let isGeocoding = $state(false);
 	let geocodingEnabled = $state(true);
+	let errors = $state<Record<string, string>>({});
 
 	// Initialize form data from initialData
 	onMount(async () => {
@@ -59,6 +61,18 @@
 			formData.end_date = formData.start_date;
 		}
 
+		// Validate form
+		const validationErrors = validateEventForm(formData);
+		errors = validationErrors;
+
+		if (Object.keys(validationErrors).length > 0) {
+			// Focus on first error field
+			const firstErrorField = Object.keys(validationErrors)[0];
+			const element = document.getElementById(firstErrorField);
+			if (element) element.focus();
+			return;
+		}
+
 		await onSubmit(formData);
 	}
 </script>
@@ -75,8 +89,12 @@
 			required
 			autofocus={mode === 'create'}
 			disabled={isSubmitting}
+			oninput={() => delete errors.title}
 			class="focus:ring-opacity-25 box-border w-full rounded border border-gray-300 p-3 text-base focus:border-brand-primary focus:ring-2 focus:ring-brand-primary focus:outline-none"
 		/>
+		{#if errors.title}
+			<p class="mt-1 text-sm text-red-600">{errors.title}</p>
+		{/if}
 	</div>
 
 	<div class="mb-4">
@@ -152,6 +170,7 @@
 					max="90"
 					bind:value={formData.point.lat}
 					disabled={isSubmitting}
+					oninput={() => delete errors.point}
 					class="focus:ring-opacity-25 box-border w-full rounded border border-gray-300 p-3 text-base focus:border-brand-primary focus:ring-2 focus:ring-brand-primary focus:outline-none"
 				/>
 			</div>
@@ -165,10 +184,14 @@
 					max="180"
 					bind:value={formData.point.lon}
 					disabled={isSubmitting}
+					oninput={() => delete errors.point}
 					class="focus:ring-opacity-25 box-border w-full rounded border border-gray-300 p-3 text-base focus:border-brand-primary focus:ring-2 focus:ring-brand-primary focus:outline-none"
 				/>
 			</div>
 		</div>
+		{#if errors.point}
+			<p class="mb-4 text-sm text-red-600">{errors.point}</p>
+		{/if}
 	{/if}
 
 	<div class="mb-4">
@@ -194,8 +217,12 @@
 			placeholder={$_('url_optional')}
 			disabled={isSubmitting}
 			pattern="https?://.+"
+			oninput={() => delete errors.url}
 			class="focus:ring-opacity-25 box-border w-full rounded border border-gray-300 p-3 text-base focus:border-brand-primary focus:ring-2 focus:ring-brand-primary focus:outline-none"
 		/>
+		{#if errors.url}
+			<p class="mt-1 text-sm text-red-600">{errors.url}</p>
+		{/if}
 	</div>
 
 	<div class="mb-4">
@@ -235,10 +262,13 @@
 				id="startDate"
 				label={$_('start_date_required')}
 				value={formData.start_date}
-				onChange={(value) => (formData.start_date = value)}
+				onChange={(value) => { formData.start_date = value; delete errors.start_date; }}
 				disabled={isSubmitting}
 				allDay={formData.all_day}
 			/>
+			{#if errors.start_date}
+				<p class="mt-1 text-sm text-red-600">{errors.start_date}</p>
+			{/if}
 		</div>
 
 		<div class="flex-1">
@@ -246,10 +276,13 @@
 				id="endDate"
 				label={$_('end_date')}
 				value={formData.end_date}
-				onChange={(value) => (formData.end_date = value)}
+				onChange={(value) => { formData.end_date = value; delete errors.end_date; }}
 				disabled={isSubmitting || !formData.all_day}
 				allDay={formData.all_day}
 			/>
+			{#if errors.end_date}
+				<p class="mt-1 text-sm text-red-600">{errors.end_date}</p>
+			{/if}
 		</div>
 	</div>
 

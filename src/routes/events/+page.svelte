@@ -19,6 +19,7 @@
 	let isSubmitting = $state(false);
 	let kmlFile: File | null = $state(null);
 	let isImporting = $state(false);
+	let isLoadingEvents = $state(false);
 
 	// Form data object for create form
 	let createFormData = $state({
@@ -47,14 +48,22 @@
 	async function fetchEvents(page = 1) {
 		if (!$user) return;
 
-		const result = await pb.collection('events').getList(page, pageSize, {
-			sort: '-start_date',
-			filter: 'state = "published" || state = "draft"'
-		});
+		isLoadingEvents = true;
+		try {
+			const result = await pb.collection('events').getList(page, pageSize, {
+				sort: '-start_date',
+				filter: 'state = "published" || state = "draft"'
+			});
 
-		events = result.items as unknown as Event[];
-		totalEvents = result.totalItems;
-		currentPage = page;
+			events = result.items as unknown as Event[];
+			totalEvents = result.totalItems;
+			currentPage = page;
+		} catch (error) {
+			console.error('Error fetching events:', error);
+			toast.push($_('failed_fetch_events'));
+		} finally {
+			isLoadingEvents = false;
+		}
 	}
 
 	onMount(async () => {
@@ -101,7 +110,7 @@
 			await fetchEvents(currentPage);
 		} catch (error) {
 			console.error('Error creating event:', error);
-			alert($_('failed_create_event'));
+			toast.push($_('failed_create_event'));
 		} finally {
 			isSubmitting = false;
 		}
@@ -145,6 +154,10 @@
 				kmlFile = null;
 				fetchEvents(currentPage);
 			});
+			toast.push($_('kml_import_successful'));
+		} catch (error) {
+			console.error('Error importing KML:', error);
+			toast.push($_('failed_kml_import'));
 		} finally {
 			isImporting = false;
 		}
@@ -173,6 +186,7 @@
 		onUpdateState={updateEventState}
 		onNextPage={nextPage}
 		onPrevPage={prevPage}
+		loading={isLoadingEvents}
 	/>
 {/if}
 

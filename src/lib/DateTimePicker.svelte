@@ -17,6 +17,9 @@
 	// Internal state
 	let dateObj = $state(new Date());
 	let timeString = $state('09:00');
+	let previousValue = $state('');
+	let isInitializing = $state(false);
+	let ignorePropChange = $state(false);
 
 	// Helper function to format Date objects for API
 	function formatDateTimeForAPI(dateObj: Date, timeObj: Date): string {
@@ -33,21 +36,27 @@
 
 	// Initialize from value
 	function initializeFromValue() {
-		if (!value) return;
+		if (!value || value === previousValue) return;
 
+		isInitializing = true;
 		const parsedDate = parseUTCDate(value);
 		const helsinkiDate = utcToHelsinkiDate(value);
 		dateObj = new Date(helsinkiDate + 'T' + parsedDate.toISOString().split('T')[1].split('.')[0]);
 		timeString = parsedDate.toISOString().split('T')[1].split('.')[0].substring(0, 5);
+		previousValue = value;
+		isInitializing = false;
 	}
 
 	// Update value when internal state changes
 	function updateValue() {
+		if (isInitializing) return;
 		const [hours, minutes] = timeString.split(':').map(Number);
 		const timeObj = new Date(1970, 0, 1, hours, minutes);
 		const newValue = formatDateTimeForAPI(dateObj, timeObj);
 		if (newValue !== value) {
+			ignorePropChange = true;
 			onChange(newValue);
+			ignorePropChange = false;
 		}
 	}
 
@@ -62,27 +71,21 @@
 	onMount(() => {
 		initializeFromValue();
 	});
-
-	// Re-initialize when value prop changes
-	$effect(() => {
-		initializeFromValue();
-	});
 </script>
 
 <div class="mb-4">
 	<label for={id} class="mb-2 block font-medium text-gray-700">{label}</label>
-	{#key dateObj.getTime()}
-		<Datepicker
-			{id}
-			bind:value={dateObj}
-			defaultDate={dateObj}
-			locale="fi"
-			firstDayOfWeek={1}
-			{disabled}
-		/>
-	{/key}
+	<Datepicker
+		{id}
+		value={dateObj}
+		defaultDate={dateObj}
+		locale="fi"
+		firstDayOfWeek={1}
+		{disabled}
+		on:change={(e) => { dateObj = e.detail; }}
+	/>
 	{#if !allDay}
-		<Timepicker id="{id}Time" bind:value={timeString} {disabled} />
+		<Timepicker id="{id}Time" value={timeString} {disabled} on:change={(e) => { timeString = e.detail; }} />
 	{/if}
 </div>
 

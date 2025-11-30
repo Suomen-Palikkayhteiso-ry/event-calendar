@@ -26,6 +26,8 @@
 		console.log('Edit form: Event ID:', eventId);
 		if (!eventId) {
 			console.log('Edit form: No event ID found');
+			toast.push($_('invalid_event_id'));
+			goto(resolve('/events'));
 			return;
 		}
 
@@ -40,6 +42,7 @@
 			})
 			.catch((error) => {
 				console.error('Edit form: Error loading event:', error);
+				toast.push($_('failed_load_event'));
 				goto(resolve('/events'));
 			});
 
