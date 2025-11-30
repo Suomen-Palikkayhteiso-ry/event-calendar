@@ -44,7 +44,7 @@ jobs:
           name: codecov-umbrella
 
       - name: Build
-        run: make clean dist
+        run: make build
 
       - name: Cache build directory
         uses: actions/cache@v4
