@@ -110,8 +110,27 @@ agents/            # Documentation and ADRs
 
 ## Testing
 
-Currently, the project does not have automated tests. Manual testing is performed by:
-- Running the development server
-- Testing user interactions
-- Verifying static generation
-- Checking build output
+### Unit Tests
+```bash
+pnpm test           # Run once and exit
+pnpm test:watch     # Watch mode for development
+pnpm test:coverage  # Run with coverage report
+pnpm test:ui        # Interactive UI mode
+```
+
+### E2E Tests (Playwright)
+```bash
+pnpm test:e2e       # Run all E2E tests
+pnpm test:e2e:ui    # Interactive UI mode
+```
+
+### Playwright on NixOS
+
+This project uses Playwright for E2E testing. On NixOS, browsers are provided by nixpkgs rather than downloaded by Playwright.
+
+**Verify Playwright setup:**
+```bash
+devenv shell -- ./scripts/check-playwright-compat.sh
+```
+
+See [Playwright Setup](./playwright-setup.md) for detailed configuration and troubleshooting.
