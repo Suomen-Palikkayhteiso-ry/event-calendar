@@ -1,6 +1,11 @@
 import type { EventFormData } from '$lib/types';
 import { localDateToUTC, localDateTimeToUTC } from '$lib/date-utils';
 
+/**
+ * Validates event form data and returns an object with field errors
+ * @param formData - The form data to validate
+ * @returns An object with field names as keys and error messages as values
+ */
 export function validateEventForm(formData: EventFormData): Record<string, string> {
 	const errors: Record<string, string> = {};
 
@@ -43,6 +48,12 @@ export function validateEventForm(formData: EventFormData): Record<string, strin
 	return errors;
 }
 
+/**
+ * Prepares event form data for submission to the API
+ * Converts local dates to UTC and formats data as FormData
+ * @param formData - The form data to prepare
+ * @returns FormData object ready for API submission
+ */
 export function prepareEventSubmitData(formData: EventFormData): FormData {
 	const submitData = new FormData();
 	submitData.append('title', formData.title);

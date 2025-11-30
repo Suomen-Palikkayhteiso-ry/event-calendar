@@ -29,6 +29,37 @@ const months: Record<string, number> = {
 	dec: 11
 };
 
+import { pb } from '$lib/pocketbase';
+import { localDateToUTC, dateToHelsinkiDateString } from '$lib/date-utils';
+import { toast } from '@zerodevx/svelte-toast';
+import type { ParsedEventName, KMLPlacemark } from '$lib/types';
+
+const months: Record<string, number> = {
+	january: 0,
+	jan: 0,
+	february: 1,
+	feb: 1,
+	march: 2,
+	mar: 2,
+	april: 3,
+	apr: 3,
+	may: 4,
+	june: 5,
+	jun: 5,
+	july: 6,
+	jul: 6,
+	august: 7,
+	aug: 7,
+	september: 8,
+	sep: 8,
+	october: 9,
+	oct: 9,
+	november: 10,
+	nov: 10,
+	december: 11,
+	dec: 11
+};
+
 const countryMap: Record<string, string> = {
 	LAT: 'Latvia',
 	EST: 'Estonia',
@@ -39,6 +70,11 @@ const countryMap: Record<string, string> = {
 	DNK: 'Denmark'
 };
 
+/**
+ * Parses an event name from KML format into title, country, and dates
+ * @param name - The raw name string from KML
+ * @returns Parsed event name object
+ */
 export function parseEventName(name: string): ParsedEventName {
 	const match = name.match(/^(.+?)\s*\(([^)]+)\)\s*(.+)?$/);
 	if (match) {
@@ -48,6 +84,11 @@ export function parseEventName(name: string): ParsedEventName {
 	}
 }
 
+/**
+ * Imports events from a KML file and creates them in the database
+ * @param kmlFile - The KML file to import
+ * @param onSuccess - Callback function called on successful import
+ */
 export async function importKML(kmlFile: File, onSuccess: () => void) {
 	try {
 		const text = await kmlFile.text();
