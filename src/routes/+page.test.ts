@@ -8,7 +8,7 @@ import { tick } from 'svelte';
 
 // Mock @event-calendar/core
 vi.mock('@event-calendar/core', () => {
-	const MockCalendar = () => {
+	const MockCalendar = (options: any) => {
 		return {
 			$$: {
 				fragment: {
@@ -18,6 +18,27 @@ vi.mock('@event-calendar/core', () => {
 						div.textContent = 'Mock Calendar';
 						div.setAttribute('data-testid', 'calendar');
 						target.appendChild(div);
+
+						// Add test buttons to trigger eventClick and dateClick
+						const eventButton = document.createElement('button');
+						eventButton.textContent = 'Trigger Event Click';
+						eventButton.setAttribute('data-testid', 'event-click');
+						eventButton.onclick = () => {
+							if (options.eventClick) {
+								options.eventClick({ event: { id: 'test-event-id' } });
+							}
+						};
+						target.appendChild(eventButton);
+
+						const dateButton = document.createElement('button');
+						dateButton.textContent = 'Trigger Date Click';
+						dateButton.setAttribute('data-testid', 'date-click');
+						dateButton.onclick = () => {
+							if (options.dateClick) {
+								options.dateClick({ date: new Date('2023-12-01') });
+							}
+						};
+						target.appendChild(dateButton);
 					},
 					d: () => {}
 				}
