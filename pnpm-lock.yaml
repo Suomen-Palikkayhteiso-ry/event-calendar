@@ -8,9 +8,6 @@ importers:
 
   .:
     dependencies:
-      '@zerodevx/svelte-toast':
-        specifier: ^0.9.5
-        version: 0.9.6(svelte@5.43.2)
       feed:
         specifier: ^5.1.0
         version: 5.1.0
@@ -96,6 +93,9 @@ importers:
       '@vitest/ui':
         specifier: ^4.0.14
         version: 4.0.14(vitest@4.0.14)
+      '@zerodevx/svelte-toast':
+        specifier: ^0.9.5
+        version: 0.9.6(svelte@5.43.2)
       eslint:
         specifier: ^9.38.0
         version: 9.39.0(jiti@2.6.1)

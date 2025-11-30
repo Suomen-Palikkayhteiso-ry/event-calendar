@@ -42,6 +42,7 @@
 		"@types/node": "^20",
 		"@vitest/coverage-v8": "^4.0.14",
 		"@vitest/ui": "^4.0.14",
+		"@zerodevx/svelte-toast": "^0.9.5",
 		"eslint": "^9.38.0",
 		"eslint-config-prettier": "^10.1.8",
 		"eslint-plugin-svelte": "^3.12.4",
@@ -68,7 +69,6 @@
 		]
 	},
 	"dependencies": {
-		"@zerodevx/svelte-toast": "^0.9.5",
 		"feed": "^5.1.0",
 		"flowbite": "^3.1.2",
 		"flowbite-svelte": "^1.22.0",
