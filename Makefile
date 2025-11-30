@@ -57,6 +57,10 @@ test-coverage: node_modules
 test-e2e: node_modules
 	$(PNPM) test:e2e
 
+.PHONY: screenshots
+screenshots: node_modules
+	$(PNPM) screenshots
+
 .PHONY: format
 format:
 	$(PNPM) format
