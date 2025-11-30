@@ -51,6 +51,24 @@ describe('date-utils', () => {
 			const result = localDateToUTC('2024-06-15');
 			expect(result).toBe('2024-06-14T21:00:00.000Z'); // 00:00 EEST = 21:00 UTC
 		});
+
+		it('should handle DST transition start date', () => {
+			// March 31, 2024 midnight EET (before DST starts at 03:00)
+			const result = localDateToUTC('2024-03-31');
+			expect(result).toBe('2024-03-30T22:00:00.000Z'); // 00:00 EET = 22:00 UTC
+		});
+
+		it('should handle DST transition end date', () => {
+			// October 27, 2024 midnight EEST (before DST ends at 04:00)
+			const result = localDateToUTC('2024-10-27');
+			expect(result).toBe('2024-10-26T21:00:00.000Z'); // 00:00 EEST = 21:00 UTC
+		});
+
+		it('should handle post DST transition date', () => {
+			// October 28, 2024 midnight EET (after DST ends)
+			const result = localDateToUTC('2024-10-28');
+			expect(result).toBe('2024-10-27T22:00:00.000Z'); // 00:00 EET = 22:00 UTC
+		});
 	});
 
 	describe('localDateTimeToUTC', () => {
@@ -63,6 +81,30 @@ describe('date-utils', () => {
 			// June 15, 2024 10:30 EEST
 			const result = localDateTimeToUTC('2024-06-15T10:30');
 			expect(result).toBe('2024-06-15T07:30:00.000Z'); // 10:30 EEST = 07:30 UTC
+		});
+
+		it('should handle DST transition start', () => {
+			// March 31, 2024 02:00 EET (before DST starts at 03:00)
+			const result = localDateTimeToUTC('2024-03-31T02:00');
+			expect(result).toBe('2024-03-31T00:00:00.000Z'); // 02:00 EET = 00:00 UTC
+		});
+
+		it('should handle DST transition start at boundary', () => {
+			// March 31, 2024 03:00 EEST (DST starts)
+			const result = localDateTimeToUTC('2024-03-31T03:00');
+			expect(result).toBe('2024-03-31T00:00:00.000Z'); // 03:00 EEST = 00:00 UTC
+		});
+
+		it('should handle DST transition end', () => {
+			// October 27, 2024 03:00 EEST (before DST ends at 04:00)
+			const result = localDateTimeToUTC('2024-10-27T03:00');
+			expect(result).toBe('2024-10-27T00:00:00.000Z'); // 03:00 EEST = 00:00 UTC
+		});
+
+		it('should handle DST transition end at boundary', () => {
+			// October 27, 2024 04:00 EET (DST ends)
+			const result = localDateTimeToUTC('2024-10-27T04:00');
+			expect(result).toBe('2024-10-27T02:00:00.000Z'); // 04:00 EET = 02:00 UTC
 		});
 	});
 
