@@ -81,6 +81,50 @@ function createEventsStore() {
 			}
 		},
 
+		async fetchAllEventsForCalendar() {
+			const cacheKey = 'calendar_events';
+			const now = Date.now();
+
+			// Check cache
+			const cached = cache.get(cacheKey);
+			if (cached && now - cached.timestamp < CACHE_DURATION) {
+				logger.debug('Using cached calendar events data');
+				set(cached.data);
+				return cached.data;
+			}
+
+			update((state) => ({ ...state, isLoading: true }));
+
+			try {
+				logger.info('Fetching all events for calendar from API');
+				const result = await retryApiCall(() =>
+					pb.collection('events').getFullList({
+						sort: 'start_date',
+						filter: 'state = "published"'
+					})
+				);
+
+				const newState: EventsState = {
+					events: result as unknown as Event[],
+					totalEvents: result.length,
+					currentPage: 1,
+					pageSize: result.length,
+					isLoading: false
+				};
+
+				// Cache the result
+				cache.set(cacheKey, { data: newState, timestamp: now });
+
+				logger.info('Calendar events fetched successfully', { count: result.length });
+				set(newState);
+				return newState;
+			} catch (error) {
+				logger.error('Error fetching calendar events', { error });
+				update((state) => ({ ...state, isLoading: false }));
+				throw error;
+			}
+		},
+
 		async createEvent(eventData: any) {
 			try {
 				logger.info('Creating new event', { title: eventData.title });

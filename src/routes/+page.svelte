@@ -1,7 +1,5 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { pb } from '$lib/pocketbase';
-	import type { Event } from '$lib/types';
 	import { Datepicker } from 'flowbite-svelte';
 	import { _ } from 'svelte-i18n';
 	import { goto } from '$app/navigation';
@@ -12,40 +10,39 @@
 	import { browser } from '$app/environment';
 	import Calendar from '$lib/Calendar.svelte';
 	import { calendarStore } from '$lib/stores/calendar';
+	import { eventsStore, type EventsState } from '$lib/stores/events';
 
-	let events = $state<Event[]>([]);
+	let eventsState: EventsState = $state({
+		events: [],
+		totalEvents: 0,
+		currentPage: 1,
+		pageSize: 50,
+		isLoading: false
+	});
+	eventsStore.subscribe((state) => {
+		eventsState = state;
+	});
 
 	if (browser) {
 		const searchParams = new URLSearchParams(window.location.search);
 		const dateParam = searchParams.get('date');
-		if (dateParam) {
-			const paramDate = new Date(`${dateParam}T00:00:00`);
-			if (!Number.isNaN(paramDate.getTime())) {
-				calendarStore.setSelectedDate(paramDate);
-			}
-		}
+		calendarStore.setSelectedDateFromUrlParam(dateParam);
 	}
 
 	onMount(async () => {
-		events = await pb.collection('events').getFullList({
-			sort: 'start_date',
-			filter: 'state = "published"'
-		});
+		await eventsStore.fetchAllEventsForCalendar();
 	});
 
 	$effect(() => {
 		const dateParam = $page.url.searchParams.get('date');
-		if (!dateParam) return;
-
-		const paramDate = new Date(`${dateParam}T00:00:00`);
-		if (!Number.isNaN(paramDate.getTime())) {
-			calendarStore.setSelectedDate(paramDate);
-		}
+		calendarStore.setSelectedDateFromUrlParam(dateParam);
 		// Clear the date from querystring after consuming it
-		const newUrl = new URL($page.url);
-		newUrl.searchParams.delete('date');
-		// @ts-ignore
-		goto(resolve(newUrl.pathname + newUrl.search, { replaceState: true }));
+		if (dateParam) {
+			const newUrl = new URL($page.url);
+			newUrl.searchParams.delete('date');
+			// @ts-ignore
+			goto(resolve(newUrl.pathname + newUrl.search, { replaceState: true }));
+		}
 	});
 </script>
 
@@ -100,7 +97,7 @@
 
 <div>
 	<Calendar
-		{events}
+		events={eventsState.events}
 		selectedDate={$calendarStore.selectedDate}
 		onDateClick={(date) => calendarStore.setSelectedDate(date)}
 	/>

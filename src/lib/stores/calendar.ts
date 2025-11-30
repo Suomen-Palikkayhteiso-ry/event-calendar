@@ -20,6 +20,14 @@ function createCalendarStore() {
 			update((state) => ({ ...state, selectedDate: date }));
 		},
 
+		setSelectedDateFromUrlParam(dateParam: string | null) {
+			if (!dateParam) return;
+			const paramDate = new Date(`${dateParam}T00:00:00`);
+			if (!Number.isNaN(paramDate.getTime())) {
+				this.setSelectedDate(paramDate);
+			}
+		},
+
 		reset() {
 			set(initialState);
 		}

@@ -114,6 +114,51 @@ vi.mock('$app/environment', () => ({
 	browser: true
 }));
 
+// Mock $lib/stores/events
+vi.mock('$lib/stores/events', () => {
+	const mockFetchAllEventsForCalendar = vi.fn().mockResolvedValue({
+		events: [],
+		totalEvents: 0,
+		currentPage: 1,
+		pageSize: 0,
+		isLoading: false
+	});
+	const mockEventsStore = {
+		subscribe: vi.fn((fn) => {
+			fn({
+				events: [],
+				totalEvents: 0,
+				currentPage: 1,
+				pageSize: 0,
+				isLoading: false
+			});
+			return () => {};
+		}),
+		fetchAllEventsForCalendar: mockFetchAllEventsForCalendar
+	};
+	(globalThis as Record<string, unknown>).__mockEventsStore = mockEventsStore;
+	return {
+		eventsStore: mockEventsStore
+	};
+});
+
+// Mock $lib/stores/calendar
+vi.mock('$lib/stores/calendar', () => {
+	const mockSetSelectedDateFromUrlParam = vi.fn();
+	const mockCalendarStore = {
+		subscribe: vi.fn((fn) => {
+			fn({ selectedDate: new Date() });
+			return () => {};
+		}),
+		setSelectedDate: vi.fn(),
+		setSelectedDateFromUrlParam: mockSetSelectedDateFromUrlParam
+	};
+	(globalThis as Record<string, unknown>).__mockCalendarStore = mockCalendarStore;
+	return {
+		calendarStore: mockCalendarStore
+	};
+});
+
 // Mock flowbite-svelte Datepicker
 vi.mock('flowbite-svelte', () => {
 	const MockDatepicker = () => {
@@ -193,16 +238,19 @@ describe('+page.svelte calendar view', () => {
 			}
 		];
 
-		getMockGetFullList().mockResolvedValue(mockEvents);
+		const mockEventsStore = (globalThis as Record<string, unknown>).__mockEventsStore as any;
+		mockEventsStore.fetchAllEventsForCalendar.mockResolvedValue({
+			events: mockEvents,
+			totalEvents: 1,
+			currentPage: 1,
+			pageSize: 1,
+			isLoading: false
+		});
 
 		render(Page);
 
 		await waitFor(() => {
-			expect(getMockCollection()).toHaveBeenCalledWith('events');
-			expect(getMockGetFullList()).toHaveBeenCalledWith({
-				sort: 'start_date',
-				filter: 'state = "published"'
-			});
+			expect(mockEventsStore.fetchAllEventsForCalendar).toHaveBeenCalled();
 		});
 	});
 
@@ -312,9 +360,14 @@ describe('+page.svelte calendar view', () => {
 			}
 		];
 
-		getMockCollection().mockReturnValue({
-			getFullList: vi.fn().mockResolvedValue(mockEvents)
-		});
+		const mockEventsStore = (globalThis as Record<string, unknown>).__mockEventsStore as any;
+		mockEventsStore.subscribe.mockImplementation((fn) => fn({
+			events: mockEvents,
+			totalEvents: 1,
+			currentPage: 1,
+			pageSize: 1,
+			isLoading: false
+		}));
 
 		getMockUserStore().set({
 			collectionId: 'users',
@@ -345,9 +398,14 @@ describe('+page.svelte calendar view', () => {
 			}
 		];
 
-		getMockCollection().mockReturnValue({
-			getFullList: vi.fn().mockResolvedValue(mockEvents)
-		});
+		const mockEventsStore = (globalThis as Record<string, unknown>).__mockEventsStore as any;
+		mockEventsStore.subscribe.mockImplementation((fn) => fn({
+			events: mockEvents,
+			totalEvents: 1,
+			currentPage: 1,
+			pageSize: 1,
+			isLoading: false
+		}));
 
 		getMockUserStore().set({
 			collectionId: 'users',
@@ -377,9 +435,14 @@ describe('+page.svelte calendar view', () => {
 			}
 		];
 
-		getMockCollection().mockReturnValue({
-			getFullList: vi.fn().mockResolvedValue(mockEvents)
-		});
+		const mockEventsStore = (globalThis as Record<string, unknown>).__mockEventsStore as any;
+		mockEventsStore.subscribe.mockImplementation((fn) => fn({
+			events: mockEvents,
+			totalEvents: 1,
+			currentPage: 1,
+			pageSize: 1,
+			isLoading: false
+		}));
 
 		getMockUserStore().set({
 			collectionId: 'users',
@@ -446,9 +509,14 @@ describe('+page.svelte calendar view', () => {
 			}
 		];
 
-		getMockCollection().mockReturnValue({
-			getFullList: vi.fn().mockResolvedValue(mockEvents)
-		});
+		const mockEventsStore = (globalThis as Record<string, unknown>).__mockEventsStore as any;
+		mockEventsStore.subscribe.mockImplementation((fn) => fn({
+			events: mockEvents,
+			totalEvents: 2,
+			currentPage: 1,
+			pageSize: 2,
+			isLoading: false
+		}));
 
 		getMockUserStore().set({
 			collectionId: 'users',
@@ -477,9 +545,14 @@ describe('+page.svelte calendar view', () => {
 			}
 		];
 
-		getMockCollection().mockReturnValue({
-			getFullList: vi.fn().mockResolvedValue(mockEvents)
-		});
+		const mockEventsStore = (globalThis as Record<string, unknown>).__mockEventsStore as any;
+		mockEventsStore.subscribe.mockImplementation((fn) => fn({
+			events: mockEvents,
+			totalEvents: 1,
+			currentPage: 1,
+			pageSize: 1,
+			isLoading: false
+		}));
 
 		getMockUserStore().set({
 			collectionId: 'users',
