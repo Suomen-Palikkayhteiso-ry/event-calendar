@@ -14,3 +14,17 @@ export interface Event {
 	created: string; // Record creation datetime
 	updated: string; // Record last update datetime
 }
+
+export interface EventFormData {
+	title: string;
+	start_date: string;
+	end_date: string;
+	all_day: boolean;
+	location: string;
+	description: string;
+	url: string;
+	image: File | null;
+	image_description: string;
+	state: 'draft' | 'pending' | 'published' | 'deleted';
+	point: { lat: number; lon: number } | null;
+}

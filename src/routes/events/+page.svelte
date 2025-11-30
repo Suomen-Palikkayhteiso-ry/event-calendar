@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { onMount, tick } from 'svelte';
+	import { onMount } from 'svelte';
 	import { pb } from '$lib/pocketbase';
-	import type { Event } from '$lib/types';
+	import type { Event, EventFormData } from '$lib/types';
 	import {
 		formatDateInHelsinki,
 		localDateToUTC,
@@ -11,12 +11,9 @@
 	import { user } from '$lib/auth';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import { browser } from '$app/environment';
-	import { Datepicker, Timepicker } from 'flowbite-svelte';
 	import { _ } from 'svelte-i18n';
 	import { toast } from '@zerodevx/svelte-toast';
-	import Map from '$lib/Map.svelte';
-	import { geocodeLocation } from '$lib/geocode';
+	import EventForm from '$lib/EventForm.svelte';
 
 	let events = $state<Event[]>([]);
 	let currentPage = $state(1);
@@ -25,8 +22,8 @@
 	let kmlFile: File | null = $state(null);
 	let isImporting = $state(false);
 
-	// Form data object
-	let formData = $state({
+	// Form data object for create form
+	let createFormData = $state({
 		title: '',
 		start_date: '',
 		end_date: '',
@@ -40,95 +37,7 @@
 		point: null as { lat: number; lon: number } | null
 	});
 
-	let mapCenter = $state<[number, number]>([60.1699, 24.9384]); // Helsinki default
-	let mapZoom = $state(10);
-	let isGeocoding = $state(false);
-	let geocodingEnabled = $state(true);
-
-	// Date/Time picker values (Date objects for components)
-	let startDateObj = $state(new Date());
-	let startTimeObj = $state(new Date(1970, 0, 1, 9, 0)); // Default to 9:00 AM
-	let endDateObj = $state(new Date());
-	let endTimeObj = $state(new Date(1970, 0, 1, 17, 0)); // Default to 5:00 PM
-
-	if (browser) {
-		const searchParams = new URLSearchParams(window.location.search);
-		const dateParam = searchParams.get('date');
-		if (dateParam) {
-			const [rawYear, rawMonth, rawDay] = dateParam.split('-');
-			const year = parseInt(rawYear, 10);
-			const month = parseInt(rawMonth, 10);
-			const day = parseInt(rawDay, 10);
-			if (!Number.isNaN(year) && !Number.isNaN(month) && !Number.isNaN(day)) {
-				const initial = new Date(year, month - 1, day, 12, 0, 0);
-				startDateObj = new Date(initial);
-				endDateObj = new Date(initial);
-			}
-		}
-	}
-
-	// String values for Timepicker components (separate state, not derived)
-	let startTimeString = $state('09:00');
-	let endTimeString = $state('17:00');
-
-	// Helper function to format Date objects for API
-	function formatDateTimeForAPI(dateObj: Date, timeObj: Date): string {
-		const year = dateObj.getFullYear();
-		const month = String(dateObj.getMonth() + 1).padStart(2, '0');
-		const day = String(dateObj.getDate()).padStart(2, '0');
-		const date = `${year}-${month}-${day}`;
-		const time =
-			String(timeObj.getHours()).padStart(2, '0') +
-			':' +
-			String(timeObj.getMinutes()).padStart(2, '0');
-		return date + 'T' + time;
-	}
-
-	// Reactive statements for date/time synchronization
-	$effect(() => {
-		if (!isMounted) return; // Don't run until component is mounted
-
-		// For timed events (not all-day), force end date to match start date
-		if (!formData.all_day) {
-			endDateObj = new Date(startDateObj);
-		}
-		// For all-day events, allow different end dates
-	});
-
-	$effect(() => {
-		if (!isMounted) return; // Don't run until component is mounted
-
-		// Update form data when Date objects change
-		formData.start_date = formatDateTimeForAPI(startDateObj, startTimeObj);
-		formData.end_date = formatDateTimeForAPI(endDateObj, endTimeObj);
-	});
-
-	// Sync time strings back to Date objects
-	$effect(() => {
-		if (!isMounted) return; // Don't run until component is mounted
-
-		const [hours, minutes] = startTimeString.split(':').map(Number);
-		startTimeObj = new Date(1970, 0, 1, hours, minutes);
-	});
-
-	$effect(() => {
-		if (!isMounted) return; // Don't run until component is mounted
-
-		const [hours, minutes] = endTimeString.split(':').map(Number);
-		endTimeObj = new Date(1970, 0, 1, hours, minutes);
-	});
-
-	$effect(() => {
-		if (formData.point) {
-			mapCenter = [formData.point.lat, formData.point.lon];
-		}
-	});
-
-	// Sync end date with start date when all day is enabled
-	// Removed: Allow different days for all-day events
-
 	let totalEvents = $state(0);
-	let isMounted = $state(false);
 
 	const months: Record<string, number> = {
 		january: 0,
@@ -196,17 +105,7 @@
 	}
 
 	onMount(async () => {
-		// Wait for the component to be fully rendered
-		await tick();
-
-		// Update formData to match the Date objects
-		formData.start_date = formatDateTimeForAPI(startDateObj, startTimeObj);
-		formData.end_date = formatDateTimeForAPI(endDateObj, endTimeObj);
-
 		await fetchEvents();
-
-		// Mark component as mounted to enable reactive effects
-		isMounted = true;
 	});
 
 	// Add ESC key listener
@@ -222,8 +121,8 @@
 			document.removeEventListener('keydown', handleKeydown);
 		};
 	});
-	async function createEvent(e: SubmitEvent) {
-		e.preventDefault();
+
+	async function createEvent(formData: EventFormData) {
 		if (!$user) return;
 
 		isSubmitting = true;
@@ -261,21 +160,15 @@
 			toast.push($_('event_created_successfully'));
 
 			// Reset form
-			formData.title = '';
-			formData.location = '';
-			formData.description = '';
-			formData.url = '';
-			formData.image = null;
-			formData.image_description = '';
-			formData.state = 'published';
-			formData.all_day = true;
-			formData.point = null;
-
-			startDateObj = new Date();
-			startTimeObj = new Date(1970, 0, 1, 9, 0);
-
-			endDateObj = new Date();
-			endTimeObj = new Date(1970, 0, 1, 17, 0);
+			createFormData.title = '';
+			createFormData.location = '';
+			createFormData.description = '';
+			createFormData.url = '';
+			createFormData.image = null;
+			createFormData.image_description = '';
+			createFormData.state = 'published';
+			createFormData.all_day = true;
+			createFormData.point = null;
 
 			// Refresh events list
 			await fetchEvents(currentPage);
@@ -422,243 +315,7 @@
 {#if !$user}
 	<p>{$_('login_required')}</p>
 {:else}
-	<form onsubmit={createEvent} class="mb-8">
-		<div class="mb-4">
-			<label for="title" class="mb-2 block font-medium text-gray-700">{$_('title_required')}</label>
-			<!-- svelte-ignore a11y_autofocus -->
-			<input
-				type="text"
-				id="title"
-				bind:value={formData.title}
-				placeholder={$_('event_title')}
-				required
-				autofocus
-				disabled={isSubmitting}
-				class="focus:ring-opacity-25 box-border w-full rounded border border-gray-300 p-3 text-base focus:border-brand-primary focus:ring-2 focus:ring-brand-primary focus:outline-none"
-			/>
-		</div>
-
-		<div class="mb-4">
-			<label for="location" class="mb-2 block font-medium text-gray-700"
-				>{$_('location_label')}</label
-			>
-			<div class="flex items-center gap-2">
-				<input
-					type="text"
-					id="location"
-					bind:value={formData.location}
-					placeholder={$_('location_optional')}
-					disabled={isSubmitting}
-					onblur={async () => {
-						if (formData.location && !isGeocoding && geocodingEnabled) {
-							isGeocoding = true;
-							try {
-								const coords = await geocodeLocation(formData.location);
-								if (coords) {
-									formData.point = {
-										lat: parseFloat(coords[0].toFixed(6)),
-										lon: parseFloat(coords[1].toFixed(6))
-									}; // rounded
-									mapZoom = 15; // Zoom in closer after geocoding
-								}
-							} catch (error) {
-								console.error('Geocoding failed:', error);
-								toast.push($_('geocoding_failed'));
-							} finally {
-								isGeocoding = false;
-							}
-						}
-					}}
-					class="focus:ring-opacity-25 box-border flex-1 rounded border border-gray-300 p-3 text-base focus:border-brand-primary focus:ring-2 focus:ring-brand-primary focus:outline-none"
-				/>
-				<button
-					type="button"
-					class="cursor-pointer rounded border border-gray-300 p-3 text-xl hover:bg-gray-50 focus:ring-2 focus:ring-brand-primary focus:outline-none"
-					onclick={() => (geocodingEnabled = !geocodingEnabled)}
-					title={geocodingEnabled ? $_('disable_geocoding') : $_('enable_geocoding')}
-				>
-					{geocodingEnabled ? '🌍' : '📍'}
-				</button>
-			</div>
-		</div>
-
-		{#if formData.location}
-			<div class="mb-4">
-				<Map
-					center={mapCenter}
-					zoom={mapZoom}
-					markerPosition={formData.point ? [formData.point.lat, formData.point.lon] : null}
-					onMarkerMove={(latlng) =>
-						(formData.point = {
-							lat: parseFloat(latlng[0].toFixed(6)),
-							lon: parseFloat(latlng[1].toFixed(6))
-						})}
-				/>
-			</div>
-		{/if}
-
-		{#if formData.point}
-			<div class="mb-4 flex gap-4">
-				<div class="flex-1">
-					<label for="lat" class="mb-2 block font-medium text-gray-700">{$_('latitude')}</label>
-					<input
-						type="number"
-						id="lat"
-						step="0.000001"
-						min="-90"
-						max="90"
-						bind:value={formData.point.lat}
-						disabled={isSubmitting}
-						class="focus:ring-opacity-25 box-border w-full rounded border border-gray-300 p-3 text-base focus:border-brand-primary focus:ring-2 focus:ring-brand-primary focus:outline-none"
-					/>
-				</div>
-				<div class="flex-1">
-					<label for="lng" class="mb-2 block font-medium text-gray-700">{$_('longitude')}</label>
-					<input
-						type="number"
-						id="lng"
-						step="0.000001"
-						min="-180"
-						max="180"
-						bind:value={formData.point.lon}
-						disabled={isSubmitting}
-						class="focus:ring-opacity-25 box-border w-full rounded border border-gray-300 p-3 text-base focus:border-brand-primary focus:ring-2 focus:ring-brand-primary focus:outline-none"
-					/>
-				</div>
-			</div>
-		{/if}
-
-		<div class="mb-4">
-			<label for="description" class="mb-2 block font-medium text-gray-700"
-				>{$_('description_label')}</label
-			>
-			<textarea
-				id="description"
-				bind:value={formData.description}
-				placeholder={$_('description_optional')}
-				rows="3"
-				disabled={isSubmitting}
-				class="focus:ring-opacity-25 box-border w-full rounded border border-gray-300 p-3 text-base focus:border-brand-primary focus:ring-2 focus:ring-brand-primary focus:outline-none"
-			></textarea>
-		</div>
-
-		<div class="mb-4">
-			<label for="url" class="mb-2 block font-medium text-gray-700">{$_('url_label')}</label>
-			<input
-				type="url"
-				id="url"
-				bind:value={formData.url}
-				placeholder={$_('url_optional')}
-				disabled={isSubmitting}
-				pattern="https?://.+"
-				class="focus:ring-opacity-25 box-border w-full rounded border border-gray-300 p-3 text-base focus:border-brand-primary focus:ring-2 focus:ring-brand-primary focus:outline-none"
-			/>
-		</div>
-
-		<div class="mb-4">
-			<label for="image" class="mb-2 block font-medium text-gray-700">{$_('image_label')}</label>
-			<input
-				type="file"
-				id="image"
-				accept="image/*"
-				disabled={isSubmitting}
-				onchange={(e) => {
-					const target = e.target as HTMLInputElement;
-					formData.image = target.files?.[0] || null;
-				}}
-			/>
-		</div>
-
-		<div class="mb-4">
-			<label for="imageDescription" class="mb-2 block font-medium text-gray-700"
-				>{$_('image_description_label')}</label
-			>
-			<input
-				type="text"
-				id="imageDescription"
-				bind:value={formData.image_description}
-				placeholder={$_('image_description_optional')}
-				disabled={isSubmitting}
-				class="focus:ring-opacity-25 box-border w-full rounded border border-gray-300 p-3 text-base focus:border-brand-primary focus:ring-2 focus:ring-brand-primary focus:outline-none"
-			/>
-		</div>
-
-		<div class="flex gap-4">
-			<div class="mb-4 flex-1">
-				<label for="startDate" class="mb-2 block font-medium text-gray-700"
-					>{$_('start_date_required')}</label
-				>
-				{#key startDateObj.getTime()}
-					<Datepicker
-						id="startDate"
-						bind:value={startDateObj}
-						defaultDate={startDateObj}
-						locale="fi"
-						firstDayOfWeek={1}
-						disabled={isSubmitting}
-					/>
-				{/key}
-				{#if !formData.all_day}
-					<Timepicker id="startTime" bind:value={startTimeString} disabled={isSubmitting} />
-				{/if}
-			</div>
-
-			<div class="mb-4 flex-1">
-				<label for="endDate" class="mb-2 block font-medium text-gray-700">{$_('end_date')}</label>
-				{#key endDateObj.getTime()}
-					<Datepicker
-						id="endDate"
-						bind:value={endDateObj}
-						defaultDate={endDateObj}
-						locale="fi"
-						firstDayOfWeek={1}
-						disabled={isSubmitting || !formData.all_day}
-					/>
-				{/key}
-				{#if !formData.all_day}
-					<Timepicker id="endTime" bind:value={endTimeString} disabled={isSubmitting} />
-				{/if}
-			</div>
-		</div>
-
-		<div class="mb-4">
-			<label class="flex cursor-pointer items-center gap-2 font-normal">
-				<input type="checkbox" bind:checked={formData.all_day} disabled={isSubmitting} />
-				{$_('all_day_event_label')}
-			</label>
-		</div>
-
-		<div class="mb-4">
-			<label for="state" class="mb-2 block font-medium text-gray-700">{$_('status')}</label>
-			<select
-				id="state"
-				bind:value={formData.state}
-				disabled={isSubmitting}
-				class="focus:ring-opacity-25 box-border w-full rounded border border-gray-300 p-3 text-base focus:border-brand-primary focus:ring-2 focus:ring-brand-primary focus:outline-none"
-			>
-				<option value="draft">{$_('draft')}</option>
-				<option value="published">{$_('published')}</option>
-			</select>
-		</div>
-
-		<div class="mt-6 flex gap-2">
-			<button
-				type="submit"
-				disabled={isSubmitting || !formData.title || !formData.start_date}
-				class="cursor-pointer rounded border border-primary-500 bg-primary-500 px-6 py-3 text-base text-white transition-colors hover:bg-primary-600 disabled:cursor-not-allowed disabled:border-gray-400 disabled:bg-gray-200 disabled:text-gray-600 disabled:hover:bg-gray-300"
-			>
-				{isSubmitting ? $_('creating') : $_('create_event')}
-			</button>
-			<button
-				type="button"
-				class="cursor-pointer rounded border-none bg-gray-600 px-6 py-3 text-base text-white transition-colors hover:bg-gray-700 disabled:cursor-not-allowed disabled:bg-gray-400"
-				onclick={cancelAdd}
-				disabled={isSubmitting}
-			>
-				{$_('cancel')}
-			</button>
-		</div>
-	</form>
+	<EventForm mode="create" {isSubmitting} onSubmit={createEvent} />
 
 	<div class="mb-8">
 		<h2 class="mb-4 text-gray-900">Import KML</h2>
