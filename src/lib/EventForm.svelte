@@ -3,7 +3,6 @@
 	import type { EventFormData } from '$lib/types';
 	import { _ } from 'svelte-i18n';
 	import { toast } from '@zerodevx/svelte-toast';
-	import Map from '$lib/Map.svelte';
 	import DateTimePicker from '$lib/DateTimePicker.svelte';
 	import { geocodeLocation } from '$lib/geocode';
 	import { createEventFormStore } from '$lib/stores/event-form';
@@ -28,6 +27,7 @@
 	let mapZoom = $state(10);
 	let isGeocoding = $state(false);
 	let geocodingEnabled = $state(true);
+	let MapComponent = $state<any>(null);
 
 	// Initialize form data from initialData
 	onMount(async () => {
@@ -49,6 +49,15 @@
 			if (initialData.point) {
 				mapCenter = [initialData.point.lat, initialData.point.lon];
 			}
+		}
+	});
+
+	// Lazy load Map component when location is entered
+	$effect(() => {
+		if (formState.formData.location && !MapComponent) {
+			import('$lib/Map.svelte').then((module) => {
+				MapComponent = module.default;
+			});
 		}
 	});
 
@@ -142,18 +151,22 @@
 
 	{#if formState.formData.location}
 		<div class="mb-4">
-			<Map
-				center={mapCenter}
-				zoom={mapZoom}
-				markerPosition={formState.formData.point ? [formState.formData.point.lat, formState.formData.point.lon] : null}
-				onMarkerMove={(latlng) => {
-					formStore.updateField('point', {
-						lat: parseFloat(latlng[0].toFixed(6)),
-						lon: parseFloat(latlng[1].toFixed(6))
-					});
-					mapCenter = [formState.formData.point!.lat, formState.formData.point!.lon];
-				}}
-			/>
+			{#if MapComponent}
+				<MapComponent
+					center={mapCenter}
+					zoom={mapZoom}
+					markerPosition={formState.formData.point ? [formState.formData.point.lat, formState.formData.point.lon] : null}
+					onMarkerMove={(latlng: [number, number]) => {
+						formStore.updateField('point', {
+							lat: parseFloat(latlng[0].toFixed(6)),
+							lon: parseFloat(latlng[1].toFixed(6))
+						});
+						mapCenter = [formState.formData.point!.lat, formState.formData.point!.lon];
+					}}
+				/>
+			{:else}
+				<p>Loading map...</p>
+			{/if}
 		</div>
 	{/if}
 
