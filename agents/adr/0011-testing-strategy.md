@@ -54,6 +54,6 @@ We adopt Test-Driven Development (TDD) as our primary development approach:
 
 ## Notes
 
-- Component tests are currently skipped due to Svelte 5 and @testing-library/svelte compatibility issues
+- Svelte 5 component testing is enabled via the `svelteTesting` plugin from `@testing-library/svelte/vite`
 - E2E tests require authentication setup for full workflow testing
 - Test coverage is monitored and reported in CI
