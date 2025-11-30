@@ -20,14 +20,38 @@
 	}: Props = $props();
 
 	let modalElement = $state<HTMLElement>();
+	let modalBody = $state<HTMLElement>();
 	let previousFocus: HTMLElement | null = null;
 
-	// Handle escape key
+	// Handle escape key and focus trapping
 	$effect(() => {
-		if (open && closeOnEscape) {
+		if (open) {
 			const handleKeydown = (event: KeyboardEvent) => {
-				if (event.key === 'Escape') {
+				if (event.key === 'Escape' && closeOnEscape) {
 					open = false;
+				} else if (event.key === 'Tab') {
+					// Focus trapping
+					if (modalBody) {
+						const focusableElements = modalBody.querySelectorAll(
+							'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+						);
+						const firstFocusable = focusableElements[0] as HTMLElement;
+						const lastFocusable = focusableElements[focusableElements.length - 1] as HTMLElement;
+
+						if (event.shiftKey) {
+							// Shift+Tab
+							if (document.activeElement === firstFocusable) {
+								event.preventDefault();
+								lastFocusable.focus();
+							}
+						} else {
+							// Tab
+							if (document.activeElement === lastFocusable) {
+								event.preventDefault();
+								firstFocusable.focus();
+							}
+						}
+					}
 				}
 			};
 			document.addEventListener('keydown', handleKeydown);
@@ -39,10 +63,19 @@
 	$effect(() => {
 		if (open) {
 			previousFocus = document.activeElement as HTMLElement;
-			// Focus the modal after a short delay to ensure it's rendered
+			// Focus the first focusable element in the modal body after a short delay
 			setTimeout(() => {
-				if (modalElement) {
-					modalElement.focus();
+				if (modalBody) {
+					const focusableElements = modalBody.querySelectorAll(
+						'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+					);
+					const firstFocusable = focusableElements[0] as HTMLElement;
+					if (firstFocusable) {
+						firstFocusable.focus();
+					} else {
+						// Fallback to modal element
+						modalElement?.focus();
+					}
 				}
 			}, 10);
 		} else if (previousFocus) {
@@ -92,7 +125,7 @@
 					</button>
 				</div>
 			{/if}
-			<div class="modal-body">
+			<div class="modal-body" bind:this={modalBody}>
 				{@render children?.()}
 			</div>
 		</div>
