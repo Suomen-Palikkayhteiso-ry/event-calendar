@@ -1,32 +1,33 @@
+# Dependencies
 node_modules
 
-# Agents
-TODO*
-
-# Output
-.devenv*
-.output
-.vercel
-.netlify
-.wrangler
+# Build outputs
 /.svelte-kit
 /build
+coverage/
 
-# OS
-.DS_Store
-Thumbs.db
-
-# Env
+# Environment variables
 .env
 .env.*
 !.env.example
 !.env.test
 
-# Vite
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+.devenv*
+.output
+.vercel
+.netlify
+.wrangler
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+test-results/
+playwright-report/
 
-# Generated
+# Generated static files
 static/kalenteri.json
 static/kalenteri.geo.json
 static/*.ics
@@ -35,3 +36,6 @@ static/*.atom
 static/*.html
 static/images/
 static/events/
+
+# Agents
+TODO*
