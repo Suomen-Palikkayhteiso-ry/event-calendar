@@ -35,7 +35,8 @@ export function formatEventForDisplay(event: Event) {
 			? 'Koko päivä'
 			: new Date(event.start_date).toLocaleTimeString('fi-FI', {
 					hour: '2-digit',
-					minute: '2-digit'
+					minute: '2-digit',
+					timeZone: 'Europe/Helsinki'
 				})
 	};
 }
