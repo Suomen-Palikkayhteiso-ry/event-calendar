@@ -158,7 +158,10 @@
 								mapZoom = 15; // Zoom in closer after geocoding
 							}
 						} catch (error) {
-							logger.error('Geocoding failed during form submission', { error, location: formState.formData.location });
+							logger.error('Geocoding failed during form submission', {
+								error,
+								location: formState.formData.location
+							});
 							toast.push($_('geocoding_failed'));
 						} finally {
 							isGeocoding = false;
@@ -169,7 +172,7 @@
 			/>
 			<button
 				type="button"
-				class="cursor-pointer rounded border border-gray-300 p-3 text-xl hover:bg-gray-50 focus:ring-2 focus:ring-brand-primary focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+				class="cursor-pointer rounded border border-gray-300 p-3 text-xl hover:bg-gray-50 focus:ring-2 focus:ring-brand-primary focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
 				disabled={!isPointValid}
 				onclick={() => (geocodingEnabled = !geocodingEnabled)}
 				aria-label={geocodingEnabled ? $_('disable_geocoding') : $_('enable_geocoding')}
@@ -260,7 +263,8 @@
 			placeholder={$_('description_optional')}
 			rows={3}
 			disabled={isSubmitting}
-			on:input={(e) => formStore.updateField('description', (e.target as HTMLTextAreaElement).value)}
+			on:input={(e) =>
+				formStore.updateField('description', (e.target as HTMLTextAreaElement).value)}
 		/>
 	</div>
 

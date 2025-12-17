@@ -1,9 +1,12 @@
-import { defineConfig, devices } from '@playwright/test';
+import { defineBddConfig } from 'playwright-bdd';
+import { devices } from '@playwright/test';
 
 /**
  * @see https://playwright.dev/docs/test-configuration
  */
-export default defineConfig({
+export default defineBddConfig({
+	features: 'tests/features/*.feature',
+	steps: 'tests/steps/**/*.ts',
 	testDir: './tests',
 	/* Run tests in files in parallel */
 	fullyParallel: true,

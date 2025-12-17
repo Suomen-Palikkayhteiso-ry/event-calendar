@@ -1,6 +1,15 @@
-import { defineConfig } from 'playwright-bdd';
+import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
-  features: 'tests/features/*.feature',
-  steps: 'tests/steps/**/*.ts',
+  testDir: 'tests',
+  testMatch: '**/*.feature',
+  use: {
+    baseURL: 'http://localhost:5174',
+  },
+  projects: [
+    {
+      name: 'chromium',
+      use: { ...devices['Desktop Chrome'] },
+    },
+  ],
 });

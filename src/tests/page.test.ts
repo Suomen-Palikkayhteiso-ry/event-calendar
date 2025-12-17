@@ -361,13 +361,15 @@ describe('+page.svelte calendar view', () => {
 		];
 
 		const mockEventsStore = (globalThis as Record<string, unknown>).__mockEventsStore as any;
-		mockEventsStore.subscribe.mockImplementation((fn) => fn({
-			events: mockEvents,
-			totalEvents: 1,
-			currentPage: 1,
-			pageSize: 1,
-			isLoading: false
-		}));
+		mockEventsStore.subscribe.mockImplementation((fn) =>
+			fn({
+				events: mockEvents,
+				totalEvents: 1,
+				currentPage: 1,
+				pageSize: 1,
+				isLoading: false
+			})
+		);
 
 		getMockUserStore().set({
 			collectionId: 'users',
@@ -399,13 +401,15 @@ describe('+page.svelte calendar view', () => {
 		];
 
 		const mockEventsStore = (globalThis as Record<string, unknown>).__mockEventsStore as any;
-		mockEventsStore.subscribe.mockImplementation((fn) => fn({
-			events: mockEvents,
-			totalEvents: 1,
-			currentPage: 1,
-			pageSize: 1,
-			isLoading: false
-		}));
+		mockEventsStore.subscribe.mockImplementation((fn) =>
+			fn({
+				events: mockEvents,
+				totalEvents: 1,
+				currentPage: 1,
+				pageSize: 1,
+				isLoading: false
+			})
+		);
 
 		getMockUserStore().set({
 			collectionId: 'users',
@@ -436,13 +440,15 @@ describe('+page.svelte calendar view', () => {
 		];
 
 		const mockEventsStore = (globalThis as Record<string, unknown>).__mockEventsStore as any;
-		mockEventsStore.subscribe.mockImplementation((fn) => fn({
-			events: mockEvents,
-			totalEvents: 1,
-			currentPage: 1,
-			pageSize: 1,
-			isLoading: false
-		}));
+		mockEventsStore.subscribe.mockImplementation((fn) =>
+			fn({
+				events: mockEvents,
+				totalEvents: 1,
+				currentPage: 1,
+				pageSize: 1,
+				isLoading: false
+			})
+		);
 
 		getMockUserStore().set({
 			collectionId: 'users',
@@ -510,13 +516,15 @@ describe('+page.svelte calendar view', () => {
 		];
 
 		const mockEventsStore = (globalThis as Record<string, unknown>).__mockEventsStore as any;
-		mockEventsStore.subscribe.mockImplementation((fn) => fn({
-			events: mockEvents,
-			totalEvents: 2,
-			currentPage: 1,
-			pageSize: 2,
-			isLoading: false
-		}));
+		mockEventsStore.subscribe.mockImplementation((fn) =>
+			fn({
+				events: mockEvents,
+				totalEvents: 2,
+				currentPage: 1,
+				pageSize: 2,
+				isLoading: false
+			})
+		);
 
 		getMockUserStore().set({
 			collectionId: 'users',
@@ -546,13 +554,15 @@ describe('+page.svelte calendar view', () => {
 		];
 
 		const mockEventsStore = (globalThis as Record<string, unknown>).__mockEventsStore as any;
-		mockEventsStore.subscribe.mockImplementation((fn) => fn({
-			events: mockEvents,
-			totalEvents: 1,
-			currentPage: 1,
-			pageSize: 1,
-			isLoading: false
-		}));
+		mockEventsStore.subscribe.mockImplementation((fn) =>
+			fn({
+				events: mockEvents,
+				totalEvents: 1,
+				currentPage: 1,
+				pageSize: 1,
+				isLoading: false
+			})
+		);
 
 		getMockUserStore().set({
 			collectionId: 'users',

@@ -71,7 +71,10 @@ function createEventsStore() {
 				// Cache the result
 				cache.set(cacheKey, { data: newState, timestamp: now });
 
-				logger.info('Events fetched successfully', { count: result.items.length, total: result.totalItems });
+				logger.info('Events fetched successfully', {
+					count: result.items.length,
+					total: result.totalItems
+				});
 				set(newState);
 				return newState;
 			} catch (error) {
@@ -142,7 +145,9 @@ function createEventsStore() {
 		async updateEvent(eventId: string, eventData: any) {
 			try {
 				logger.info('Updating event', { eventId, changes: Object.keys(eventData) });
-				const updatedEvent = await retryApiCall(() => pb.collection('events').update(eventId, eventData));
+				const updatedEvent = await retryApiCall(() =>
+					pb.collection('events').update(eventId, eventData)
+				);
 				// Invalidate cache
 				cache.clear();
 				logger.info('Event updated successfully', { eventId });

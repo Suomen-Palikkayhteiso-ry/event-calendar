@@ -52,7 +52,10 @@
 			// Add screen reader support
 			(info as any).el.setAttribute('aria-label', (info as any).event.title);
 			if ((info as any).event.extendedProps.description) {
-				(info as any).el.setAttribute('aria-description', (info as any).event.extendedProps.description);
+				(info as any).el.setAttribute(
+					'aria-description',
+					(info as any).event.extendedProps.description
+				);
 			}
 			// Make events accessible with keyboard navigation
 			if ((info as any).event.id !== 'selected-day') {
