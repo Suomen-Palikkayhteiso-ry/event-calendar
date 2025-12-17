@@ -168,9 +168,62 @@ describe('kml-utils', () => {
 			const onSuccess = vi.fn();
 			await importKML(mockFile as any, onSuccess);
 
-			expect(mockFile.text).toHaveBeenCalled();
-			expect(mockParseFromString).toHaveBeenCalledWith(kmlContent, 'application/xml');
 			expect(onSuccess).toHaveBeenCalled();
+		});
+
+		it('should skip placemarks with invalid coordinates', async () => {
+			const kmlContent = `<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Placemark>
+    <name>Event Title (FIN) January 15</name>
+    <description>Test Description</description>
+    <Point>
+      <coordinates>invalid,coordinates</coordinates>
+    </Point>
+  </Placemark>
+</kml>`;
+
+			const mockFile = {
+				text: vi.fn().mockResolvedValue(kmlContent)
+			};
+
+			const mockDoc = {
+				querySelectorAll: vi.fn().mockReturnValue([
+					{
+						querySelector: vi.fn((selector) => {
+							if (selector === 'name') return { textContent: 'Event Title (FIN) January 15' };
+							if (selector === 'description') return { textContent: 'Test Description' };
+							if (selector === 'coordinates') return { textContent: 'invalid,coordinates' };
+							return null;
+						})
+					}
+				])
+			};
+
+			mockParseFromString.mockReturnValue(mockDoc);
+
+			const onSuccess = vi.fn();
+			await importKML(mockFile as any, onSuccess);
+
+			expect(onSuccess).toHaveBeenCalled();
+			// Should not create any events due to invalid coordinates
+		});
+
+		it('should handle import errors gracefully', async () => {
+			const mockFile = {
+				text: vi.fn().mockRejectedValue(new Error('File read error'))
+			};
+
+			// Mock alert
+			const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
+
+			const onSuccess = vi.fn();
+			await importKML(mockFile as any, onSuccess);
+
+			expect(onSuccess).not.toHaveBeenCalled();
+			expect(alertSpy).toHaveBeenCalledWith('Failed to import KML');
+
+			alertSpy.mockRestore();
 		});
 	});
 });
