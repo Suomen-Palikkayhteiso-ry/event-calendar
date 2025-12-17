@@ -35,13 +35,6 @@ jobs:
       - name: Run test coverage
         run: pnpm test:coverage
 
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4
-        with:
-          file: ./coverage/coverage-final.json
-          flags: unittests
-          name: codecov-umbrella
-
       - name: Run E2E tests
         run: pnpm test:e2e
 
