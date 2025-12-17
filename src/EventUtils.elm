@@ -1,8 +1,8 @@
-module EventUtils exposing (..)module EventUtils exposing (..)
+module EventUtils exposing (..)
 
 import DateUtils
 import Time
-import Types exposing (Event, EventFormData, EventState(..), Point)
+import Types exposing (Event, EventFormData, EventState(..), Point, DisplayEvent)
 
 
 eventToFormData : Event -> EventFormData
@@ -21,7 +21,7 @@ eventToFormData event =
     }
 
 
-formatEventForDisplay : Event -> { event | displayDate : String, displayTime : String }
+formatEventForDisplay : Event -> DisplayEvent
 formatEventForDisplay event =
     let
         startPosix = DateUtils.parseUTCDate event.startDate
@@ -42,7 +42,7 @@ formatEventForDisplay event =
                 in
                 String.padLeft 2 '0' (String.fromInt hour) ++ ":" ++ String.padLeft 2 '0' (String.fromInt minute)
     in
-    { event | displayDate = displayDate, displayTime = displayTime }
+    { event = event, displayDate = displayDate, displayTime = displayTime }
 
 
 isEventOngoing : Event -> Bool

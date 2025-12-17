@@ -40,6 +40,28 @@ type alias Point =
     }
 
 
+type alias EventFormData =
+    { title : String
+    , start_date : String
+    , end_date : String
+    , all_day : Bool
+    , location : String
+    , description : String
+    , url : String
+    , image : Maybe String
+    , image_description : String
+    , state : EventState
+    , point : Maybe Point
+    }
+
+
+type alias DisplayEvent =
+    { event : Event
+    , displayDate : String
+    , displayTime : String
+    }
+
+
 eventDecoder : Decode.Decoder Event
 eventDecoder =
     Decode.succeed Event

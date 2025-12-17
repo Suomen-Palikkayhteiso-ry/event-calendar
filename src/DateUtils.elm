@@ -1,4 +1,4 @@
-module DateUtils exposing (..)module DateUtils exposing (..)
+module DateUtils exposing (..)
 
 import Time
 
@@ -8,21 +8,51 @@ import Time
 
 parseUTCDate : String -> Time.Posix
 parseUTCDate utcString =
-    -- Simple parsing, assuming ISO format
+    -- Parse ISO format like 2024-01-01T10:00:00Z
     case String.split "T" utcString of
-        [ date, time ] ->
+        [ date, timeWithZ ] ->
+            let
+                time = String.dropRight 1 timeWithZ -- remove Z
+            in
             case String.split "-" date of
-                [ y, m, d ] ->
-                    case String.split ":" (String.dropRight 1 time) of
-                        [ h, min, s ] ->
-                            Time.millisToPosix
-                                ( (String.toInt y |> Maybe.withDefault 1970) * 365 * 24 * 60 * 60 * 1000
-                                    + (String.toInt m |> Maybe.withDefault 1) * 30 * 24 * 60 * 60 * 1000
-                                    + (String.toInt d |> Maybe.withDefault 1) * 24 * 60 * 60 * 1000
-                                    + (String.toInt h |> Maybe.withDefault 0) * 60 * 60 * 1000
-                                    + (String.toInt min |> Maybe.withDefault 0) * 60 * 1000
-                                    + (String.toInt s |> Maybe.withDefault 0) * 1000
-                                )
+                [ yStr, mStr, dStr ] ->
+                    case String.split ":" time of
+                        [ hStr, minStr, sStr ] ->
+                            case String.toInt yStr of
+                                Just y ->
+                                    case String.toInt mStr of
+                                        Just m ->
+                                            case String.toInt dStr of
+                                                Just d ->
+                                                    case String.toInt hStr of
+                                                        Just h ->
+                                                            case String.toInt minStr of
+                                                                Just min ->
+                                                                    case String.toInt sStr of
+                                                                        Just s ->
+                                                                            let
+                                                                                days = daysSinceEpoch y m d
+                                                                                millis = days * 24 * 60 * 60 * 1000 + h * 60 * 60 * 1000 + min * 60 * 1000 + s * 1000
+                                                                            in
+                                                                            Time.millisToPosix millis
+
+                                                                        _ ->
+                                                                            Time.millisToPosix 0
+
+                                                                _ ->
+                                                                    Time.millisToPosix 0
+
+                                                        _ ->
+                                                            Time.millisToPosix 0
+
+                                                _ ->
+                                                    Time.millisToPosix 0
+
+                                        _ ->
+                                            Time.millisToPosix 0
+
+                                _ ->
+                                    Time.millisToPosix 0
 
                         _ ->
                             Time.millisToPosix 0
@@ -32,6 +62,17 @@ parseUTCDate utcString =
 
         _ ->
             Time.millisToPosix 0
+
+
+daysSinceEpoch : Int -> Int -> Int -> Int
+daysSinceEpoch year month day =
+    let
+        a = (14 - month) // 12
+        y = year + 4800 - a
+        m = month + 12 * a - 3
+        jd = day + (153 * m + 2) // 5 + 365 * y + y // 4 - y // 100 + y // 400 - 32045
+    in
+    jd - 2440588 -- days since 1970-01-01
 
 
 -- Format date in Helsinki timezone (approximate)
