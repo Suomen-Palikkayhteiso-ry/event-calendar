@@ -19,6 +19,7 @@ See [Development Setup](./agents/development-setup.md) for environment setup and
 - [Project Overview](./agents/project-overview.md) - Detailed project description and features
 - [Architecture](./agents/architecture.md) - High-level system architecture
 - [Security](./agents/security.md) - Security considerations and best practices
+- [User Stories](./agents/stories/) - User story documentation
 - [Architectural Decisions](./agents/adr/) - ADR records for major technical decisions
 
 ## Key Commands
@@ -28,6 +29,10 @@ See [Development Setup](./agents/development-setup.md) for environment setup and
 - `pnpm build` - Build for production
 - `pnpm lint` - Lint and format code
 - `pnpm check` - Type checking
+- `pnpm test` - Run unit tests
+- `pnpm test:coverage` - Run tests with coverage report
+- `pnpm test:bdd` - Run BDD tests
+- `pnpm test:e2e` - Run E2E tests
 - `pnpm generate-statics` - Generate static feeds
 
 ## Code Style
