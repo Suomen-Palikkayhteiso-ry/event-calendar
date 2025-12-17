@@ -1,4 +1,4 @@
-module PocketBase exposing (..)module PocketBase exposing (..)
+module PocketBase exposing (..)
 
 import Http
 import Json.Decode as Decode

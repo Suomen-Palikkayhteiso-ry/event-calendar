@@ -1,6 +1,7 @@
-module Events exposing (..)module Events exposing (..)
+module Events exposing (..)
 
 import Http
+import PocketBase
 import Types exposing (Event)
 
 
@@ -33,7 +34,7 @@ type Msg
     | UpdateEvent String Event
     | EventUpdated (Result Http.Error Event)
     | DeleteEvent String
-    | EventDeleted (Result Http.Error ())
+    | EventDeleted String (Result Http.Error ())
 
 
 -- Update
@@ -44,7 +45,7 @@ update msg model =
     case msg of
         FetchEvents ->
             ( { model | loading = True, error = Nothing }
-            , Cmd.none -- TODO: call PocketBase.getEvents
+            , PocketBase.getEvents Nothing EventsFetched
             )
 
         EventsFetched result ->
@@ -61,7 +62,7 @@ update msg model =
 
         CreateEvent event ->
             ( model
-            , Cmd.none -- TODO: call PocketBase.createEvent
+            , PocketBase.createEvent Nothing event EventCreated
             )
 
         EventCreated result ->
@@ -78,7 +79,7 @@ update msg model =
 
         UpdateEvent id updatedEvent ->
             ( model
-            , Cmd.none -- TODO: call PocketBase.updateEvent
+            , PocketBase.updateEvent Nothing id updatedEvent EventUpdated
             )
 
         EventUpdated result ->
@@ -95,10 +96,10 @@ update msg model =
 
         DeleteEvent id ->
             ( model
-            , Cmd.none -- TODO: call PocketBase.deleteEvent
+            , PocketBase.deleteEvent Nothing id (EventDeleted id)
             )
 
-        EventDeleted result ->
+        EventDeleted id result ->
             case result of
                 Ok () ->
                     ( { model | events = List.filter (\e -> e.id /= id) model.events }

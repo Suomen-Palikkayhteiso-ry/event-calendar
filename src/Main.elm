@@ -3,6 +3,7 @@ module Main exposing (..)
 import Browser
 import Browser.Navigation as Nav
 import Calendar
+import Events
 import Html exposing (Html, a, div, h1, header, main_, nav, text)
 import Html.Attributes exposing (..)
 import Time
@@ -33,12 +34,18 @@ type alias Model =
     , url : Url.Url
     , route : Route
     , calendar : Calendar.Model
+    , events : Events.Model
     }
 
 
 init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init flags url key =
-    ( Model key url (parseUrl url) Calendar.init, Cmd.none )
+    let
+        ( eventsModel, eventsCmd ) = Events.update Events.FetchEvents Events.init
+    in
+    ( Model key url (parseUrl url) Calendar.init eventsModel
+    , Cmd.map EventsMsg eventsCmd
+    )
 
 
 -- ROUTE
@@ -79,6 +86,7 @@ type Msg
     = LinkClicked Browser.UrlRequest
     | UrlChanged Url.Url
     | CalendarMsg Calendar.Msg
+    | EventsMsg Events.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -100,6 +108,23 @@ update msg model =
         CalendarMsg calendarMsg ->
             ( { model | calendar = Calendar.update calendarMsg model.calendar }
             , Cmd.none
+            )
+
+        EventsMsg eventsMsg ->
+            let
+                ( updatedEvents, eventsCmd ) =
+                    Events.update eventsMsg model.events
+
+                updatedCalendar =
+                    case eventsMsg of
+                        Events.EventsFetched (Ok events) ->
+                            Calendar.update (Calendar.SetEvents events) model.calendar
+
+                        _ ->
+                            model.calendar
+            in
+            ( { model | events = updatedEvents, calendar = updatedCalendar }
+            , Cmd.map EventsMsg eventsCmd
             )
 
 
