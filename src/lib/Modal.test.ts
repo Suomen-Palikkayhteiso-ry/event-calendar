@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 import Modal from './Modal.svelte';
@@ -32,10 +32,34 @@ describe('Modal', () => {
 		expect(modalContent).toHaveClass('modal-lg');
 	});
 
+	it('renders with default size md', () => {
+		render(Modal, { open: true, children: () => 'Content' });
+		const modalContent = document.querySelector('.modal-content');
+		expect(modalContent).toHaveClass('modal-md');
+	});
+
+	it('renders with xl size', () => {
+		render(Modal, { open: true, size: 'xl', children: () => 'Content' });
+		const modalContent = document.querySelector('.modal-content');
+		expect(modalContent).toHaveClass('modal-xl');
+	});
+
+	it('renders without title', () => {
+		render(Modal, { open: true, children: () => 'Content' });
+		expect(screen.queryByRole('heading')).not.toBeInTheDocument();
+		expect(screen.queryByRole('button', { name: 'Close modal' })).not.toBeInTheDocument();
+	});
+
 	it('has correct ARIA attributes', () => {
 		render(Modal, { open: true, title: 'Test' });
 		const modal = screen.getByRole('dialog');
 		expect(modal).toHaveAttribute('aria-modal', 'true');
 		expect(modal).toHaveAttribute('aria-labelledby', 'modal-title');
+	});
+
+	it('renders modal body', () => {
+		render(Modal, { open: true, children: () => 'Content' });
+		const modalBody = document.querySelector('.modal-body');
+		expect(modalBody).toBeInTheDocument();
 	});
 });
