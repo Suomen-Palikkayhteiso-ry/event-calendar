@@ -270,3 +270,12 @@ utcToHelsinkiDate utcString =
         ++ String.padLeft 2 '0' (String.fromInt (monthToInt month))
         ++ "-"
         ++ String.padLeft 2 '0' (String.fromInt day)
+
+
+dateToString : { year : Int, month : Int, day : Int } -> String
+dateToString { year, month, day } =
+    String.fromInt year
+        ++ "-"
+        ++ String.padLeft 2 '0' (String.fromInt month)
+        ++ "-"
+        ++ String.padLeft 2 '0' (String.fromInt day)
