@@ -4395,6 +4395,181 @@ function _Url_percentDecode(string)
 	{
 		return $elm$core$Maybe$Nothing;
 	}
+}
+
+
+// SEND REQUEST
+
+var _Http_toTask = F3(function(router, toTask, request)
+{
+	return _Scheduler_binding(function(callback)
+	{
+		function done(response) {
+			callback(toTask(request.expect.a(response)));
+		}
+
+		var xhr = new XMLHttpRequest();
+		xhr.addEventListener('error', function() { done($elm$http$Http$NetworkError_); });
+		xhr.addEventListener('timeout', function() { done($elm$http$Http$Timeout_); });
+		xhr.addEventListener('load', function() { done(_Http_toResponse(request.expect.b, xhr)); });
+		$elm$core$Maybe$isJust(request.tracker) && _Http_track(router, xhr, request.tracker.a);
+
+		try {
+			xhr.open(request.method, request.url, true);
+		} catch (e) {
+			return done($elm$http$Http$BadUrl_(request.url));
+		}
+
+		_Http_configureRequest(xhr, request);
+
+		request.body.a && xhr.setRequestHeader('Content-Type', request.body.a);
+		xhr.send(request.body.b);
+
+		return function() { xhr.c = true; xhr.abort(); };
+	});
+});
+
+
+// CONFIGURE
+
+function _Http_configureRequest(xhr, request)
+{
+	for (var headers = request.headers; headers.b; headers = headers.b) // WHILE_CONS
+	{
+		xhr.setRequestHeader(headers.a.a, headers.a.b);
+	}
+	xhr.timeout = request.timeout.a || 0;
+	xhr.responseType = request.expect.d;
+	xhr.withCredentials = request.allowCookiesFromOtherDomains;
+}
+
+
+// RESPONSES
+
+function _Http_toResponse(toBody, xhr)
+{
+	return A2(
+		200 <= xhr.status && xhr.status < 300 ? $elm$http$Http$GoodStatus_ : $elm$http$Http$BadStatus_,
+		_Http_toMetadata(xhr),
+		toBody(xhr.response)
+	);
+}
+
+
+// METADATA
+
+function _Http_toMetadata(xhr)
+{
+	return {
+		url: xhr.responseURL,
+		statusCode: xhr.status,
+		statusText: xhr.statusText,
+		headers: _Http_parseHeaders(xhr.getAllResponseHeaders())
+	};
+}
+
+
+// HEADERS
+
+function _Http_parseHeaders(rawHeaders)
+{
+	if (!rawHeaders)
+	{
+		return $elm$core$Dict$empty;
+	}
+
+	var headers = $elm$core$Dict$empty;
+	var headerPairs = rawHeaders.split('\r\n');
+	for (var i = headerPairs.length; i--; )
+	{
+		var headerPair = headerPairs[i];
+		var index = headerPair.indexOf(': ');
+		if (index > 0)
+		{
+			var key = headerPair.substring(0, index);
+			var value = headerPair.substring(index + 2);
+
+			headers = A3($elm$core$Dict$update, key, function(oldValue) {
+				return $elm$core$Maybe$Just($elm$core$Maybe$isJust(oldValue)
+					? value + ', ' + oldValue.a
+					: value
+				);
+			}, headers);
+		}
+	}
+	return headers;
+}
+
+
+// EXPECT
+
+var _Http_expect = F3(function(type, toBody, toValue)
+{
+	return {
+		$: 0,
+		d: type,
+		b: toBody,
+		a: toValue
+	};
+});
+
+var _Http_mapExpect = F2(function(func, expect)
+{
+	return {
+		$: 0,
+		d: expect.d,
+		b: expect.b,
+		a: function(x) { return func(expect.a(x)); }
+	};
+});
+
+function _Http_toDataView(arrayBuffer)
+{
+	return new DataView(arrayBuffer);
+}
+
+
+// BODY and PARTS
+
+var _Http_emptyBody = { $: 0 };
+var _Http_pair = F2(function(a, b) { return { $: 0, a: a, b: b }; });
+
+function _Http_toFormData(parts)
+{
+	for (var formData = new FormData(); parts.b; parts = parts.b) // WHILE_CONS
+	{
+		var part = parts.a;
+		formData.append(part.a, part.b);
+	}
+	return formData;
+}
+
+var _Http_bytesToBlob = F2(function(mime, bytes)
+{
+	return new Blob([bytes], { type: mime });
+});
+
+
+// PROGRESS
+
+function _Http_track(router, xhr, tracker)
+{
+	// TODO check out lengthComputable on loadstart event
+
+	xhr.upload.addEventListener('progress', function(event) {
+		if (xhr.c) { return; }
+		_Scheduler_rawSpawn(A2($elm$core$Platform$sendToSelf, router, _Utils_Tuple2(tracker, $elm$http$Http$Sending({
+			sent: event.loaded,
+			size: event.total
+		}))));
+	});
+	xhr.addEventListener('progress', function(event) {
+		if (xhr.c) { return; }
+		_Scheduler_rawSpawn(A2($elm$core$Platform$sendToSelf, router, _Utils_Tuple2(tracker, $elm$http$Http$Receiving({
+			received: event.loaded,
+			size: event.lengthComputable ? $elm$core$Maybe$Just(event.total) : $elm$core$Maybe$Nothing
+		}))));
+	});
 }var $author$project$Main$LinkClicked = function (a) {
 	return {$: 'LinkClicked', a: a};
 };
@@ -5190,10 +5365,33 @@ var $elm$core$Task$perform = F2(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
 var $elm$browser$Browser$application = _Browser_application;
-var $author$project$Main$Model = F4(
-	function (key, url, route, calendar) {
-		return {calendar: calendar, key: key, route: route, url: url};
-	});
+var $author$project$Main$EventsMsg = function (a) {
+	return {$: 'EventsMsg', a: a};
+};
+var $author$project$Events$FetchEvents = {$: 'FetchEvents'};
+var $author$project$Main$Model = function (key) {
+	return function (url) {
+		return function (route) {
+			return function (calendar) {
+				return function (events) {
+					return function (map) {
+						return function (eventForm) {
+							return function (auth) {
+								return function (loginEmail) {
+									return function (loginPassword) {
+										return function (error) {
+											return {auth: auth, calendar: calendar, error: error, eventForm: eventForm, events: events, key: key, loginEmail: loginEmail, loginPassword: loginPassword, map: map, route: route, url: url};
+										};
+									};
+								};
+							};
+						};
+					};
+				};
+			};
+		};
+	};
+};
 var $elm$time$Time$Posix = function (a) {
 	return {$: 'Posix', a: a};
 };
@@ -5205,8 +5403,15 @@ var $author$project$Calendar$init = {
 	locale: 'en',
 	view: 'month'
 };
-var $elm$core$Platform$Cmd$batch = _Platform_batch;
-var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
+var $author$project$Types$Draft = {$: 'Draft'};
+var $author$project$EventForm$init = {allDay: false, description: '', endDate: '', errors: _List_Nil, image: $elm$core$Maybe$Nothing, imageDescription: '', location: '', point: $elm$core$Maybe$Nothing, startDate: '', state: $author$project$Types$Draft, title: '', url: ''};
+var $author$project$Events$init = {error: $elm$core$Maybe$Nothing, events: _List_Nil, loading: false};
+var $author$project$Map$init = {
+	center: _Utils_Tuple2(60.1699, 24.9384),
+	marker: $elm$core$Maybe$Nothing,
+	zoom: 10
+};
+var $elm$core$Platform$Cmd$map = _Platform_map;
 var $author$project$Main$NotFound = {$: 'NotFound'};
 var $elm$url$Url$Parser$State = F5(
 	function (visited, unvisited, params, frag, value) {
@@ -5850,6 +6055,7 @@ var $author$project$Main$EventDetail = function (a) {
 	return {$: 'EventDetail', a: a};
 };
 var $author$project$Main$Home = {$: 'Home'};
+var $author$project$Main$MapRoute = {$: 'MapRoute'};
 var $elm$url$Url$Parser$Parser = function (a) {
 	return {$: 'Parser', a: a};
 };
@@ -5996,6 +6202,10 @@ var $author$project$Main$routeParser = $elm$url$Url$Parser$oneOf(
 			A2($elm$url$Url$Parser$map, $author$project$Main$Home, $elm$url$Url$Parser$top),
 			A2(
 			$elm$url$Url$Parser$map,
+			$author$project$Main$MapRoute,
+			$elm$url$Url$Parser$s('map')),
+			A2(
+			$elm$url$Url$Parser$map,
 			$author$project$Main$EventDetail,
 			A2(
 				$elm$url$Url$Parser$slash,
@@ -6025,24 +6235,1107 @@ var $author$project$Main$parseUrl = function (url) {
 		return $author$project$Main$NotFound;
 	}
 };
+var $author$project$Events$EventCreated = function (a) {
+	return {$: 'EventCreated', a: a};
+};
+var $author$project$Events$EventDeleted = F2(
+	function (a, b) {
+		return {$: 'EventDeleted', a: a, b: b};
+	});
+var $author$project$Events$EventUpdated = function (a) {
+	return {$: 'EventUpdated', a: a};
+};
+var $author$project$Events$EventsFetched = function (a) {
+	return {$: 'EventsFetched', a: a};
+};
+var $elm$http$Http$Header = F2(
+	function (a, b) {
+		return {$: 'Header', a: a, b: b};
+	});
+var $elm$http$Http$header = $elm$http$Http$Header;
+var $author$project$PocketBase$authHeader = function (token) {
+	if (token.$ === 'Just') {
+		var t = token.a;
+		return _List_fromArray(
+			[
+				A2($elm$http$Http$header, 'Authorization', 'Bearer ' + t)
+			]);
+	} else {
+		return _List_Nil;
+	}
+};
+var $author$project$PocketBase$baseUrl = 'http://localhost:8090';
+var $author$project$Types$Event = function (id) {
+	return function (title) {
+		return function (description) {
+			return function (startDate) {
+				return function (endDate) {
+					return function (allDay) {
+						return function (url) {
+							return function (location) {
+								return function (state) {
+									return function (image) {
+										return function (imageDescription) {
+											return function (point) {
+												return function (created) {
+													return function (updated) {
+														return {allDay: allDay, created: created, description: description, endDate: endDate, id: id, image: image, imageDescription: imageDescription, location: location, point: point, startDate: startDate, state: state, title: title, updated: updated, url: url};
+													};
+												};
+											};
+										};
+									};
+								};
+							};
+						};
+					};
+				};
+			};
+		};
+	};
+};
+var $elm_community$json_extra$Json$Decode$Extra$andMap = $elm$json$Json$Decode$map2($elm$core$Basics$apR);
+var $elm$json$Json$Decode$bool = _Json_decodeBool;
+var $author$project$Types$Deleted = {$: 'Deleted'};
+var $author$project$Types$Pending = {$: 'Pending'};
+var $author$project$Types$Published = {$: 'Published'};
+var $elm$json$Json$Decode$andThen = _Json_andThen;
+var $elm$json$Json$Decode$fail = _Json_fail;
+var $elm$json$Json$Decode$string = _Json_decodeString;
+var $author$project$Types$eventStateDecoder = A2(
+	$elm$json$Json$Decode$andThen,
+	function (str) {
+		switch (str) {
+			case 'draft':
+				return $elm$json$Json$Decode$succeed($author$project$Types$Draft);
+			case 'pending':
+				return $elm$json$Json$Decode$succeed($author$project$Types$Pending);
+			case 'published':
+				return $elm$json$Json$Decode$succeed($author$project$Types$Published);
+			case 'deleted':
+				return $elm$json$Json$Decode$succeed($author$project$Types$Deleted);
+			default:
+				return $elm$json$Json$Decode$fail('Unknown event state: ' + str);
+		}
+	},
+	$elm$json$Json$Decode$string);
+var $elm$json$Json$Decode$field = _Json_decodeField;
+var $elm$json$Json$Decode$null = _Json_decodeNull;
+var $elm$json$Json$Decode$oneOf = _Json_oneOf;
+var $elm$json$Json$Decode$nullable = function (decoder) {
+	return $elm$json$Json$Decode$oneOf(
+		_List_fromArray(
+			[
+				$elm$json$Json$Decode$null($elm$core$Maybe$Nothing),
+				A2($elm$json$Json$Decode$map, $elm$core$Maybe$Just, decoder)
+			]));
+};
+var $elm$json$Json$Decode$decodeValue = _Json_run;
+var $elm$json$Json$Decode$value = _Json_decodeValue;
+var $elm_community$json_extra$Json$Decode$Extra$optionalField = F2(
+	function (fieldName, decoder) {
+		var finishDecoding = function (json) {
+			var _v0 = A2(
+				$elm$json$Json$Decode$decodeValue,
+				A2($elm$json$Json$Decode$field, fieldName, $elm$json$Json$Decode$value),
+				json);
+			if (_v0.$ === 'Ok') {
+				var val = _v0.a;
+				return A2(
+					$elm$json$Json$Decode$map,
+					$elm$core$Maybe$Just,
+					A2($elm$json$Json$Decode$field, fieldName, decoder));
+			} else {
+				return $elm$json$Json$Decode$succeed($elm$core$Maybe$Nothing);
+			}
+		};
+		return A2($elm$json$Json$Decode$andThen, finishDecoding, $elm$json$Json$Decode$value);
+	});
+var $author$project$Types$Point = F2(
+	function (lat, lon) {
+		return {lat: lat, lon: lon};
+	});
+var $elm$json$Json$Decode$float = _Json_decodeFloat;
+var $author$project$Types$pointDecoder = A3(
+	$elm$json$Json$Decode$map2,
+	$author$project$Types$Point,
+	A2($elm$json$Json$Decode$field, 'lat', $elm$json$Json$Decode$float),
+	A2($elm$json$Json$Decode$field, 'lon', $elm$json$Json$Decode$float));
+var $elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
+		}
+	});
+var $author$project$Types$eventDecoder = A2(
+	$elm_community$json_extra$Json$Decode$Extra$andMap,
+	A2($elm$json$Json$Decode$field, 'updated', $elm$json$Json$Decode$string),
+	A2(
+		$elm_community$json_extra$Json$Decode$Extra$andMap,
+		A2($elm$json$Json$Decode$field, 'created', $elm$json$Json$Decode$string),
+		A2(
+			$elm_community$json_extra$Json$Decode$Extra$andMap,
+			A2(
+				$elm$json$Json$Decode$map,
+				$elm$core$Maybe$withDefault($elm$core$Maybe$Nothing),
+				A2(
+					$elm_community$json_extra$Json$Decode$Extra$optionalField,
+					'point',
+					$elm$json$Json$Decode$nullable($author$project$Types$pointDecoder))),
+			A2(
+				$elm_community$json_extra$Json$Decode$Extra$andMap,
+				A2(
+					$elm$json$Json$Decode$map,
+					$elm$core$Maybe$withDefault($elm$core$Maybe$Nothing),
+					A2(
+						$elm_community$json_extra$Json$Decode$Extra$optionalField,
+						'image_description',
+						$elm$json$Json$Decode$nullable($elm$json$Json$Decode$string))),
+				A2(
+					$elm_community$json_extra$Json$Decode$Extra$andMap,
+					A2(
+						$elm$json$Json$Decode$map,
+						$elm$core$Maybe$withDefault($elm$core$Maybe$Nothing),
+						A2(
+							$elm_community$json_extra$Json$Decode$Extra$optionalField,
+							'image',
+							$elm$json$Json$Decode$nullable($elm$json$Json$Decode$string))),
+					A2(
+						$elm_community$json_extra$Json$Decode$Extra$andMap,
+						A2($elm$json$Json$Decode$field, 'state', $author$project$Types$eventStateDecoder),
+						A2(
+							$elm_community$json_extra$Json$Decode$Extra$andMap,
+							A2(
+								$elm$json$Json$Decode$map,
+								$elm$core$Maybe$withDefault($elm$core$Maybe$Nothing),
+								A2(
+									$elm_community$json_extra$Json$Decode$Extra$optionalField,
+									'location',
+									$elm$json$Json$Decode$nullable($elm$json$Json$Decode$string))),
+							A2(
+								$elm_community$json_extra$Json$Decode$Extra$andMap,
+								A2(
+									$elm$json$Json$Decode$map,
+									$elm$core$Maybe$withDefault($elm$core$Maybe$Nothing),
+									A2(
+										$elm_community$json_extra$Json$Decode$Extra$optionalField,
+										'url',
+										$elm$json$Json$Decode$nullable($elm$json$Json$Decode$string))),
+								A2(
+									$elm_community$json_extra$Json$Decode$Extra$andMap,
+									A2($elm$json$Json$Decode$field, 'all_day', $elm$json$Json$Decode$bool),
+									A2(
+										$elm_community$json_extra$Json$Decode$Extra$andMap,
+										A2(
+											$elm$json$Json$Decode$map,
+											$elm$core$Maybe$withDefault($elm$core$Maybe$Nothing),
+											A2(
+												$elm_community$json_extra$Json$Decode$Extra$optionalField,
+												'end_date',
+												$elm$json$Json$Decode$nullable($elm$json$Json$Decode$string))),
+										A2(
+											$elm_community$json_extra$Json$Decode$Extra$andMap,
+											A2($elm$json$Json$Decode$field, 'start_date', $elm$json$Json$Decode$string),
+											A2(
+												$elm_community$json_extra$Json$Decode$Extra$andMap,
+												A2(
+													$elm$json$Json$Decode$map,
+													$elm$core$Maybe$withDefault($elm$core$Maybe$Nothing),
+													A2(
+														$elm_community$json_extra$Json$Decode$Extra$optionalField,
+														'description',
+														$elm$json$Json$Decode$nullable($elm$json$Json$Decode$string))),
+												A2(
+													$elm_community$json_extra$Json$Decode$Extra$andMap,
+													A2($elm$json$Json$Decode$field, 'title', $elm$json$Json$Decode$string),
+													A2(
+														$elm_community$json_extra$Json$Decode$Extra$andMap,
+														A2($elm$json$Json$Decode$field, 'id', $elm$json$Json$Decode$string),
+														$elm$json$Json$Decode$succeed($author$project$Types$Event)))))))))))))));
+var $elm$json$Json$Encode$bool = _Json_wrap;
+var $elm$json$Json$Encode$string = _Json_wrap;
+var $author$project$Types$eventStateEncoder = function (state) {
+	return $elm$json$Json$Encode$string(
+		function () {
+			switch (state.$) {
+				case 'Draft':
+					return 'draft';
+				case 'Pending':
+					return 'pending';
+				case 'Published':
+					return 'published';
+				default:
+					return 'deleted';
+			}
+		}());
+};
+var $elm$json$Json$Encode$null = _Json_encodeNull;
+var $elm$json$Json$Encode$float = _Json_wrap;
+var $elm$json$Json$Encode$object = function (pairs) {
+	return _Json_wrap(
+		A3(
+			$elm$core$List$foldl,
+			F2(
+				function (_v0, obj) {
+					var k = _v0.a;
+					var v = _v0.b;
+					return A3(_Json_addField, k, v, obj);
+				}),
+			_Json_emptyObject(_Utils_Tuple0),
+			pairs));
+};
+var $author$project$Types$pointEncoder = function (point) {
+	return $elm$json$Json$Encode$object(
+		_List_fromArray(
+			[
+				_Utils_Tuple2(
+				'lat',
+				$elm$json$Json$Encode$float(point.lat)),
+				_Utils_Tuple2(
+				'lon',
+				$elm$json$Json$Encode$float(point.lon))
+			]));
+};
+var $author$project$Types$maybePointEncoder = function (maybe) {
+	if (maybe.$ === 'Just') {
+		var p = maybe.a;
+		return $author$project$Types$pointEncoder(p);
+	} else {
+		return $elm$json$Json$Encode$null;
+	}
+};
+var $author$project$Types$maybeStringEncoder = function (maybe) {
+	if (maybe.$ === 'Just') {
+		var s = maybe.a;
+		return $elm$json$Json$Encode$string(s);
+	} else {
+		return $elm$json$Json$Encode$null;
+	}
+};
+var $author$project$Types$eventEncoder = function (event) {
+	return $elm$json$Json$Encode$object(
+		_List_fromArray(
+			[
+				_Utils_Tuple2(
+				'id',
+				$elm$json$Json$Encode$string(event.id)),
+				_Utils_Tuple2(
+				'title',
+				$elm$json$Json$Encode$string(event.title)),
+				_Utils_Tuple2(
+				'description',
+				$author$project$Types$maybeStringEncoder(event.description)),
+				_Utils_Tuple2(
+				'start_date',
+				$elm$json$Json$Encode$string(event.startDate)),
+				_Utils_Tuple2(
+				'end_date',
+				$author$project$Types$maybeStringEncoder(event.endDate)),
+				_Utils_Tuple2(
+				'all_day',
+				$elm$json$Json$Encode$bool(event.allDay)),
+				_Utils_Tuple2(
+				'url',
+				$author$project$Types$maybeStringEncoder(event.url)),
+				_Utils_Tuple2(
+				'location',
+				$author$project$Types$maybeStringEncoder(event.location)),
+				_Utils_Tuple2(
+				'state',
+				$author$project$Types$eventStateEncoder(event.state)),
+				_Utils_Tuple2(
+				'image',
+				$author$project$Types$maybeStringEncoder(event.image)),
+				_Utils_Tuple2(
+				'image_description',
+				$author$project$Types$maybeStringEncoder(event.imageDescription)),
+				_Utils_Tuple2(
+				'point',
+				$author$project$Types$maybePointEncoder(event.point)),
+				_Utils_Tuple2(
+				'created',
+				$elm$json$Json$Encode$string(event.created)),
+				_Utils_Tuple2(
+				'updated',
+				$elm$json$Json$Encode$string(event.updated))
+			]));
+};
+var $elm$json$Json$Decode$decodeString = _Json_runOnString;
+var $elm$http$Http$BadStatus_ = F2(
+	function (a, b) {
+		return {$: 'BadStatus_', a: a, b: b};
+	});
+var $elm$http$Http$BadUrl_ = function (a) {
+	return {$: 'BadUrl_', a: a};
+};
+var $elm$http$Http$GoodStatus_ = F2(
+	function (a, b) {
+		return {$: 'GoodStatus_', a: a, b: b};
+	});
+var $elm$http$Http$NetworkError_ = {$: 'NetworkError_'};
+var $elm$http$Http$Receiving = function (a) {
+	return {$: 'Receiving', a: a};
+};
+var $elm$http$Http$Sending = function (a) {
+	return {$: 'Sending', a: a};
+};
+var $elm$http$Http$Timeout_ = {$: 'Timeout_'};
+var $elm$core$Maybe$isJust = function (maybe) {
+	if (maybe.$ === 'Just') {
+		return true;
+	} else {
+		return false;
+	}
+};
+var $elm$core$Platform$sendToSelf = _Platform_sendToSelf;
+var $elm$core$Basics$composeR = F3(
+	function (f, g, x) {
+		return g(
+			f(x));
+	});
+var $elm$http$Http$expectStringResponse = F2(
+	function (toMsg, toResult) {
+		return A3(
+			_Http_expect,
+			'',
+			$elm$core$Basics$identity,
+			A2($elm$core$Basics$composeR, toResult, toMsg));
+	});
+var $elm$core$Result$mapError = F2(
+	function (f, result) {
+		if (result.$ === 'Ok') {
+			var v = result.a;
+			return $elm$core$Result$Ok(v);
+		} else {
+			var e = result.a;
+			return $elm$core$Result$Err(
+				f(e));
+		}
+	});
+var $elm$http$Http$BadBody = function (a) {
+	return {$: 'BadBody', a: a};
+};
+var $elm$http$Http$BadStatus = function (a) {
+	return {$: 'BadStatus', a: a};
+};
+var $elm$http$Http$BadUrl = function (a) {
+	return {$: 'BadUrl', a: a};
+};
+var $elm$http$Http$NetworkError = {$: 'NetworkError'};
+var $elm$http$Http$Timeout = {$: 'Timeout'};
+var $elm$http$Http$resolve = F2(
+	function (toResult, response) {
+		switch (response.$) {
+			case 'BadUrl_':
+				var url = response.a;
+				return $elm$core$Result$Err(
+					$elm$http$Http$BadUrl(url));
+			case 'Timeout_':
+				return $elm$core$Result$Err($elm$http$Http$Timeout);
+			case 'NetworkError_':
+				return $elm$core$Result$Err($elm$http$Http$NetworkError);
+			case 'BadStatus_':
+				var metadata = response.a;
+				return $elm$core$Result$Err(
+					$elm$http$Http$BadStatus(metadata.statusCode));
+			default:
+				var body = response.b;
+				return A2(
+					$elm$core$Result$mapError,
+					$elm$http$Http$BadBody,
+					toResult(body));
+		}
+	});
+var $elm$http$Http$expectJson = F2(
+	function (toMsg, decoder) {
+		return A2(
+			$elm$http$Http$expectStringResponse,
+			toMsg,
+			$elm$http$Http$resolve(
+				function (string) {
+					return A2(
+						$elm$core$Result$mapError,
+						$elm$json$Json$Decode$errorToString,
+						A2($elm$json$Json$Decode$decodeString, decoder, string));
+				}));
+	});
+var $elm$http$Http$jsonBody = function (value) {
+	return A2(
+		_Http_pair,
+		'application/json',
+		A2($elm$json$Json$Encode$encode, 0, value));
+};
+var $elm$http$Http$Request = function (a) {
+	return {$: 'Request', a: a};
+};
+var $elm$http$Http$State = F2(
+	function (reqs, subs) {
+		return {reqs: reqs, subs: subs};
+	});
+var $elm$http$Http$init = $elm$core$Task$succeed(
+	A2($elm$http$Http$State, $elm$core$Dict$empty, _List_Nil));
+var $elm$core$Process$kill = _Scheduler_kill;
+var $elm$core$Process$spawn = _Scheduler_spawn;
+var $elm$http$Http$updateReqs = F3(
+	function (router, cmds, reqs) {
+		updateReqs:
+		while (true) {
+			if (!cmds.b) {
+				return $elm$core$Task$succeed(reqs);
+			} else {
+				var cmd = cmds.a;
+				var otherCmds = cmds.b;
+				if (cmd.$ === 'Cancel') {
+					var tracker = cmd.a;
+					var _v2 = A2($elm$core$Dict$get, tracker, reqs);
+					if (_v2.$ === 'Nothing') {
+						var $temp$router = router,
+							$temp$cmds = otherCmds,
+							$temp$reqs = reqs;
+						router = $temp$router;
+						cmds = $temp$cmds;
+						reqs = $temp$reqs;
+						continue updateReqs;
+					} else {
+						var pid = _v2.a;
+						return A2(
+							$elm$core$Task$andThen,
+							function (_v3) {
+								return A3(
+									$elm$http$Http$updateReqs,
+									router,
+									otherCmds,
+									A2($elm$core$Dict$remove, tracker, reqs));
+							},
+							$elm$core$Process$kill(pid));
+					}
+				} else {
+					var req = cmd.a;
+					return A2(
+						$elm$core$Task$andThen,
+						function (pid) {
+							var _v4 = req.tracker;
+							if (_v4.$ === 'Nothing') {
+								return A3($elm$http$Http$updateReqs, router, otherCmds, reqs);
+							} else {
+								var tracker = _v4.a;
+								return A3(
+									$elm$http$Http$updateReqs,
+									router,
+									otherCmds,
+									A3($elm$core$Dict$insert, tracker, pid, reqs));
+							}
+						},
+						$elm$core$Process$spawn(
+							A3(
+								_Http_toTask,
+								router,
+								$elm$core$Platform$sendToApp(router),
+								req)));
+				}
+			}
+		}
+	});
+var $elm$http$Http$onEffects = F4(
+	function (router, cmds, subs, state) {
+		return A2(
+			$elm$core$Task$andThen,
+			function (reqs) {
+				return $elm$core$Task$succeed(
+					A2($elm$http$Http$State, reqs, subs));
+			},
+			A3($elm$http$Http$updateReqs, router, cmds, state.reqs));
+	});
+var $elm$core$List$maybeCons = F3(
+	function (f, mx, xs) {
+		var _v0 = f(mx);
+		if (_v0.$ === 'Just') {
+			var x = _v0.a;
+			return A2($elm$core$List$cons, x, xs);
+		} else {
+			return xs;
+		}
+	});
+var $elm$core$List$filterMap = F2(
+	function (f, xs) {
+		return A3(
+			$elm$core$List$foldr,
+			$elm$core$List$maybeCons(f),
+			_List_Nil,
+			xs);
+	});
+var $elm$http$Http$maybeSend = F4(
+	function (router, desiredTracker, progress, _v0) {
+		var actualTracker = _v0.a;
+		var toMsg = _v0.b;
+		return _Utils_eq(desiredTracker, actualTracker) ? $elm$core$Maybe$Just(
+			A2(
+				$elm$core$Platform$sendToApp,
+				router,
+				toMsg(progress))) : $elm$core$Maybe$Nothing;
+	});
+var $elm$http$Http$onSelfMsg = F3(
+	function (router, _v0, state) {
+		var tracker = _v0.a;
+		var progress = _v0.b;
+		return A2(
+			$elm$core$Task$andThen,
+			function (_v1) {
+				return $elm$core$Task$succeed(state);
+			},
+			$elm$core$Task$sequence(
+				A2(
+					$elm$core$List$filterMap,
+					A3($elm$http$Http$maybeSend, router, tracker, progress),
+					state.subs)));
+	});
+var $elm$http$Http$Cancel = function (a) {
+	return {$: 'Cancel', a: a};
+};
+var $elm$http$Http$cmdMap = F2(
+	function (func, cmd) {
+		if (cmd.$ === 'Cancel') {
+			var tracker = cmd.a;
+			return $elm$http$Http$Cancel(tracker);
+		} else {
+			var r = cmd.a;
+			return $elm$http$Http$Request(
+				{
+					allowCookiesFromOtherDomains: r.allowCookiesFromOtherDomains,
+					body: r.body,
+					expect: A2(_Http_mapExpect, func, r.expect),
+					headers: r.headers,
+					method: r.method,
+					timeout: r.timeout,
+					tracker: r.tracker,
+					url: r.url
+				});
+		}
+	});
+var $elm$http$Http$MySub = F2(
+	function (a, b) {
+		return {$: 'MySub', a: a, b: b};
+	});
+var $elm$http$Http$subMap = F2(
+	function (func, _v0) {
+		var tracker = _v0.a;
+		var toMsg = _v0.b;
+		return A2(
+			$elm$http$Http$MySub,
+			tracker,
+			A2($elm$core$Basics$composeR, toMsg, func));
+	});
+_Platform_effectManagers['Http'] = _Platform_createManager($elm$http$Http$init, $elm$http$Http$onEffects, $elm$http$Http$onSelfMsg, $elm$http$Http$cmdMap, $elm$http$Http$subMap);
+var $elm$http$Http$command = _Platform_leaf('Http');
+var $elm$http$Http$subscription = _Platform_leaf('Http');
+var $elm$http$Http$request = function (r) {
+	return $elm$http$Http$command(
+		$elm$http$Http$Request(
+			{allowCookiesFromOtherDomains: false, body: r.body, expect: r.expect, headers: r.headers, method: r.method, timeout: r.timeout, tracker: r.tracker, url: r.url}));
+};
+var $author$project$PocketBase$createEvent = F3(
+	function (token, event, toMsg) {
+		return $elm$http$Http$request(
+			{
+				body: $elm$http$Http$jsonBody(
+					$author$project$Types$eventEncoder(event)),
+				expect: A2($elm$http$Http$expectJson, toMsg, $author$project$Types$eventDecoder),
+				headers: $author$project$PocketBase$authHeader(token),
+				method: 'POST',
+				timeout: $elm$core$Maybe$Nothing,
+				tracker: $elm$core$Maybe$Nothing,
+				url: $author$project$PocketBase$baseUrl + '/api/collections/events/records'
+			});
+	});
+var $elm$http$Http$emptyBody = _Http_emptyBody;
+var $elm$http$Http$expectBytesResponse = F2(
+	function (toMsg, toResult) {
+		return A3(
+			_Http_expect,
+			'arraybuffer',
+			_Http_toDataView,
+			A2($elm$core$Basics$composeR, toResult, toMsg));
+	});
+var $elm$http$Http$expectWhatever = function (toMsg) {
+	return A2(
+		$elm$http$Http$expectBytesResponse,
+		toMsg,
+		$elm$http$Http$resolve(
+			function (_v0) {
+				return $elm$core$Result$Ok(_Utils_Tuple0);
+			}));
+};
+var $author$project$PocketBase$deleteEvent = F3(
+	function (token, id, toMsg) {
+		return $elm$http$Http$request(
+			{
+				body: $elm$http$Http$emptyBody,
+				expect: $elm$http$Http$expectWhatever(toMsg),
+				headers: $author$project$PocketBase$authHeader(token),
+				method: 'DELETE',
+				timeout: $elm$core$Maybe$Nothing,
+				tracker: $elm$core$Maybe$Nothing,
+				url: $author$project$PocketBase$baseUrl + ('/api/collections/events/records/' + id)
+			});
+	});
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
+	});
+var $elm$json$Json$Decode$list = _Json_decodeList;
+var $author$project$PocketBase$eventsResponseDecoder = A2(
+	$elm$json$Json$Decode$field,
+	'items',
+	$elm$json$Json$Decode$list($author$project$Types$eventDecoder));
+var $author$project$PocketBase$getEvents = F2(
+	function (token, toMsg) {
+		return $elm$http$Http$request(
+			{
+				body: $elm$http$Http$emptyBody,
+				expect: A2($elm$http$Http$expectJson, toMsg, $author$project$PocketBase$eventsResponseDecoder),
+				headers: $author$project$PocketBase$authHeader(token),
+				method: 'GET',
+				timeout: $elm$core$Maybe$Nothing,
+				tracker: $elm$core$Maybe$Nothing,
+				url: $author$project$PocketBase$baseUrl + '/api/collections/events/records'
+			});
+	});
+var $elm$core$Basics$neq = _Utils_notEqual;
+var $elm$core$Platform$Cmd$batch = _Platform_batch;
+var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
+var $author$project$PocketBase$updateEvent = F4(
+	function (token, id, event, toMsg) {
+		return $elm$http$Http$request(
+			{
+				body: $elm$http$Http$jsonBody(
+					$author$project$Types$eventEncoder(event)),
+				expect: A2($elm$http$Http$expectJson, toMsg, $author$project$Types$eventDecoder),
+				headers: $author$project$PocketBase$authHeader(token),
+				method: 'PATCH',
+				timeout: $elm$core$Maybe$Nothing,
+				tracker: $elm$core$Maybe$Nothing,
+				url: $author$project$PocketBase$baseUrl + ('/api/collections/events/records/' + id)
+			});
+	});
+var $author$project$Events$update = F2(
+	function (msg, model) {
+		switch (msg.$) {
+			case 'FetchEvents':
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{error: $elm$core$Maybe$Nothing, loading: true}),
+					A2($author$project$PocketBase$getEvents, $elm$core$Maybe$Nothing, $author$project$Events$EventsFetched));
+			case 'EventsFetched':
+				var result = msg.a;
+				if (result.$ === 'Ok') {
+					var events = result.a;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{events: events, loading: false}),
+						$elm$core$Platform$Cmd$none);
+				} else {
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								error: $elm$core$Maybe$Just('Failed to fetch events'),
+								loading: false
+							}),
+						$elm$core$Platform$Cmd$none);
+				}
+			case 'CreateEvent':
+				var event = msg.a;
+				return _Utils_Tuple2(
+					model,
+					A3($author$project$PocketBase$createEvent, $elm$core$Maybe$Nothing, event, $author$project$Events$EventCreated));
+			case 'EventCreated':
+				var result = msg.a;
+				if (result.$ === 'Ok') {
+					var newEvent = result.a;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								events: A2($elm$core$List$cons, newEvent, model.events)
+							}),
+						$elm$core$Platform$Cmd$none);
+				} else {
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								error: $elm$core$Maybe$Just('Failed to create event')
+							}),
+						$elm$core$Platform$Cmd$none);
+				}
+			case 'UpdateEvent':
+				var id = msg.a;
+				var updatedEvent = msg.b;
+				return _Utils_Tuple2(
+					model,
+					A4($author$project$PocketBase$updateEvent, $elm$core$Maybe$Nothing, id, updatedEvent, $author$project$Events$EventUpdated));
+			case 'EventUpdated':
+				var result = msg.a;
+				if (result.$ === 'Ok') {
+					var updatedEvent = result.a;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								events: A2(
+									$elm$core$List$map,
+									function (e) {
+										return _Utils_eq(e.id, updatedEvent.id) ? updatedEvent : e;
+									},
+									model.events)
+							}),
+						$elm$core$Platform$Cmd$none);
+				} else {
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								error: $elm$core$Maybe$Just('Failed to update event')
+							}),
+						$elm$core$Platform$Cmd$none);
+				}
+			case 'DeleteEvent':
+				var id = msg.a;
+				return _Utils_Tuple2(
+					model,
+					A3(
+						$author$project$PocketBase$deleteEvent,
+						$elm$core$Maybe$Nothing,
+						id,
+						$author$project$Events$EventDeleted(id)));
+			default:
+				var id = msg.a;
+				var result = msg.b;
+				if (result.$ === 'Ok') {
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								events: A2(
+									$elm$core$List$filter,
+									function (e) {
+										return !_Utils_eq(e.id, id);
+									},
+									model.events)
+							}),
+						$elm$core$Platform$Cmd$none);
+				} else {
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								error: $elm$core$Maybe$Just('Failed to delete event')
+							}),
+						$elm$core$Platform$Cmd$none);
+				}
+		}
+	});
 var $author$project$Main$init = F3(
 	function (flags, url, key) {
+		var _v0 = A2($author$project$Events$update, $author$project$Events$FetchEvents, $author$project$Events$init);
+		var eventsModel = _v0.a;
+		var eventsCmd = _v0.b;
 		return _Utils_Tuple2(
-			A4(
-				$author$project$Main$Model,
-				key,
-				url,
-				$author$project$Main$parseUrl(url),
-				$author$project$Calendar$init),
-			$elm$core$Platform$Cmd$none);
+			$author$project$Main$Model(key)(url)(
+				$author$project$Main$parseUrl(url))($author$project$Calendar$init)(eventsModel)($author$project$Map$init)($author$project$EventForm$init)($elm$core$Maybe$Nothing)('')('')($elm$core$Maybe$Nothing),
+			A2($elm$core$Platform$Cmd$map, $author$project$Main$EventsMsg, eventsCmd));
 	});
+var $author$project$Main$AuthRemoved = {$: 'AuthRemoved'};
+var $author$project$Main$AuthStored = function (a) {
+	return {$: 'AuthStored', a: a};
+};
+var $author$project$Main$MapMarkerMoved = function (a) {
+	return {$: 'MapMarkerMoved', a: a};
+};
+var $elm$core$Basics$always = F2(
+	function (a, _v0) {
+		return a;
+	});
+var $author$project$Ports$authRemoved = _Platform_incomingPort(
+	'authRemoved',
+	$elm$json$Json$Decode$null(_Utils_Tuple0));
+var $author$project$Ports$authStored = _Platform_incomingPort(
+	'authStored',
+	A2(
+		$elm$json$Json$Decode$andThen,
+		function (user) {
+			return A2(
+				$elm$json$Json$Decode$andThen,
+				function (token) {
+					return $elm$json$Json$Decode$succeed(
+						{token: token, user: user});
+				},
+				A2(
+					$elm$json$Json$Decode$field,
+					'token',
+					$elm$json$Json$Decode$oneOf(
+						_List_fromArray(
+							[
+								$elm$json$Json$Decode$null($elm$core$Maybe$Nothing),
+								A2($elm$json$Json$Decode$map, $elm$core$Maybe$Just, $elm$json$Json$Decode$string)
+							]))));
+		},
+		A2(
+			$elm$json$Json$Decode$field,
+			'user',
+			$elm$json$Json$Decode$oneOf(
+				_List_fromArray(
+					[
+						$elm$json$Json$Decode$null($elm$core$Maybe$Nothing),
+						A2(
+						$elm$json$Json$Decode$map,
+						$elm$core$Maybe$Just,
+						A2(
+							$elm$json$Json$Decode$andThen,
+							function (name) {
+								return A2(
+									$elm$json$Json$Decode$andThen,
+									function (id) {
+										return A2(
+											$elm$json$Json$Decode$andThen,
+											function (email) {
+												return A2(
+													$elm$json$Json$Decode$andThen,
+													function (avatar) {
+														return $elm$json$Json$Decode$succeed(
+															{avatar: avatar, email: email, id: id, name: name});
+													},
+													A2(
+														$elm$json$Json$Decode$field,
+														'avatar',
+														$elm$json$Json$Decode$oneOf(
+															_List_fromArray(
+																[
+																	$elm$json$Json$Decode$null($elm$core$Maybe$Nothing),
+																	A2($elm$json$Json$Decode$map, $elm$core$Maybe$Just, $elm$json$Json$Decode$string)
+																]))));
+											},
+											A2($elm$json$Json$Decode$field, 'email', $elm$json$Json$Decode$string));
+									},
+									A2($elm$json$Json$Decode$field, 'id', $elm$json$Json$Decode$string));
+							},
+							A2(
+								$elm$json$Json$Decode$field,
+								'name',
+								$elm$json$Json$Decode$oneOf(
+									_List_fromArray(
+										[
+											$elm$json$Json$Decode$null($elm$core$Maybe$Nothing),
+											A2($elm$json$Json$Decode$map, $elm$core$Maybe$Just, $elm$json$Json$Decode$string)
+										])))))
+					])))));
 var $elm$core$Platform$Sub$batch = _Platform_batch;
-var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
+var $elm$json$Json$Decode$index = _Json_decodeIndex;
+var $author$project$Ports$mapMarkerMoved = _Platform_incomingPort(
+	'mapMarkerMoved',
+	A2(
+		$elm$json$Json$Decode$andThen,
+		function (_v0) {
+			return A2(
+				$elm$json$Json$Decode$andThen,
+				function (_v1) {
+					return $elm$json$Json$Decode$succeed(
+						_Utils_Tuple2(_v0, _v1));
+				},
+				A2($elm$json$Json$Decode$index, 1, $elm$json$Json$Decode$float));
+		},
+		A2($elm$json$Json$Decode$index, 0, $elm$json$Json$Decode$float)));
 var $author$project$Main$subscriptions = function (_v0) {
-	return $elm$core$Platform$Sub$none;
+	return $elm$core$Platform$Sub$batch(
+		_List_fromArray(
+			[
+				$author$project$Ports$authStored($author$project$Main$AuthStored),
+				$author$project$Ports$authRemoved(
+				$elm$core$Basics$always($author$project$Main$AuthRemoved)),
+				$author$project$Ports$mapMarkerMoved($author$project$Main$MapMarkerMoved)
+			]));
+};
+var $author$project$Main$EventFormMsg = function (a) {
+	return {$: 'EventFormMsg', a: a};
+};
+var $author$project$Main$LoginResult = function (a) {
+	return {$: 'LoginResult', a: a};
+};
+var $author$project$Main$LogoutResult = function (a) {
+	return {$: 'LogoutResult', a: a};
+};
+var $author$project$Main$MapMsg = function (a) {
+	return {$: 'MapMsg', a: a};
+};
+var $author$project$Map$MarkerMoved = function (a) {
+	return {$: 'MarkerMoved', a: a};
+};
+var $author$project$Calendar$SetEvents = function (a) {
+	return {$: 'SetEvents', a: a};
+};
+var $author$project$Main$httpErrorToString = function (error) {
+	switch (error.$) {
+		case 'BadUrl':
+			var url = error.a;
+			return 'Bad URL: ' + url;
+		case 'Timeout':
+			return 'Request timed out';
+		case 'NetworkError':
+			return 'Network error';
+		case 'BadStatus':
+			var status = error.a;
+			return 'Bad status: ' + $elm$core$String$fromInt(status);
+		default:
+			var body = error.a;
+			return 'Bad body: ' + body;
+	}
 };
 var $elm$browser$Browser$Navigation$load = _Browser_load;
+var $author$project$Types$Auth = F2(
+	function (user, token) {
+		return {token: token, user: user};
+	});
+var $author$project$Types$User = F4(
+	function (id, email, name, avatar) {
+		return {avatar: avatar, email: email, id: id, name: name};
+	});
+var $elm$json$Json$Decode$map4 = _Json_map4;
+var $author$project$PocketBase$userDecoder = A5(
+	$elm$json$Json$Decode$map4,
+	$author$project$Types$User,
+	A2($elm$json$Json$Decode$field, 'id', $elm$json$Json$Decode$string),
+	A2($elm$json$Json$Decode$field, 'email', $elm$json$Json$Decode$string),
+	A2(
+		$elm$json$Json$Decode$field,
+		'name',
+		$elm$json$Json$Decode$nullable($elm$json$Json$Decode$string)),
+	A2(
+		$elm$json$Json$Decode$field,
+		'avatar',
+		$elm$json$Json$Decode$nullable($elm$json$Json$Decode$string)));
+var $author$project$PocketBase$authResponseDecoder = A3(
+	$elm$json$Json$Decode$map2,
+	$author$project$Types$Auth,
+	A2(
+		$elm$json$Json$Decode$field,
+		'record',
+		$elm$json$Json$Decode$nullable($author$project$PocketBase$userDecoder)),
+	A2(
+		$elm$json$Json$Decode$field,
+		'token',
+		$elm$json$Json$Decode$nullable($elm$json$Json$Decode$string)));
+var $author$project$PocketBase$loginEncoder = function (credentials) {
+	return $elm$json$Json$Encode$object(
+		_List_fromArray(
+			[
+				_Utils_Tuple2(
+				'identity',
+				$elm$json$Json$Encode$string(credentials.email)),
+				_Utils_Tuple2(
+				'password',
+				$elm$json$Json$Encode$string(credentials.password))
+			]));
+};
+var $elm$http$Http$post = function (r) {
+	return $elm$http$Http$request(
+		{body: r.body, expect: r.expect, headers: _List_Nil, method: 'POST', timeout: $elm$core$Maybe$Nothing, tracker: $elm$core$Maybe$Nothing, url: r.url});
+};
+var $author$project$PocketBase$login = F2(
+	function (credentials, toMsg) {
+		return $elm$http$Http$post(
+			{
+				body: $elm$http$Http$jsonBody(
+					$author$project$PocketBase$loginEncoder(credentials)),
+				expect: A2($elm$http$Http$expectJson, toMsg, $author$project$PocketBase$authResponseDecoder),
+				url: $author$project$PocketBase$baseUrl + '/api/collections/users/auth-with-password'
+			});
+	});
+var $author$project$PocketBase$logout = F2(
+	function (token, toMsg) {
+		return $elm$http$Http$request(
+			{
+				body: $elm$http$Http$emptyBody,
+				expect: $elm$http$Http$expectWhatever(toMsg),
+				headers: _List_fromArray(
+					[
+						A2($elm$http$Http$header, 'Authorization', 'Bearer ' + token)
+					]),
+				method: 'POST',
+				timeout: $elm$core$Maybe$Nothing,
+				tracker: $elm$core$Maybe$Nothing,
+				url: $author$project$PocketBase$baseUrl + '/api/collections/users/auth-refresh'
+			});
+	});
 var $elm$browser$Browser$Navigation$pushUrl = _Browser_pushUrl;
+var $author$project$Ports$removeAuth = _Platform_outgoingPort(
+	'removeAuth',
+	function ($) {
+		return $elm$json$Json$Encode$null;
+	});
+var $elm$core$Maybe$destruct = F3(
+	function (_default, func, maybe) {
+		if (maybe.$ === 'Just') {
+			var a = maybe.a;
+			return func(a);
+		} else {
+			return _default;
+		}
+	});
+var $author$project$Ports$storeAuth = _Platform_outgoingPort(
+	'storeAuth',
+	function ($) {
+		return $elm$json$Json$Encode$object(
+			_List_fromArray(
+				[
+					_Utils_Tuple2(
+					'token',
+					function ($) {
+						return A3($elm$core$Maybe$destruct, $elm$json$Json$Encode$null, $elm$json$Json$Encode$string, $);
+					}($.token)),
+					_Utils_Tuple2(
+					'user',
+					function ($) {
+						return A3(
+							$elm$core$Maybe$destruct,
+							$elm$json$Json$Encode$null,
+							function ($) {
+								return $elm$json$Json$Encode$object(
+									_List_fromArray(
+										[
+											_Utils_Tuple2(
+											'avatar',
+											function ($) {
+												return A3($elm$core$Maybe$destruct, $elm$json$Json$Encode$null, $elm$json$Json$Encode$string, $);
+											}($.avatar)),
+											_Utils_Tuple2(
+											'email',
+											$elm$json$Json$Encode$string($.email)),
+											_Utils_Tuple2(
+											'id',
+											$elm$json$Json$Encode$string($.id)),
+											_Utils_Tuple2(
+											'name',
+											function ($) {
+												return A3($elm$core$Maybe$destruct, $elm$json$Json$Encode$null, $elm$json$Json$Encode$string, $);
+											}($.name))
+										]));
+							},
+							$);
+					}($.user))
+				]));
+	});
 var $elm$url$Url$addPort = F2(
 	function (maybePort, starter) {
 		if (maybePort.$ === 'Nothing') {
@@ -6116,7 +7409,6 @@ var $author$project$Calendar$daysInMonthsBefore = function (month) {
 	}
 };
 var $elm$core$Basics$modBy = _Basics_modBy;
-var $elm$core$Basics$neq = _Utils_notEqual;
 var $author$project$Calendar$isLeapYear = function (year) {
 	return (!A2($elm$core$Basics$modBy, 4, year)) && ((!(!A2($elm$core$Basics$modBy, 100, year))) || (!A2($elm$core$Basics$modBy, 400, year)));
 };
@@ -6377,6 +7669,252 @@ var $author$project$Calendar$update = F2(
 					});
 		}
 	});
+var $elm$core$List$isEmpty = function (xs) {
+	if (!xs.b) {
+		return true;
+	} else {
+		return false;
+	}
+};
+var $author$project$EventForm$addError = F3(
+	function (condition, error, errors) {
+		return condition ? A2($elm$core$List$cons, error, errors) : errors;
+	});
+var $author$project$EventForm$validate = function (model) {
+	var errors = A3(
+		$author$project$EventForm$addError,
+		$elm$core$String$isEmpty(model.startDate),
+		'Start date is required',
+		A3(
+			$author$project$EventForm$addError,
+			$elm$core$String$isEmpty(model.title),
+			'Title is required',
+			_List_Nil));
+	return _Utils_update(
+		model,
+		{errors: errors});
+};
+var $author$project$EventForm$update = F2(
+	function (msg, model) {
+		switch (msg.$) {
+			case 'SetTitle':
+				var title = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{title: title}),
+					$elm$core$Platform$Cmd$none);
+			case 'SetStartDate':
+				var startDate = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{startDate: startDate}),
+					$elm$core$Platform$Cmd$none);
+			case 'SetEndDate':
+				var endDate = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{endDate: endDate}),
+					$elm$core$Platform$Cmd$none);
+			case 'SetAllDay':
+				var allDay = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{allDay: allDay}),
+					$elm$core$Platform$Cmd$none);
+			case 'SetLocation':
+				var location = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{location: location}),
+					$elm$core$Platform$Cmd$none);
+			case 'SetDescription':
+				var description = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{description: description}),
+					$elm$core$Platform$Cmd$none);
+			case 'SetUrl':
+				var url = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{url: url}),
+					$elm$core$Platform$Cmd$none);
+			case 'SetImage':
+				var image = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							image: $elm$core$Maybe$Just(image)
+						}),
+					$elm$core$Platform$Cmd$none);
+			case 'SetImageDescription':
+				var imageDescription = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{imageDescription: imageDescription}),
+					$elm$core$Platform$Cmd$none);
+			case 'SetState':
+				var state = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{state: state}),
+					$elm$core$Platform$Cmd$none);
+			case 'SetPoint':
+				var point = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{point: point}),
+					$elm$core$Platform$Cmd$none);
+			case 'Submit':
+				var newModel = $author$project$EventForm$validate(model);
+				return $elm$core$List$isEmpty(newModel.errors) ? _Utils_Tuple2(newModel, $elm$core$Platform$Cmd$none) : _Utils_Tuple2(newModel, $elm$core$Platform$Cmd$none);
+			default:
+				return _Utils_Tuple2(
+					$author$project$EventForm$validate(model),
+					$elm$core$Platform$Cmd$none);
+		}
+	});
+var $elm$json$Json$Encode$int = _Json_wrap;
+var $elm$json$Json$Encode$list = F2(
+	function (func, entries) {
+		return _Json_wrap(
+			A3(
+				$elm$core$List$foldl,
+				_Json_addEntry(func),
+				_Json_emptyArray(_Utils_Tuple0),
+				entries));
+	});
+var $author$project$Ports$initMap = _Platform_outgoingPort(
+	'initMap',
+	function ($) {
+		return $elm$json$Json$Encode$object(
+			_List_fromArray(
+				[
+					_Utils_Tuple2(
+					'center',
+					function ($) {
+						var a = $.a;
+						var b = $.b;
+						return A2(
+							$elm$json$Json$Encode$list,
+							$elm$core$Basics$identity,
+							_List_fromArray(
+								[
+									$elm$json$Json$Encode$float(a),
+									$elm$json$Json$Encode$float(b)
+								]));
+					}($.center)),
+					_Utils_Tuple2(
+					'marker',
+					function ($) {
+						return A3(
+							$elm$core$Maybe$destruct,
+							$elm$json$Json$Encode$null,
+							function ($) {
+								var a = $.a;
+								var b = $.b;
+								return A2(
+									$elm$json$Json$Encode$list,
+									$elm$core$Basics$identity,
+									_List_fromArray(
+										[
+											$elm$json$Json$Encode$float(a),
+											$elm$json$Json$Encode$float(b)
+										]));
+							},
+							$);
+					}($.marker)),
+					_Utils_Tuple2(
+					'zoom',
+					$elm$json$Json$Encode$int($.zoom))
+				]));
+	});
+var $author$project$Ports$updateMap = _Platform_outgoingPort(
+	'updateMap',
+	function ($) {
+		return $elm$json$Json$Encode$object(
+			_List_fromArray(
+				[
+					_Utils_Tuple2(
+					'center',
+					function ($) {
+						var a = $.a;
+						var b = $.b;
+						return A2(
+							$elm$json$Json$Encode$list,
+							$elm$core$Basics$identity,
+							_List_fromArray(
+								[
+									$elm$json$Json$Encode$float(a),
+									$elm$json$Json$Encode$float(b)
+								]));
+					}($.center)),
+					_Utils_Tuple2(
+					'marker',
+					function ($) {
+						return A3(
+							$elm$core$Maybe$destruct,
+							$elm$json$Json$Encode$null,
+							function ($) {
+								var a = $.a;
+								var b = $.b;
+								return A2(
+									$elm$json$Json$Encode$list,
+									$elm$core$Basics$identity,
+									_List_fromArray(
+										[
+											$elm$json$Json$Encode$float(a),
+											$elm$json$Json$Encode$float(b)
+										]));
+							},
+							$);
+					}($.marker)),
+					_Utils_Tuple2(
+					'zoom',
+					$elm$json$Json$Encode$int($.zoom))
+				]));
+	});
+var $author$project$Map$update = F2(
+	function (msg, model) {
+		switch (msg.$) {
+			case 'InitMap':
+				return _Utils_Tuple2(
+					model,
+					$author$project$Ports$initMap(
+						{center: model.center, marker: model.marker, zoom: model.zoom}));
+			case 'UpdateMap':
+				var center = msg.a;
+				var zoom = msg.b;
+				var marker = msg.c;
+				var newModel = _Utils_update(
+					model,
+					{center: center, marker: marker, zoom: zoom});
+				return _Utils_Tuple2(
+					newModel,
+					$author$project$Ports$updateMap(
+						{center: center, marker: marker, zoom: zoom}));
+			default:
+				var pos = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							marker: $elm$core$Maybe$Just(pos)
+						}),
+					$elm$core$Platform$Cmd$none);
+		}
+	});
 var $author$project$Main$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
@@ -6406,7 +7944,7 @@ var $author$project$Main$update = F2(
 							url: url
 						}),
 					$elm$core$Platform$Cmd$none);
-			default:
+			case 'CalendarMsg':
 				var calendarMsg = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
@@ -6415,16 +7953,180 @@ var $author$project$Main$update = F2(
 							calendar: A2($author$project$Calendar$update, calendarMsg, model.calendar)
 						}),
 					$elm$core$Platform$Cmd$none);
+			case 'EventsMsg':
+				var eventsMsg = msg.a;
+				var updatedCalendar = function () {
+					if ((eventsMsg.$ === 'EventsFetched') && (eventsMsg.a.$ === 'Ok')) {
+						var events = eventsMsg.a.a;
+						return A2(
+							$author$project$Calendar$update,
+							$author$project$Calendar$SetEvents(events),
+							model.calendar);
+					} else {
+						return model.calendar;
+					}
+				}();
+				var _v2 = A2($author$project$Events$update, eventsMsg, model.events);
+				var updatedEvents = _v2.a;
+				var eventsCmd = _v2.b;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{calendar: updatedCalendar, events: updatedEvents}),
+					A2($elm$core$Platform$Cmd$map, $author$project$Main$EventsMsg, eventsCmd));
+			case 'MapMsg':
+				var mapMsg = msg.a;
+				var _v4 = A2($author$project$Map$update, mapMsg, model.map);
+				var updatedMap = _v4.a;
+				var mapCmd = _v4.b;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{map: updatedMap}),
+					A2($elm$core$Platform$Cmd$map, $author$project$Main$MapMsg, mapCmd));
+			case 'EventFormMsg':
+				var eventFormMsg = msg.a;
+				var _v5 = A2($author$project$EventForm$update, eventFormMsg, model.eventForm);
+				var updatedEventForm = _v5.a;
+				var eventFormCmd = _v5.b;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{eventForm: updatedEventForm}),
+					A2($elm$core$Platform$Cmd$map, $author$project$Main$EventFormMsg, eventFormCmd));
+			case 'AuthStored':
+				var auth = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							auth: $elm$core$Maybe$Just(auth)
+						}),
+					$elm$core$Platform$Cmd$none);
+			case 'AuthRemoved':
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{auth: $elm$core$Maybe$Nothing}),
+					$elm$core$Platform$Cmd$none);
+			case 'MapMarkerMoved':
+				var pos = msg.a;
+				var _v6 = A2(
+					$author$project$Map$update,
+					$author$project$Map$MarkerMoved(pos),
+					model.map);
+				var updatedMap = _v6.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{map: updatedMap}),
+					$elm$core$Platform$Cmd$none);
+			case 'Login':
+				var credentials = {email: model.loginEmail, password: model.loginPassword};
+				return _Utils_Tuple2(
+					model,
+					A2($author$project$PocketBase$login, credentials, $author$project$Main$LoginResult));
+			case 'Logout':
+				var _v7 = model.auth;
+				if (_v7.$ === 'Just') {
+					var auth = _v7.a;
+					var _v8 = auth.token;
+					if (_v8.$ === 'Just') {
+						var token = _v8.a;
+						return _Utils_Tuple2(
+							model,
+							A2($author$project$PocketBase$logout, token, $author$project$Main$LogoutResult));
+					} else {
+						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+					}
+				} else {
+					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+				}
+			case 'LoginResult':
+				var result = msg.a;
+				if (result.$ === 'Ok') {
+					var auth = result.a;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								auth: $elm$core$Maybe$Just(auth),
+								error: $elm$core$Maybe$Nothing
+							}),
+						$author$project$Ports$storeAuth(auth));
+				} else {
+					var err = result.a;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								error: $elm$core$Maybe$Just(
+									$author$project$Main$httpErrorToString(err))
+							}),
+						$elm$core$Platform$Cmd$none);
+				}
+			case 'LogoutResult':
+				var result = msg.a;
+				if (result.$ === 'Ok') {
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{auth: $elm$core$Maybe$Nothing, error: $elm$core$Maybe$Nothing}),
+						$author$project$Ports$removeAuth(_Utils_Tuple0));
+				} else {
+					var err = result.a;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								error: $elm$core$Maybe$Just(
+									$author$project$Main$httpErrorToString(err))
+							}),
+						$elm$core$Platform$Cmd$none);
+				}
+			case 'UpdateLoginEmail':
+				var email = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{loginEmail: email}),
+					$elm$core$Platform$Cmd$none);
+			default:
+				var password = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{loginPassword: password}),
+					$elm$core$Platform$Cmd$none);
 		}
 	});
 var $author$project$Main$CalendarMsg = function (a) {
 	return {$: 'CalendarMsg', a: a};
 };
+var $author$project$Main$Login = {$: 'Login'};
+var $author$project$Main$Logout = {$: 'Logout'};
+var $author$project$Button$Md = {$: 'Md'};
+var $author$project$Button$Primary = {$: 'Primary'};
+var $author$project$Button$Secondary = {$: 'Secondary'};
+var $author$project$Main$UpdateLoginEmail = function (a) {
+	return {$: 'UpdateLoginEmail', a: a};
+};
+var $author$project$Main$UpdateLoginPassword = function (a) {
+	return {$: 'UpdateLoginPassword', a: a};
+};
 var $elm$html$Html$a = _VirtualDom_node('a');
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$html$Html$h1 = _VirtualDom_node('h1');
+var $elm$core$List$head = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(x);
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
 var $elm$html$Html$header = _VirtualDom_node('header');
-var $elm$json$Json$Encode$string = _Json_wrap;
 var $elm$html$Html$Attributes$stringProperty = F2(
 	function (key, string) {
 		return A2(
@@ -6441,13 +8143,119 @@ var $elm$html$Html$Attributes$href = function (url) {
 var $elm$html$Html$main_ = _VirtualDom_node('main');
 var $elm$virtual_dom$VirtualDom$map = _VirtualDom_map;
 var $elm$html$Html$map = $elm$virtual_dom$VirtualDom$map;
+var $elm$core$Maybe$map = F2(
+	function (f, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return $elm$core$Maybe$Just(
+				f(value));
+		} else {
+			return $elm$core$Maybe$Nothing;
+		}
+	});
 var $elm$html$Html$nav = _VirtualDom_node('nav');
+var $elm$html$Html$p = _VirtualDom_node('p');
+var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
+var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
-var $author$project$Calendar$Next = {$: 'Next'};
-var $author$project$Calendar$Previous = {$: 'Previous'};
+var $elm$virtual_dom$VirtualDom$attribute = F2(
+	function (key, value) {
+		return A2(
+			_VirtualDom_attribute,
+			_VirtualDom_noOnOrFormAction(key),
+			_VirtualDom_noJavaScriptOrHtmlUri(value));
+	});
+var $elm$html$Html$Attributes$attribute = $elm$virtual_dom$VirtualDom$attribute;
 var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
+var $elm$html$Html$Attributes$boolProperty = F2(
+	function (key, bool) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			$elm$json$Json$Encode$bool(bool));
+	});
+var $elm$html$Html$Attributes$disabled = $elm$html$Html$Attributes$boolProperty('disabled');
+var $elm$virtual_dom$VirtualDom$Normal = function (a) {
+	return {$: 'Normal', a: a};
+};
+var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
+var $elm$html$Html$Events$on = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$Normal(decoder));
+	});
+var $elm$html$Html$Events$onClick = function (msg) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'click',
+		$elm$json$Json$Decode$succeed(msg));
+};
+var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
+var $author$project$Button$view = function (config) {
+	var variantClass = function () {
+		var _v3 = config.variant;
+		switch (_v3.$) {
+			case 'Primary':
+				return 'btn-primary';
+			case 'Secondary':
+				return 'btn-secondary';
+			default:
+				return 'btn-icon';
+		}
+	}();
+	var sizeClass = function () {
+		var _v2 = config.size;
+		switch (_v2.$) {
+			case 'Sm':
+				return 'btn-sm';
+			case 'Md':
+				return 'btn-md';
+			default:
+				return 'btn-lg';
+		}
+	}();
+	var disabledClass = config.disabled ? 'disabled' : '';
+	var classes = 'btn ' + (variantClass + (' ' + (sizeClass + (' ' + disabledClass))));
+	var attributes = _Utils_ap(
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class(classes),
+				$elm$html$Html$Attributes$type_(config.type_),
+				$elm$html$Html$Attributes$disabled(config.disabled)
+			]),
+		_Utils_ap(
+			function () {
+				var _v0 = config.ariaLabel;
+				if (_v0.$ === 'Just') {
+					var label = _v0.a;
+					return _List_fromArray(
+						[
+							A2($elm$html$Html$Attributes$attribute, 'aria-label', label)
+						]);
+				} else {
+					return _List_Nil;
+				}
+			}(),
+			function () {
+				var _v1 = config.onClick;
+				if (_v1.$ === 'Just') {
+					var msg = _v1.a;
+					return _List_fromArray(
+						[
+							$elm$html$Html$Events$onClick(msg)
+						]);
+				} else {
+					return _List_Nil;
+				}
+			}()));
+	return A2($elm$html$Html$button, attributes, config.children);
+};
+var $author$project$Calendar$Next = {$: 'Next'};
+var $author$project$Calendar$Previous = {$: 'Previous'};
 var $elm$core$Basics$round = _Basics_round;
 var $author$project$Calendar$addDays = F2(
 	function (days, posix) {
@@ -6766,23 +8574,6 @@ var $author$project$Calendar$monthYearString = function (posix) {
 	var month = A2($elm$time$Time$toMonth, $elm$time$Time$utc, posix);
 	return $author$project$Calendar$monthToString(month) + (' ' + $elm$core$String$fromInt(year));
 };
-var $elm$virtual_dom$VirtualDom$Normal = function (a) {
-	return {$: 'Normal', a: a};
-};
-var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
-var $elm$html$Html$Events$on = F2(
-	function (event, decoder) {
-		return A2(
-			$elm$virtual_dom$VirtualDom$on,
-			event,
-			$elm$virtual_dom$VirtualDom$Normal(decoder));
-	});
-var $elm$html$Html$Events$onClick = function (msg) {
-	return A2(
-		$elm$html$Html$Events$on,
-		'click',
-		$elm$json$Json$Decode$succeed(msg));
-};
 var $author$project$Calendar$viewEvent = function (event) {
 	return A2(
 		$elm$html$Html$div,
@@ -6961,6 +8752,574 @@ var $author$project$Calendar$view = function (model) {
 						])))
 			]));
 };
+var $author$project$EventForm$SetAllDay = function (a) {
+	return {$: 'SetAllDay', a: a};
+};
+var $author$project$EventForm$SetDescription = function (a) {
+	return {$: 'SetDescription', a: a};
+};
+var $author$project$EventForm$SetEndDate = function (a) {
+	return {$: 'SetEndDate', a: a};
+};
+var $author$project$EventForm$SetImage = function (a) {
+	return {$: 'SetImage', a: a};
+};
+var $author$project$EventForm$SetImageDescription = function (a) {
+	return {$: 'SetImageDescription', a: a};
+};
+var $author$project$EventForm$SetLocation = function (a) {
+	return {$: 'SetLocation', a: a};
+};
+var $author$project$EventForm$SetStartDate = function (a) {
+	return {$: 'SetStartDate', a: a};
+};
+var $author$project$EventForm$SetState = function (a) {
+	return {$: 'SetState', a: a};
+};
+var $author$project$EventForm$SetTitle = function (a) {
+	return {$: 'SetTitle', a: a};
+};
+var $author$project$EventForm$SetUrl = function (a) {
+	return {$: 'SetUrl', a: a};
+};
+var $author$project$EventForm$Submit = {$: 'Submit'};
+var $author$project$EventForm$Validate = {$: 'Validate'};
+var $elm$html$Html$Attributes$checked = $elm$html$Html$Attributes$boolProperty('checked');
+var $elm$html$Html$Attributes$for = $elm$html$Html$Attributes$stringProperty('htmlFor');
+var $elm$html$Html$Attributes$id = $elm$html$Html$Attributes$stringProperty('id');
+var $elm$html$Html$input = _VirtualDom_node('input');
+var $elm$html$Html$label = _VirtualDom_node('label');
+var $elm$html$Html$li = _VirtualDom_node('li');
+var $elm$html$Html$Attributes$name = $elm$html$Html$Attributes$stringProperty('name');
+var $elm$core$Basics$not = _Basics_not;
+var $elm$json$Json$Decode$at = F2(
+	function (fields, decoder) {
+		return A3($elm$core$List$foldr, $elm$json$Json$Decode$field, decoder, fields);
+	});
+var $elm$html$Html$Events$targetChecked = A2(
+	$elm$json$Json$Decode$at,
+	_List_fromArray(
+		['target', 'checked']),
+	$elm$json$Json$Decode$bool);
+var $elm$html$Html$Events$onCheck = function (tagger) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'change',
+		A2($elm$json$Json$Decode$map, tagger, $elm$html$Html$Events$targetChecked));
+};
+var $elm$html$Html$Events$alwaysStop = function (x) {
+	return _Utils_Tuple2(x, true);
+};
+var $elm$virtual_dom$VirtualDom$MayStopPropagation = function (a) {
+	return {$: 'MayStopPropagation', a: a};
+};
+var $elm$html$Html$Events$stopPropagationOn = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$MayStopPropagation(decoder));
+	});
+var $elm$html$Html$Events$targetValue = A2(
+	$elm$json$Json$Decode$at,
+	_List_fromArray(
+		['target', 'value']),
+	$elm$json$Json$Decode$string);
+var $elm$html$Html$Events$onInput = function (tagger) {
+	return A2(
+		$elm$html$Html$Events$stopPropagationOn,
+		'input',
+		A2(
+			$elm$json$Json$Decode$map,
+			$elm$html$Html$Events$alwaysStop,
+			A2($elm$json$Json$Decode$map, tagger, $elm$html$Html$Events$targetValue)));
+};
+var $elm$html$Html$Attributes$placeholder = $elm$html$Html$Attributes$stringProperty('placeholder');
+var $elm$html$Html$textarea = _VirtualDom_node('textarea');
+var $elm$html$Html$ul = _VirtualDom_node('ul');
+var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
+var $author$project$EventForm$view = function (model) {
+	return A2(
+		$elm$html$Html$div,
+		_List_Nil,
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$label,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$for('title')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Title')
+							])),
+						A2(
+						$elm$html$Html$input,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$type_('text'),
+								$elm$html$Html$Attributes$id('title'),
+								$elm$html$Html$Attributes$value(model.title),
+								$elm$html$Html$Events$onInput($author$project$EventForm$SetTitle),
+								$elm$html$Html$Attributes$placeholder('Event title')
+							]),
+						_List_Nil)
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$label,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$for('startDate')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Start Date')
+							])),
+						A2(
+						$elm$html$Html$input,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$type_('datetime-local'),
+								$elm$html$Html$Attributes$id('startDate'),
+								$elm$html$Html$Attributes$value(model.startDate),
+								$elm$html$Html$Events$onInput($author$project$EventForm$SetStartDate)
+							]),
+						_List_Nil)
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$label,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$for('endDate')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('End Date')
+							])),
+						A2(
+						$elm$html$Html$input,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$type_('datetime-local'),
+								$elm$html$Html$Attributes$id('endDate'),
+								$elm$html$Html$Attributes$value(model.endDate),
+								$elm$html$Html$Events$onInput($author$project$EventForm$SetEndDate)
+							]),
+						_List_Nil)
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$label,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$for('allDay')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('All Day')
+							])),
+						A2(
+						$elm$html$Html$input,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$type_('checkbox'),
+								$elm$html$Html$Attributes$id('allDay'),
+								$elm$html$Html$Attributes$checked(model.allDay),
+								$elm$html$Html$Events$onCheck($author$project$EventForm$SetAllDay)
+							]),
+						_List_Nil)
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$label,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$for('location')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Location')
+							])),
+						A2(
+						$elm$html$Html$input,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$type_('text'),
+								$elm$html$Html$Attributes$id('location'),
+								$elm$html$Html$Attributes$value(model.location),
+								$elm$html$Html$Events$onInput($author$project$EventForm$SetLocation),
+								$elm$html$Html$Attributes$placeholder('Event location')
+							]),
+						_List_Nil)
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$label,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$for('description')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Description')
+							])),
+						A2(
+						$elm$html$Html$textarea,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$id('description'),
+								$elm$html$Html$Attributes$value(model.description),
+								$elm$html$Html$Events$onInput($author$project$EventForm$SetDescription),
+								$elm$html$Html$Attributes$placeholder('Event description')
+							]),
+						_List_Nil)
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$label,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$for('url')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('URL')
+							])),
+						A2(
+						$elm$html$Html$input,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$type_('url'),
+								$elm$html$Html$Attributes$id('url'),
+								$elm$html$Html$Attributes$value(model.url),
+								$elm$html$Html$Events$onInput($author$project$EventForm$SetUrl),
+								$elm$html$Html$Attributes$placeholder('Event URL')
+							]),
+						_List_Nil)
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$label,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$for('image')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Image URL')
+							])),
+						A2(
+						$elm$html$Html$input,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$type_('url'),
+								$elm$html$Html$Attributes$id('image'),
+								$elm$html$Html$Attributes$value(
+								A2($elm$core$Maybe$withDefault, '', model.image)),
+								$elm$html$Html$Events$onInput($author$project$EventForm$SetImage),
+								$elm$html$Html$Attributes$placeholder('Image URL')
+							]),
+						_List_Nil)
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$label,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$for('imageDescription')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Image Description')
+							])),
+						A2(
+						$elm$html$Html$input,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$type_('text'),
+								$elm$html$Html$Attributes$id('imageDescription'),
+								$elm$html$Html$Attributes$value(model.imageDescription),
+								$elm$html$Html$Events$onInput($author$project$EventForm$SetImageDescription),
+								$elm$html$Html$Attributes$placeholder('Image description')
+							]),
+						_List_Nil)
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$label,
+						_List_Nil,
+						_List_fromArray(
+							[
+								$elm$html$Html$text('State')
+							])),
+						A2(
+						$elm$html$Html$div,
+						_List_Nil,
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$label,
+								_List_Nil,
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$input,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$type_('radio'),
+												$elm$html$Html$Attributes$name('state'),
+												$elm$html$Html$Attributes$checked(
+												_Utils_eq(model.state, $author$project$Types$Draft)),
+												$elm$html$Html$Events$onClick(
+												$author$project$EventForm$SetState($author$project$Types$Draft))
+											]),
+										_List_Nil),
+										$elm$html$Html$text('Draft')
+									])),
+								A2(
+								$elm$html$Html$label,
+								_List_Nil,
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$input,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$type_('radio'),
+												$elm$html$Html$Attributes$name('state'),
+												$elm$html$Html$Attributes$checked(
+												_Utils_eq(model.state, $author$project$Types$Pending)),
+												$elm$html$Html$Events$onClick(
+												$author$project$EventForm$SetState($author$project$Types$Pending))
+											]),
+										_List_Nil),
+										$elm$html$Html$text('Pending')
+									])),
+								A2(
+								$elm$html$Html$label,
+								_List_Nil,
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$input,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$type_('radio'),
+												$elm$html$Html$Attributes$name('state'),
+												$elm$html$Html$Attributes$checked(
+												_Utils_eq(model.state, $author$project$Types$Published)),
+												$elm$html$Html$Events$onClick(
+												$author$project$EventForm$SetState($author$project$Types$Published))
+											]),
+										_List_Nil),
+										$elm$html$Html$text('Published')
+									])),
+								A2(
+								$elm$html$Html$label,
+								_List_Nil,
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$input,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$type_('radio'),
+												$elm$html$Html$Attributes$name('state'),
+												$elm$html$Html$Attributes$checked(
+												_Utils_eq(model.state, $author$project$Types$Deleted)),
+												$elm$html$Html$Events$onClick(
+												$author$project$EventForm$SetState($author$project$Types$Deleted))
+											]),
+										_List_Nil),
+										$elm$html$Html$text('Deleted')
+									]))
+							]))
+					])),
+				(!$elm$core$List$isEmpty(model.errors)) ? A2(
+				$elm$html$Html$ul,
+				_List_Nil,
+				A2(
+					$elm$core$List$map,
+					function (error) {
+						return A2(
+							$elm$html$Html$li,
+							_List_Nil,
+							_List_fromArray(
+								[
+									$elm$html$Html$text(error)
+								]));
+					},
+					model.errors)) : $elm$html$Html$text(''),
+				A2(
+				$elm$html$Html$button,
+				_List_fromArray(
+					[
+						$elm$html$Html$Events$onClick($author$project$EventForm$Submit),
+						$elm$html$Html$Attributes$disabled(
+						!$elm$core$List$isEmpty(model.errors))
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Submit')
+					])),
+				A2(
+				$elm$html$Html$button,
+				_List_fromArray(
+					[
+						$elm$html$Html$Events$onClick($author$project$EventForm$Validate)
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Validate')
+					]))
+			]));
+};
+var $elm$html$Html$Attributes$accept = $elm$html$Html$Attributes$stringProperty('accept');
+var $elm$html$Html$Attributes$autofocus = $elm$html$Html$Attributes$boolProperty('autofocus');
+var $elm$html$Html$Attributes$max = $elm$html$Html$Attributes$stringProperty('max');
+var $elm$html$Html$Attributes$min = $elm$html$Html$Attributes$stringProperty('min');
+var $elm$html$Html$Events$onBlur = function (msg) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'blur',
+		$elm$json$Json$Decode$succeed(msg));
+};
+var $elm$html$Html$Events$onFocus = function (msg) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'focus',
+		$elm$json$Json$Decode$succeed(msg));
+};
+var $elm$html$Html$Attributes$pattern = $elm$html$Html$Attributes$stringProperty('pattern');
+var $elm$html$Html$Attributes$readonly = $elm$html$Html$Attributes$boolProperty('readOnly');
+var $elm$html$Html$Attributes$required = $elm$html$Html$Attributes$boolProperty('required');
+var $elm$html$Html$Attributes$step = function (n) {
+	return A2($elm$html$Html$Attributes$stringProperty, 'step', n);
+};
+var $author$project$Input$view = function (config) {
+	var baseClass = 'form-input';
+	var fullClass = function () {
+		var _v0 = config._class;
+		if (_v0.$ === 'Just') {
+			var c = _v0.a;
+			return baseClass + (' ' + c);
+		} else {
+			return baseClass;
+		}
+	}();
+	var attributes = _Utils_ap(
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$type_(config.type_),
+				$elm$html$Html$Attributes$value(config.value),
+				$elm$html$Html$Attributes$class(fullClass),
+				$elm$html$Html$Attributes$required(config.required),
+				$elm$html$Html$Attributes$disabled(config.disabled),
+				$elm$html$Html$Attributes$readonly(config.readonly),
+				$elm$html$Html$Attributes$autofocus(config.autofocus),
+				A2(
+				$elm$html$Html$Attributes$attribute,
+				'aria-invalid',
+				config.ariaInvalid ? 'true' : 'false'),
+				A2(
+				$elm$html$Html$Attributes$attribute,
+				'aria-required',
+				config.ariaRequired ? 'true' : 'false')
+			]),
+		A2(
+			$elm$core$List$filterMap,
+			$elm$core$Basics$identity,
+			_List_fromArray(
+				[
+					A2($elm$core$Maybe$map, $elm$html$Html$Attributes$placeholder, config.placeholder),
+					A2(
+					$elm$core$Maybe$map,
+					function (label) {
+						return A2($elm$html$Html$Attributes$attribute, 'aria-label', label);
+					},
+					config.ariaLabel),
+					A2(
+					$elm$core$Maybe$map,
+					function (desc) {
+						return A2($elm$html$Html$Attributes$attribute, 'aria-describedby', desc);
+					},
+					config.ariaDescribedBy),
+					A2($elm$core$Maybe$map, $elm$html$Html$Attributes$id, config.id),
+					A2($elm$core$Maybe$map, $elm$html$Html$Attributes$name, config.name),
+					A2($elm$core$Maybe$map, $elm$html$Html$Attributes$pattern, config.pattern),
+					A2($elm$core$Maybe$map, $elm$html$Html$Attributes$min, config.min),
+					A2($elm$core$Maybe$map, $elm$html$Html$Attributes$max, config.max),
+					A2($elm$core$Maybe$map, $elm$html$Html$Attributes$step, config.step),
+					A2($elm$core$Maybe$map, $elm$html$Html$Attributes$accept, config.accept),
+					A2($elm$core$Maybe$map, $elm$html$Html$Events$onInput, config.onInput),
+					A2(
+					$elm$core$Maybe$map,
+					function (handler) {
+						return A2(
+							$elm$html$Html$Events$on,
+							'change',
+							A2($elm$json$Json$Decode$map, handler, $elm$html$Html$Events$targetValue));
+					},
+					config.onChange),
+					A2($elm$core$Maybe$map, $elm$html$Html$Events$onBlur, config.onBlur),
+					A2($elm$core$Maybe$map, $elm$html$Html$Events$onFocus, config.onFocus)
+				])));
+	return A2($elm$html$Html$input, attributes, _List_Nil);
+};
+var $author$project$Map$view = function (model) {
+	return A2(
+		$elm$html$Html$div,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$id('map'),
+				A2($elm$html$Html$Attributes$style, 'height', '400px')
+			]),
+		_List_Nil);
+};
 var $author$project$Main$view = function (model) {
 	return {
 		body: _List_fromArray(
@@ -6995,6 +9354,17 @@ var $author$project$Main$view = function (model) {
 										$elm$html$Html$a,
 										_List_fromArray(
 											[
+												$elm$html$Html$Attributes$href('/map')
+											]),
+										_List_fromArray(
+											[
+												$elm$html$Html$text('Map')
+											])),
+										$elm$html$Html$text(' | '),
+										A2(
+										$elm$html$Html$a,
+										_List_fromArray(
+											[
 												$elm$html$Html$Attributes$href('/events/123')
 											]),
 										_List_fromArray(
@@ -7023,7 +9393,138 @@ var $author$project$Main$view = function (model) {
 											[
 												$elm$html$Html$text('Callback')
 											]))
-									]))
+									])),
+								A2(
+								$elm$html$Html$div,
+								_List_Nil,
+								_List_fromArray(
+									[
+										function () {
+										var _v0 = model.auth;
+										if (_v0.$ === 'Just') {
+											var auth = _v0.a;
+											return A2(
+												$elm$html$Html$div,
+												_List_Nil,
+												_List_fromArray(
+													[
+														$elm$html$Html$text(
+														'Logged in as: ' + A2(
+															$elm$core$Maybe$withDefault,
+															'Unknown',
+															A2(
+																$elm$core$Maybe$map,
+																function ($) {
+																	return $.email;
+																},
+																auth.user))),
+														$author$project$Button$view(
+														{
+															ariaLabel: $elm$core$Maybe$Nothing,
+															children: _List_fromArray(
+																[
+																	$elm$html$Html$text('Logout')
+																]),
+															disabled: false,
+															onClick: $elm$core$Maybe$Just($author$project$Main$Logout),
+															size: $author$project$Button$Md,
+															type_: 'button',
+															variant: $author$project$Button$Secondary
+														})
+													]));
+										} else {
+											return A2(
+												$elm$html$Html$div,
+												_List_Nil,
+												_List_fromArray(
+													[
+														$author$project$Input$view(
+														{
+															accept: $elm$core$Maybe$Nothing,
+															ariaDescribedBy: $elm$core$Maybe$Nothing,
+															ariaInvalid: false,
+															ariaLabel: $elm$core$Maybe$Nothing,
+															ariaRequired: false,
+															autofocus: false,
+															_class: $elm$core$Maybe$Nothing,
+															disabled: false,
+															id: $elm$core$Maybe$Nothing,
+															max: $elm$core$Maybe$Nothing,
+															min: $elm$core$Maybe$Nothing,
+															name: $elm$core$Maybe$Nothing,
+															onBlur: $elm$core$Maybe$Nothing,
+															onChange: $elm$core$Maybe$Nothing,
+															onFocus: $elm$core$Maybe$Nothing,
+															onInput: $elm$core$Maybe$Just($author$project$Main$UpdateLoginEmail),
+															pattern: $elm$core$Maybe$Nothing,
+															placeholder: $elm$core$Maybe$Just('Email'),
+															readonly: false,
+															required: false,
+															step: $elm$core$Maybe$Nothing,
+															type_: 'email',
+															value: model.loginEmail
+														}),
+														$author$project$Input$view(
+														{
+															accept: $elm$core$Maybe$Nothing,
+															ariaDescribedBy: $elm$core$Maybe$Nothing,
+															ariaInvalid: false,
+															ariaLabel: $elm$core$Maybe$Nothing,
+															ariaRequired: false,
+															autofocus: false,
+															_class: $elm$core$Maybe$Nothing,
+															disabled: false,
+															id: $elm$core$Maybe$Nothing,
+															max: $elm$core$Maybe$Nothing,
+															min: $elm$core$Maybe$Nothing,
+															name: $elm$core$Maybe$Nothing,
+															onBlur: $elm$core$Maybe$Nothing,
+															onChange: $elm$core$Maybe$Nothing,
+															onFocus: $elm$core$Maybe$Nothing,
+															onInput: $elm$core$Maybe$Just($author$project$Main$UpdateLoginPassword),
+															pattern: $elm$core$Maybe$Nothing,
+															placeholder: $elm$core$Maybe$Just('Password'),
+															readonly: false,
+															required: false,
+															step: $elm$core$Maybe$Nothing,
+															type_: 'password',
+															value: model.loginPassword
+														}),
+														$author$project$Button$view(
+														{
+															ariaLabel: $elm$core$Maybe$Nothing,
+															children: _List_fromArray(
+																[
+																	$elm$html$Html$text('Login')
+																]),
+															disabled: false,
+															onClick: $elm$core$Maybe$Just($author$project$Main$Login),
+															size: $author$project$Button$Md,
+															type_: 'button',
+															variant: $author$project$Button$Primary
+														})
+													]));
+										}
+									}()
+									])),
+								function () {
+								var _v1 = model.error;
+								if (_v1.$ === 'Just') {
+									var err = _v1.a;
+									return A2(
+										$elm$html$Html$div,
+										_List_fromArray(
+											[
+												A2($elm$html$Html$Attributes$style, 'color', 'red')
+											]),
+										_List_fromArray(
+											[
+												$elm$html$Html$text(err)
+											]));
+								} else {
+									return $elm$html$Html$text('');
+								}
+							}()
 							])),
 						A2(
 						$elm$html$Html$main_,
@@ -7031,46 +9532,141 @@ var $author$project$Main$view = function (model) {
 						_List_fromArray(
 							[
 								function () {
-								var _v0 = model.route;
-								switch (_v0.$) {
+								var _v2 = model.route;
+								switch (_v2.$) {
 									case 'Home':
 										return A2(
 											$elm$html$Html$map,
 											$author$project$Main$CalendarMsg,
 											$author$project$Calendar$view(model.calendar));
+									case 'MapRoute':
+										return A2(
+											$elm$html$Html$map,
+											$author$project$Main$MapMsg,
+											$author$project$Map$view(model.map));
 									case 'EventDetail':
-										var id = _v0.a;
-										return A2(
-											$elm$html$Html$h1,
-											_List_Nil,
-											_List_fromArray(
-												[
-													$elm$html$Html$text('Event Detail Page for ' + id)
-												]));
+										var id = _v2.a;
+										var _v3 = $elm$core$List$head(
+											A2(
+												$elm$core$List$filter,
+												function (e) {
+													return _Utils_eq(e.id, id);
+												},
+												model.events.events));
+										if (_v3.$ === 'Just') {
+											var event = _v3.a;
+											return A2(
+												$elm$html$Html$div,
+												_List_Nil,
+												_List_fromArray(
+													[
+														A2(
+														$elm$html$Html$h1,
+														_List_Nil,
+														_List_fromArray(
+															[
+																$elm$html$Html$text(event.title)
+															])),
+														A2(
+														$elm$html$Html$p,
+														_List_Nil,
+														_List_fromArray(
+															[
+																$elm$html$Html$text(
+																A2($elm$core$Maybe$withDefault, '', event.description))
+															])),
+														A2(
+														$elm$html$Html$p,
+														_List_Nil,
+														_List_fromArray(
+															[
+																$elm$html$Html$text('Start: ' + event.startDate)
+															])),
+														A2(
+														$elm$html$Html$p,
+														_List_Nil,
+														_List_fromArray(
+															[
+																$elm$html$Html$text(
+																'Location: ' + A2($elm$core$Maybe$withDefault, '', event.location))
+															])),
+														A2(
+														$elm$html$Html$a,
+														_List_fromArray(
+															[
+																$elm$html$Html$Attributes$href('/events/' + (id + '/edit'))
+															]),
+														_List_fromArray(
+															[
+																$elm$html$Html$text('Edit')
+															]))
+													]));
+										} else {
+											return A2(
+												$elm$html$Html$h1,
+												_List_Nil,
+												_List_fromArray(
+													[
+														$elm$html$Html$text('Event not found: ' + id)
+													]));
+										}
 									case 'EditEvent':
-										var id = _v0.a;
+										var id = _v2.a;
 										return A2(
-											$elm$html$Html$h1,
-											_List_Nil,
-											_List_fromArray(
-												[
-													$elm$html$Html$text('Edit Event Page for ' + id)
-												]));
+											$elm$html$Html$map,
+											$author$project$Main$EventFormMsg,
+											$author$project$EventForm$view(model.eventForm));
 									case 'Callback':
 										return A2(
-											$elm$html$Html$h1,
+											$elm$html$Html$div,
 											_List_Nil,
 											_List_fromArray(
 												[
-													$elm$html$Html$text('Auth Callback Page')
+													A2(
+													$elm$html$Html$h1,
+													_List_Nil,
+													_List_fromArray(
+														[
+															$elm$html$Html$text('Authentication Callback')
+														])),
+													A2(
+													$elm$html$Html$p,
+													_List_Nil,
+													_List_fromArray(
+														[
+															$elm$html$Html$text('Processing authentication...')
+														]))
 												]));
 									default:
 										return A2(
-											$elm$html$Html$h1,
+											$elm$html$Html$div,
 											_List_Nil,
 											_List_fromArray(
 												[
-													$elm$html$Html$text('Not Found')
+													A2(
+													$elm$html$Html$h1,
+													_List_Nil,
+													_List_fromArray(
+														[
+															$elm$html$Html$text('404 - Page Not Found')
+														])),
+													A2(
+													$elm$html$Html$p,
+													_List_Nil,
+													_List_fromArray(
+														[
+															$elm$html$Html$text('The page you are looking for does not exist.')
+														])),
+													A2(
+													$elm$html$Html$a,
+													_List_fromArray(
+														[
+															$elm$html$Html$Attributes$href('/')
+														]),
+													_List_fromArray(
+														[
+															$elm$html$Html$text('Go Home')
+														]))
 												]));
 								}
 							}()

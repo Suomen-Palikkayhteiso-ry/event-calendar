@@ -6,12 +6,14 @@ import Json.Encode as Encode
 import Types exposing (Auth, Event, User)
 
 
+
 -- Configuration
 
 
 baseUrl : String
 baseUrl =
     "http://localhost:8090"
+
 
 
 -- Authentication
@@ -67,6 +69,7 @@ logout token toMsg =
         , timeout = Nothing
         , tracker = Nothing
         }
+
 
 
 -- Event CRUD

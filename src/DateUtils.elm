@@ -3,6 +3,7 @@ module DateUtils exposing (..)
 import Time
 
 
+
 -- Parse UTC ISO string to Posix
 
 
@@ -12,7 +13,10 @@ parseUTCDate utcString =
     case String.split "T" utcString of
         [ date, timeWithZ ] ->
             let
-                time = String.dropRight 1 timeWithZ -- remove Z
+                time =
+                    String.dropRight 1 timeWithZ
+
+                -- remove Z
             in
             case String.split "-" date of
                 [ yStr, mStr, dStr ] ->
@@ -31,8 +35,11 @@ parseUTCDate utcString =
                                                                     case String.toInt sStr of
                                                                         Just s ->
                                                                             let
-                                                                                days = daysSinceEpoch y m d
-                                                                                millis = days * 24 * 60 * 60 * 1000 + h * 60 * 60 * 1000 + min * 60 * 1000 + s * 1000
+                                                                                days =
+                                                                                    daysSinceEpoch y m d
+
+                                                                                millis =
+                                                                                    days * 24 * 60 * 60 * 1000 + h * 60 * 60 * 1000 + min * 60 * 1000 + s * 1000
                                                                             in
                                                                             Time.millisToPosix millis
 
@@ -67,27 +74,49 @@ parseUTCDate utcString =
 daysSinceEpoch : Int -> Int -> Int -> Int
 daysSinceEpoch year month day =
     let
-        a = (14 - month) // 12
-        y = year + 4800 - a
-        m = month + 12 * a - 3
-        jd = day + (153 * m + 2) // 5 + 365 * y + y // 4 - y // 100 + y // 400 - 32045
+        a =
+            (14 - month) // 12
+
+        y =
+            year + 4800 - a
+
+        m =
+            month + 12 * a - 3
+
+        jd =
+            day + (153 * m + 2) // 5 + 365 * y + y // 4 - y // 100 + y // 400 - 32045
     in
-    jd - 2440588 -- days since 1970-01-01
+    jd - 2440588
 
 
+
+-- days since 1970-01-01
 -- Format date in Helsinki timezone (approximate)
 
 
 formatDateInHelsinki : String -> Bool -> String
 formatDateInHelsinki utcString allDay =
     let
-        posix = parseUTCDate utcString
+        posix =
+            parseUTCDate utcString
+
         -- Approximate Helsinki time (UTC +2 or +3)
-        helsinkiMillis = Time.posixToMillis posix + 2 * 60 * 60 * 1000 -- +2 hours
-        helsinkiPosix = Time.millisToPosix helsinkiMillis
-        year = Time.toYear Time.utc helsinkiPosix
-        month = Time.toMonth Time.utc helsinkiPosix
-        day = Time.toDay Time.utc helsinkiPosix
+        helsinkiMillis =
+            Time.posixToMillis posix + 2 * 60 * 60 * 1000
+
+        -- +2 hours
+        helsinkiPosix =
+            Time.millisToPosix helsinkiMillis
+
+        year =
+            Time.toYear Time.utc helsinkiPosix
+
+        month =
+            Time.toMonth Time.utc helsinkiPosix
+
+        day =
+            Time.toDay Time.utc helsinkiPosix
+
         dateStr =
             String.fromInt day
                 ++ "."
@@ -97,10 +126,15 @@ formatDateInHelsinki utcString allDay =
     in
     if allDay then
         dateStr
+
     else
         let
-            hour = Time.toHour Time.utc helsinkiPosix
-            minute = Time.toMinute Time.utc helsinkiPosix
+            hour =
+                Time.toHour Time.utc helsinkiPosix
+
+            minute =
+                Time.toMinute Time.utc helsinkiPosix
+
             timeStr =
                 String.padLeft 2 '0' (String.fromInt hour)
                     ++ ":"
@@ -112,18 +146,42 @@ formatDateInHelsinki utcString allDay =
 monthToInt : Time.Month -> Int
 monthToInt month =
     case month of
-        Time.Jan -> 1
-        Time.Feb -> 2
-        Time.Mar -> 3
-        Time.Apr -> 4
-        Time.May -> 5
-        Time.Jun -> 6
-        Time.Jul -> 7
-        Time.Aug -> 8
-        Time.Sep -> 9
-        Time.Oct -> 10
-        Time.Nov -> 11
-        Time.Dec -> 12
+        Time.Jan ->
+            1
+
+        Time.Feb ->
+            2
+
+        Time.Mar ->
+            3
+
+        Time.Apr ->
+            4
+
+        Time.May ->
+            5
+
+        Time.Jun ->
+            6
+
+        Time.Jul ->
+            7
+
+        Time.Aug ->
+            8
+
+        Time.Sep ->
+            9
+
+        Time.Oct ->
+            10
+
+        Time.Nov ->
+            11
+
+        Time.Dec ->
+            12
+
 
 
 -- Convert local date to UTC
@@ -132,25 +190,48 @@ monthToInt month =
 localDateToUTC : String -> String
 localDateToUTC localDateString =
     -- Assume local is Helsinki, convert to UTC
-    localDateString ++ "T00:00:00.000Z" -- placeholder
+    localDateString ++ "T00:00:00.000Z"
+
+
+
+-- placeholder
 
 
 localDateTimeToUTC : String -> String
 localDateTimeToUTC localDateTimeString =
-    localDateTimeString ++ ":00.000Z" -- placeholder
+    localDateTimeString ++ ":00.000Z"
+
+
+
+-- placeholder
 
 
 utcToHelsinkiDateTimeLocal : String -> String
 utcToHelsinkiDateTimeLocal utcString =
     let
-        posix = parseUTCDate utcString
-        helsinkiMillis = Time.posixToMillis posix + 2 * 60 * 60 * 1000
-        helsinkiPosix = Time.millisToPosix helsinkiMillis
-        year = Time.toYear Time.utc helsinkiPosix
-        month = Time.toMonth Time.utc helsinkiPosix
-        day = Time.toDay Time.utc helsinkiPosix
-        hour = Time.toHour Time.utc helsinkiPosix
-        minute = Time.toMinute Time.utc helsinkiPosix
+        posix =
+            parseUTCDate utcString
+
+        helsinkiMillis =
+            Time.posixToMillis posix + 2 * 60 * 60 * 1000
+
+        helsinkiPosix =
+            Time.millisToPosix helsinkiMillis
+
+        year =
+            Time.toYear Time.utc helsinkiPosix
+
+        month =
+            Time.toMonth Time.utc helsinkiPosix
+
+        day =
+            Time.toDay Time.utc helsinkiPosix
+
+        hour =
+            Time.toHour Time.utc helsinkiPosix
+
+        minute =
+            Time.toMinute Time.utc helsinkiPosix
     in
     String.fromInt year
         ++ "-"
@@ -166,11 +247,20 @@ utcToHelsinkiDateTimeLocal utcString =
 dateToHelsinkiDateString : Time.Posix -> String
 dateToHelsinkiDateString posix =
     let
-        helsinkiMillis = Time.posixToMillis posix + 2 * 60 * 60 * 1000
-        helsinkiPosix = Time.millisToPosix helsinkiMillis
-        year = Time.toYear Time.utc helsinkiPosix
-        month = Time.toMonth Time.utc helsinkiPosix
-        day = Time.toDay Time.utc helsinkiPosix
+        helsinkiMillis =
+            Time.posixToMillis posix + 2 * 60 * 60 * 1000
+
+        helsinkiPosix =
+            Time.millisToPosix helsinkiMillis
+
+        year =
+            Time.toYear Time.utc helsinkiPosix
+
+        month =
+            Time.toMonth Time.utc helsinkiPosix
+
+        day =
+            Time.toDay Time.utc helsinkiPosix
     in
     String.fromInt year
         ++ "-"

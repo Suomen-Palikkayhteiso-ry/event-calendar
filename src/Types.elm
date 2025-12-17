@@ -6,6 +6,7 @@ import Json.Encode as Encode
 import Time
 
 
+
 -- Event
 
 
@@ -104,15 +105,21 @@ eventEncoder event =
 maybeStringEncoder : Maybe String -> Encode.Value
 maybeStringEncoder maybe =
     case maybe of
-        Just s -> Encode.string s
-        Nothing -> Encode.null
+        Just s ->
+            Encode.string s
+
+        Nothing ->
+            Encode.null
 
 
 maybePointEncoder : Maybe Point -> Encode.Value
 maybePointEncoder maybe =
     case maybe of
-        Just p -> pointEncoder p
-        Nothing -> Encode.null
+        Just p ->
+            pointEncoder p
+
+        Nothing ->
+            Encode.null
 
 
 eventStateDecoder : Decode.Decoder EventState
@@ -170,6 +177,7 @@ pointEncoder point =
         ]
 
 
+
 -- User / Auth types
 
 
@@ -224,8 +232,12 @@ authEncoder auth =
 maybeUserEncoder : Maybe User -> Encode.Value
 maybeUserEncoder maybe =
     case maybe of
-        Just u -> userEncoder u
-        Nothing -> Encode.null
+        Just u ->
+            userEncoder u
+
+        Nothing ->
+            Encode.null
+
 
 
 -- Calendar state types

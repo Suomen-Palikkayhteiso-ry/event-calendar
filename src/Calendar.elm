@@ -7,6 +7,7 @@ import Time
 import Types exposing (Event)
 
 
+
 -- Model
 
 
@@ -29,6 +30,7 @@ init =
     }
 
 
+
 -- Msg
 
 
@@ -36,8 +38,11 @@ type Msg
     = SetView String
     | SetDate Time.Posix
     | SetEvents (List Event)
+    | AddEvent Event
+    | UpdateEvent Event
     | Next
     | Previous
+
 
 
 -- Update
@@ -55,11 +60,18 @@ update msg model =
         SetEvents events ->
             { model | events = events }
 
+        AddEvent event ->
+            { model | events = event :: model.events }
+
+        UpdateEvent event ->
+            { model | events = List.map (\e -> if e.id == event.id then event else e) model.events }
+
         Next ->
             { model | currentDate = addMonths 1 model.currentDate }
 
         Previous ->
             { model | currentDate = addMonths -1 model.currentDate }
+
 
 
 -- Helpers
@@ -68,15 +80,32 @@ update msg model =
 addMonths : Int -> Time.Posix -> Time.Posix
 addMonths months posix =
     let
-        year = Time.toYear Time.utc posix
-        month = Time.toMonth Time.utc posix
-        day = Time.toDay Time.utc posix
-        totalMonths = monthToInt month + months
-        newYear = year + (totalMonths // 12)
-        newMonthInt = modBy 12 totalMonths
-        newMonth = intToMonth newMonthInt
-        daysInNewMonth = daysInMonth newYear newMonth
-        newDay = min day daysInNewMonth
+        year =
+            Time.toYear Time.utc posix
+
+        month =
+            Time.toMonth Time.utc posix
+
+        day =
+            Time.toDay Time.utc posix
+
+        totalMonths =
+            monthToInt month + months
+
+        newYear =
+            year + (totalMonths // 12)
+
+        newMonthInt =
+            modBy 12 totalMonths
+
+        newMonth =
+            intToMonth newMonthInt
+
+        daysInNewMonth =
+            daysInMonth newYear newMonth
+
+        newDay =
+            min day daysInNewMonth
     in
     dateToPosix newYear newMonth newDay
 
@@ -85,8 +114,11 @@ dateToPosix : Int -> Time.Month -> Int -> Time.Posix
 dateToPosix year month day =
     -- Approximate calculation, ignoring time zones and leap seconds
     let
-        daysSinceEpoch = daysSince1970 year month day
-        millis = daysSinceEpoch * 24 * 60 * 60 * 1000
+        daysSinceEpoch =
+            daysSince1970 year month day
+
+        millis =
+            daysSinceEpoch * 24 * 60 * 60 * 1000
     in
     Time.millisToPosix millis
 
@@ -94,10 +126,23 @@ dateToPosix year month day =
 daysSince1970 : Int -> Time.Month -> Int -> Int
 daysSince1970 year month day =
     let
-        years = year - 1970
-        leapYears = (years // 4) - (years // 100) + (years // 400)
-        daysInYears = years * 365 + leapYears
-        daysInMonths = daysInMonthsBefore month + (if monthToInt month > 1 && isLeapYear year then 1 else 0)
+        years =
+            year - 1970
+
+        leapYears =
+            (years // 4) - (years // 100) + (years // 400)
+
+        daysInYears =
+            years * 365 + leapYears
+
+        daysInMonths =
+            daysInMonthsBefore month
+                + (if monthToInt month > 1 && isLeapYear year then
+                    1
+
+                   else
+                    0
+                  )
     in
     daysInYears + daysInMonths + day - 1
 
@@ -105,69 +150,153 @@ daysSince1970 year month day =
 daysInMonthsBefore : Time.Month -> Int
 daysInMonthsBefore month =
     case month of
-        Time.Jan -> 0
-        Time.Feb -> 31
-        Time.Mar -> 59
-        Time.Apr -> 90
-        Time.May -> 120
-        Time.Jun -> 151
-        Time.Jul -> 181
-        Time.Aug -> 212
-        Time.Sep -> 243
-        Time.Oct -> 273
-        Time.Nov -> 304
-        Time.Dec -> 334
+        Time.Jan ->
+            0
+
+        Time.Feb ->
+            31
+
+        Time.Mar ->
+            59
+
+        Time.Apr ->
+            90
+
+        Time.May ->
+            120
+
+        Time.Jun ->
+            151
+
+        Time.Jul ->
+            181
+
+        Time.Aug ->
+            212
+
+        Time.Sep ->
+            243
+
+        Time.Oct ->
+            273
+
+        Time.Nov ->
+            304
+
+        Time.Dec ->
+            334
 
 
 monthToInt : Time.Month -> Int
 monthToInt month =
     case month of
-        Time.Jan -> 0
-        Time.Feb -> 1
-        Time.Mar -> 2
-        Time.Apr -> 3
-        Time.May -> 4
-        Time.Jun -> 5
-        Time.Jul -> 6
-        Time.Aug -> 7
-        Time.Sep -> 8
-        Time.Oct -> 9
-        Time.Nov -> 10
-        Time.Dec -> 11
+        Time.Jan ->
+            0
+
+        Time.Feb ->
+            1
+
+        Time.Mar ->
+            2
+
+        Time.Apr ->
+            3
+
+        Time.May ->
+            4
+
+        Time.Jun ->
+            5
+
+        Time.Jul ->
+            6
+
+        Time.Aug ->
+            7
+
+        Time.Sep ->
+            8
+
+        Time.Oct ->
+            9
+
+        Time.Nov ->
+            10
+
+        Time.Dec ->
+            11
 
 
 intToMonth : Int -> Time.Month
 intToMonth int =
     case int of
-        0 -> Time.Jan
-        1 -> Time.Feb
-        2 -> Time.Mar
-        3 -> Time.Apr
-        4 -> Time.May
-        5 -> Time.Jun
-        6 -> Time.Jul
-        7 -> Time.Aug
-        8 -> Time.Sep
-        9 -> Time.Oct
-        10 -> Time.Nov
-        _ -> Time.Dec
+        0 ->
+            Time.Jan
+
+        1 ->
+            Time.Feb
+
+        2 ->
+            Time.Mar
+
+        3 ->
+            Time.Apr
+
+        4 ->
+            Time.May
+
+        5 ->
+            Time.Jun
+
+        6 ->
+            Time.Jul
+
+        7 ->
+            Time.Aug
+
+        8 ->
+            Time.Sep
+
+        9 ->
+            Time.Oct
+
+        10 ->
+            Time.Nov
+
+        _ ->
+            Time.Dec
 
 
 daysInMonth : Int -> Time.Month -> Int
 daysInMonth year month =
     case month of
         Time.Feb ->
-            if isLeapYear year then 29 else 28
-        Time.Apr -> 30
-        Time.Jun -> 30
-        Time.Sep -> 30
-        Time.Nov -> 30
-        _ -> 31
+            if isLeapYear year then
+                29
+
+            else
+                28
+
+        Time.Apr ->
+            30
+
+        Time.Jun ->
+            30
+
+        Time.Sep ->
+            30
+
+        Time.Nov ->
+            30
+
+        _ ->
+            31
 
 
 isLeapYear : Int -> Bool
 isLeapYear year =
     (modBy 4 year == 0) && (modBy 100 year /= 0 || modBy 400 year == 0)
+
 
 
 -- View helpers
@@ -183,12 +312,23 @@ type alias CalendarDay =
 getCalendarDays : Model -> List CalendarDay
 getCalendarDays model =
     let
-        year = Time.toYear Time.utc model.currentDate
-        month = Time.toMonth Time.utc model.currentDate
-        firstOfMonth = firstOfMonthPosix year month
-        lastOfMonth = lastOfMonthPosix year month
-        startOfWeekDate = startOfWeek firstOfMonth model.firstDay
-        endOfWeekDate = endOfWeek lastOfMonth model.firstDay
+        year =
+            Time.toYear Time.utc model.currentDate
+
+        month =
+            Time.toMonth Time.utc model.currentDate
+
+        firstOfMonth =
+            firstOfMonthPosix year month
+
+        lastOfMonth =
+            lastOfMonthPosix year month
+
+        startOfWeekDate =
+            startOfWeek firstOfMonth model.firstDay
+
+        endOfWeekDate =
+            endOfWeek lastOfMonth model.firstDay
     in
     generateDays startOfWeekDate endOfWeekDate month
 
@@ -206,10 +346,21 @@ lastOfMonthPosix year month =
 startOfWeek : Time.Posix -> Int -> Time.Posix
 startOfWeek posix firstDay =
     let
-        weekday = Time.toWeekday Time.utc posix
-        weekdayInt = weekdayToInt weekday
-        offset = modBy 7 (weekdayInt - firstDay + 7)
-        daysBack = if offset == 0 then 0 else offset
+        weekday =
+            Time.toWeekday Time.utc posix
+
+        weekdayInt =
+            weekdayToInt weekday
+
+        offset =
+            modBy 7 (weekdayInt - firstDay + 7)
+
+        daysBack =
+            if offset == 0 then
+                0
+
+            else
+                offset
     in
     addDays -daysBack posix
 
@@ -217,10 +368,21 @@ startOfWeek posix firstDay =
 endOfWeek : Time.Posix -> Int -> Time.Posix
 endOfWeek posix firstDay =
     let
-        weekday = Time.toWeekday Time.utc posix
-        weekdayInt = weekdayToInt weekday
-        offset = modBy 7 (firstDay - weekdayInt + 6)
-        daysForward = if offset == 6 then 6 else offset
+        weekday =
+            Time.toWeekday Time.utc posix
+
+        weekdayInt =
+            weekdayToInt weekday
+
+        offset =
+            modBy 7 (firstDay - weekdayInt + 6)
+
+        daysForward =
+            if offset == 6 then
+                6
+
+            else
+                offset
     in
     addDays daysForward posix
 
@@ -228,19 +390,33 @@ endOfWeek posix firstDay =
 weekdayToInt : Time.Weekday -> Int
 weekdayToInt weekday =
     case weekday of
-        Time.Mon -> 1
-        Time.Tue -> 2
-        Time.Wed -> 3
-        Time.Thu -> 4
-        Time.Fri -> 5
-        Time.Sat -> 6
-        Time.Sun -> 0
+        Time.Mon ->
+            1
+
+        Time.Tue ->
+            2
+
+        Time.Wed ->
+            3
+
+        Time.Thu ->
+            4
+
+        Time.Fri ->
+            5
+
+        Time.Sat ->
+            6
+
+        Time.Sun ->
+            0
 
 
 addDays : Int -> Time.Posix -> Time.Posix
 addDays days posix =
     let
-        millis = Time.posixToMillis posix + round (toFloat days * 24 * 60 * 60 * 1000)
+        millis =
+            Time.posixToMillis posix + round (toFloat days * 24 * 60 * 60 * 1000)
     in
     Time.millisToPosix millis
 
@@ -248,9 +424,14 @@ addDays days posix =
 generateDays : Time.Posix -> Time.Posix -> Time.Month -> List CalendarDay
 generateDays start end currentMonth =
     let
-        startMillis = Time.posixToMillis start
-        endMillis = Time.posixToMillis end
-        days = generateDaysHelper startMillis endMillis currentMonth []
+        startMillis =
+            Time.posixToMillis start
+
+        endMillis =
+            Time.posixToMillis end
+
+        days =
+            generateDaysHelper startMillis endMillis currentMonth []
     in
     List.reverse days
 
@@ -259,13 +440,22 @@ generateDaysHelper : Int -> Int -> Time.Month -> List CalendarDay -> List Calend
 generateDaysHelper currentMillis endMillis currentMonth acc =
     if currentMillis > endMillis then
         acc
+
     else
         let
-            posix = Time.millisToPosix currentMillis
-            isCurrent = Time.toMonth Time.utc posix == currentMonth
-            day = { date = posix, isCurrentMonth = isCurrent, events = [] } -- events to be filtered later
+            posix =
+                Time.millisToPosix currentMillis
+
+            isCurrent =
+                Time.toMonth Time.utc posix == currentMonth
+
+            day =
+                { date = posix, isCurrentMonth = isCurrent, events = [] }
+
+            -- events to be filtered later
         in
         generateDaysHelper (currentMillis + 24 * 60 * 60 * 1000) endMillis currentMonth (day :: acc)
+
 
 
 -- View
@@ -274,8 +464,11 @@ generateDaysHelper currentMillis endMillis currentMonth acc =
 view : Model -> Html.Html Msg
 view model =
     let
-        days = getCalendarDays model
-        weeks = groupByWeeks days
+        days =
+            getCalendarDays model
+
+        weeks =
+            groupByWeeks days
     in
     div [ class "calendar" ]
         [ div [ class "calendar-header" ]
@@ -295,8 +488,11 @@ view model =
 monthYearString : Time.Posix -> String
 monthYearString posix =
     let
-        year = Time.toYear Time.utc posix
-        month = Time.toMonth Time.utc posix
+        year =
+            Time.toYear Time.utc posix
+
+        month =
+            Time.toMonth Time.utc posix
     in
     monthToString month ++ " " ++ String.fromInt year
 
@@ -304,24 +500,48 @@ monthYearString posix =
 monthToString : Time.Month -> String
 monthToString month =
     case month of
-        Time.Jan -> "January"
-        Time.Feb -> "February"
-        Time.Mar -> "March"
-        Time.Apr -> "April"
-        Time.May -> "May"
-        Time.Jun -> "June"
-        Time.Jul -> "July"
-        Time.Aug -> "August"
-        Time.Sep -> "September"
-        Time.Oct -> "October"
-        Time.Nov -> "November"
-        Time.Dec -> "December"
+        Time.Jan ->
+            "January"
+
+        Time.Feb ->
+            "February"
+
+        Time.Mar ->
+            "March"
+
+        Time.Apr ->
+            "April"
+
+        Time.May ->
+            "May"
+
+        Time.Jun ->
+            "June"
+
+        Time.Jul ->
+            "July"
+
+        Time.Aug ->
+            "August"
+
+        Time.Sep ->
+            "September"
+
+        Time.Oct ->
+            "October"
+
+        Time.Nov ->
+            "November"
+
+        Time.Dec ->
+            "December"
 
 
 weekdayHeader : Int -> Html.Html Msg
 weekdayHeader weekdayInt =
     let
-        weekday = intToWeekday weekdayInt
+        weekday =
+            intToWeekday weekdayInt
     in
     div [ class "calendar-weekday" ] [ text (weekdayToString weekday) ]
 
@@ -329,26 +549,54 @@ weekdayHeader weekdayInt =
 intToWeekday : Int -> Time.Weekday
 intToWeekday int =
     case int of
-        0 -> Time.Sun
-        1 -> Time.Mon
-        2 -> Time.Tue
-        3 -> Time.Wed
-        4 -> Time.Thu
-        5 -> Time.Fri
-        6 -> Time.Sat
-        _ -> Time.Mon
+        0 ->
+            Time.Sun
+
+        1 ->
+            Time.Mon
+
+        2 ->
+            Time.Tue
+
+        3 ->
+            Time.Wed
+
+        4 ->
+            Time.Thu
+
+        5 ->
+            Time.Fri
+
+        6 ->
+            Time.Sat
+
+        _ ->
+            Time.Mon
 
 
 weekdayToString : Time.Weekday -> String
 weekdayToString weekday =
     case weekday of
-        Time.Mon -> "Mon"
-        Time.Tue -> "Tue"
-        Time.Wed -> "Wed"
-        Time.Thu -> "Thu"
-        Time.Fri -> "Fri"
-        Time.Sat -> "Sat"
-        Time.Sun -> "Sun"
+        Time.Mon ->
+            "Mon"
+
+        Time.Tue ->
+            "Tue"
+
+        Time.Wed ->
+            "Wed"
+
+        Time.Thu ->
+            "Thu"
+
+        Time.Fri ->
+            "Fri"
+
+        Time.Sat ->
+            "Sat"
+
+        Time.Sun ->
+            "Sun"
 
 
 viewWeek : List CalendarDay -> Html.Html Msg
@@ -362,6 +610,7 @@ viewDay day =
         dayClasses =
             if day.isCurrentMonth then
                 "calendar-day current-month"
+
             else
                 "calendar-day other-month"
     in
@@ -379,10 +628,15 @@ viewEvent event =
 groupByWeeks : List CalendarDay -> List (List CalendarDay)
 groupByWeeks days =
     case days of
-        [] -> []
-        _ -> 
+        [] ->
+            []
+
+        _ ->
             let
-                week = List.take 7 days
-                rest = List.drop 7 days
+                week =
+                    List.take 7 days
+
+                rest =
+                    List.drop 7 days
             in
             week :: groupByWeeks rest

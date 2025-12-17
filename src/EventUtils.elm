@@ -2,7 +2,7 @@ module EventUtils exposing (..)
 
 import DateUtils
 import Time
-import Types exposing (Event, EventFormData, EventState(..), Point, DisplayEvent)
+import Types exposing (DisplayEvent, Event, EventFormData, EventState(..), Point)
 
 
 eventToFormData : Event -> EventFormData
@@ -24,21 +24,39 @@ eventToFormData event =
 formatEventForDisplay : Event -> DisplayEvent
 formatEventForDisplay event =
     let
-        startPosix = DateUtils.parseUTCDate event.startDate
+        startPosix =
+            DateUtils.parseUTCDate event.startDate
+
         -- Approximate Helsinki
-        helsinkiMillis = Time.posixToMillis startPosix + 2 * 60 * 60 * 1000
-        helsinkiPosix = Time.millisToPosix helsinkiMillis
-        year = Time.toYear Time.utc helsinkiPosix
-        month = Time.toMonth Time.utc helsinkiPosix
-        day = Time.toDay Time.utc helsinkiPosix
-        displayDate = String.fromInt day ++ "." ++ String.fromInt (DateUtils.monthToInt month) ++ "." ++ String.fromInt year
+        helsinkiMillis =
+            Time.posixToMillis startPosix + 2 * 60 * 60 * 1000
+
+        helsinkiPosix =
+            Time.millisToPosix helsinkiMillis
+
+        year =
+            Time.toYear Time.utc helsinkiPosix
+
+        month =
+            Time.toMonth Time.utc helsinkiPosix
+
+        day =
+            Time.toDay Time.utc helsinkiPosix
+
+        displayDate =
+            String.fromInt day ++ "." ++ String.fromInt (DateUtils.monthToInt month) ++ "." ++ String.fromInt year
+
         displayTime =
             if event.allDay then
                 "Koko päivä"
+
             else
                 let
-                    hour = Time.toHour Time.utc helsinkiPosix
-                    minute = Time.toMinute Time.utc helsinkiPosix
+                    hour =
+                        Time.toHour Time.utc helsinkiPosix
+
+                    minute =
+                        Time.toMinute Time.utc helsinkiPosix
                 in
                 String.padLeft 2 '0' (String.fromInt hour) ++ ":" ++ String.padLeft 2 '0' (String.fromInt minute)
     in
@@ -48,9 +66,15 @@ formatEventForDisplay event =
 isEventOngoing : Event -> Bool
 isEventOngoing event =
     let
-        now = Time.millisToPosix 0 -- placeholder for current time
-        start = DateUtils.parseUTCDate event.startDate
-        end = event.endDate |> Maybe.map DateUtils.parseUTCDate |> Maybe.withDefault start
+        now =
+            Time.millisToPosix 0
+
+        -- placeholder for current time
+        start =
+            DateUtils.parseUTCDate event.startDate
+
+        end =
+            event.endDate |> Maybe.map DateUtils.parseUTCDate |> Maybe.withDefault start
     in
     Time.posixToMillis now >= Time.posixToMillis start && Time.posixToMillis now <= Time.posixToMillis end
 
@@ -58,8 +82,11 @@ isEventOngoing event =
 isEventUpcoming : Event -> Bool
 isEventUpcoming event =
     let
-        now = Time.millisToPosix 0
-        start = DateUtils.parseUTCDate event.startDate
+        now =
+            Time.millisToPosix 0
+
+        start =
+            DateUtils.parseUTCDate event.startDate
     in
     Time.posixToMillis start > Time.posixToMillis now
 
@@ -67,7 +94,10 @@ isEventUpcoming event =
 isEventPast : Event -> Bool
 isEventPast event =
     let
-        now = Time.millisToPosix 0
-        end = event.endDate |> Maybe.map DateUtils.parseUTCDate |> Maybe.withDefault (DateUtils.parseUTCDate event.startDate)
+        now =
+            Time.millisToPosix 0
+
+        end =
+            event.endDate |> Maybe.map DateUtils.parseUTCDate |> Maybe.withDefault (DateUtils.parseUTCDate event.startDate)
     in
     Time.posixToMillis end < Time.posixToMillis now

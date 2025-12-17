@@ -5,6 +5,7 @@ import PocketBase
 import Types exposing (Event)
 
 
+
 -- Model
 
 
@@ -23,6 +24,7 @@ init =
     }
 
 
+
 -- Msg
 
 
@@ -35,6 +37,7 @@ type Msg
     | EventUpdated (Result Http.Error Event)
     | DeleteEvent String
     | EventDeleted String (Result Http.Error ())
+
 
 
 -- Update
@@ -85,7 +88,18 @@ update msg model =
         EventUpdated result ->
             case result of
                 Ok updatedEvent ->
-                    ( { model | events = List.map (\e -> if e.id == updatedEvent.id then updatedEvent else e) model.events }
+                    ( { model
+                        | events =
+                            List.map
+                                (\e ->
+                                    if e.id == updatedEvent.id then
+                                        updatedEvent
+
+                                    else
+                                        e
+                                )
+                                model.events
+                      }
                     , Cmd.none
                     )
 

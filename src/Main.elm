@@ -157,9 +157,24 @@ update msg model =
                     ( model, Nav.load href )
 
         UrlChanged url ->
-            ( { model | url = url, route = parseUrl url }
-            , Cmd.none
-            )
+            let
+                newRoute = parseUrl url
+                newModel = { model | url = url, route = newRoute }
+            in
+            case newRoute of
+                EditEvent id ->
+                    case List.head (List.filter (\e -> e.id == id) model.events.events) of
+                        Just event ->
+                            let
+                                ( updatedEventForm, _ ) = EventForm.update (EventForm.LoadEvent event) model.eventForm
+                            in
+                            ( { newModel | eventForm = updatedEventForm }, Cmd.none )
+
+                        Nothing ->
+                            ( newModel, Cmd.none )
+
+                _ ->
+                    ( newModel, Cmd.none )
 
         CalendarMsg calendarMsg ->
             ( { model | calendar = Calendar.update calendarMsg model.calendar }
@@ -175,6 +190,12 @@ update msg model =
                     case eventsMsg of
                         Events.EventsFetched (Ok events) ->
                             Calendar.update (Calendar.SetEvents events) model.calendar
+
+                        Events.EventCreated (Ok event) ->
+                            Calendar.update (Calendar.AddEvent event) model.calendar
+
+                        Events.EventUpdated (Ok event) ->
+                            Calendar.update (Calendar.UpdateEvent event) model.calendar
 
                         _ ->
                             model.calendar
@@ -194,11 +215,32 @@ update msg model =
 
         EventFormMsg eventFormMsg ->
             let
-                ( updatedEventForm, eventFormCmd ) =
+                ( updatedEventForm, action ) =
                     EventForm.update eventFormMsg model.eventForm
+
+                cmd =
+                    case action of
+                        Just (EventForm.CreateEvent event) ->
+                            case model.auth of
+                                Just auth ->
+                                    PocketBase.createEvent auth.token event (Events.EventCreated >> EventsMsg)
+
+                                Nothing ->
+                                    Cmd.none
+
+                        Just (EventForm.UpdateEvent id event) ->
+                            case model.auth of
+                                Just auth ->
+                                    PocketBase.updateEvent auth.token id event (Events.EventUpdated >> EventsMsg)
+
+                                Nothing ->
+                                    Cmd.none
+
+                        Nothing ->
+                            Cmd.none
             in
             ( { model | eventForm = updatedEventForm }
-            , Cmd.map EventFormMsg eventFormCmd
+            , cmd
             )
 
         AuthStored auth ->

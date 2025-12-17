@@ -6,6 +6,11 @@ import Html.Events exposing (onInput, onCheck, onClick)
 import Types exposing (Event, EventState(..), Point)
 
 
+type Action
+    = CreateEvent Event
+    | UpdateEvent String Event
+
+
 
 -- Model
 
@@ -23,7 +28,13 @@ type alias Model =
     , state : EventState
     , point : Maybe Point
     , errors : List String
+    , mode : Mode
     }
+
+
+type Mode
+    = Create
+    | Edit String
 
 
 init : Model
@@ -40,6 +51,7 @@ init =
     , state = Draft
     , point = Nothing
     , errors = []
+    , mode = Create
     }
 
 
@@ -61,47 +73,48 @@ type Msg
     | SetPoint (Maybe Point)
     | Submit
     | Validate
+    | LoadEvent Event
 
 
 
 -- Update
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
+update : Msg -> Model -> ( Model, Maybe Action )
 update msg model =
     case msg of
         SetTitle title ->
-            ( { model | title = title }, Cmd.none )
+            ( { model | title = title }, Nothing )
 
         SetStartDate startDate ->
-            ( { model | startDate = startDate }, Cmd.none )
+            ( { model | startDate = startDate }, Nothing )
 
         SetEndDate endDate ->
-            ( { model | endDate = endDate }, Cmd.none )
+            ( { model | endDate = endDate }, Nothing )
 
         SetAllDay allDay ->
-            ( { model | allDay = allDay }, Cmd.none )
+            ( { model | allDay = allDay }, Nothing )
 
         SetLocation location ->
-            ( { model | location = location }, Cmd.none )
+            ( { model | location = location }, Nothing )
 
         SetDescription description ->
-            ( { model | description = description }, Cmd.none )
+            ( { model | description = description }, Nothing )
 
         SetUrl url ->
-            ( { model | url = url }, Cmd.none )
+            ( { model | url = url }, Nothing )
 
         SetImage image ->
-            ( { model | image = Just image }, Cmd.none )
+            ( { model | image = Just image }, Nothing )
 
         SetImageDescription imageDescription ->
-            ( { model | imageDescription = imageDescription }, Cmd.none )
+            ( { model | imageDescription = imageDescription }, Nothing )
 
         SetState state ->
-            ( { model | state = state }, Cmd.none )
+            ( { model | state = state }, Nothing )
 
         SetPoint point ->
-            ( { model | point = point }, Cmd.none )
+            ( { model | point = point }, Nothing )
 
         Submit ->
             let
@@ -109,14 +122,21 @@ update msg model =
                     validate model
             in
             if List.isEmpty newModel.errors then
-                ( newModel, Cmd.none )
-                -- TODO: submit the form
+                case model.mode of
+                    Create ->
+                        ( newModel, Just (CreateEvent (toEvent newModel)) )
+
+                    Edit id ->
+                        ( newModel, Just (UpdateEvent id (toEvent newModel)) )
 
             else
-                ( newModel, Cmd.none )
+                ( newModel, Nothing )
 
         Validate ->
-            ( validate model, Cmd.none )
+            ( validate model, Nothing )
+
+        LoadEvent event ->
+            ( fromEvent event, Nothing )
 
 
 validate : Model -> Model
@@ -175,6 +195,24 @@ toEvent model =
     , point = model.point
     , created = "" -- server
     , updated = "" -- server
+    }
+
+
+fromEvent : Event -> Model
+fromEvent event =
+    { title = event.title
+    , startDate = event.startDate
+    , endDate = Maybe.withDefault "" event.endDate
+    , allDay = event.allDay
+    , location = Maybe.withDefault "" event.location
+    , description = Maybe.withDefault "" event.description
+    , url = Maybe.withDefault "" event.url
+    , image = event.image
+    , imageDescription = Maybe.withDefault "" event.imageDescription
+    , state = event.state
+    , point = event.point
+    , errors = []
+    , mode = Edit event.id
     }
 
 
