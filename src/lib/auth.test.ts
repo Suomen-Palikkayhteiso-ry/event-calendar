@@ -1,3 +1,6 @@
+// Tests for authentication functionality
+// Related user story: agents/stories/authentication.md
+
 import { describe, it, expect, vi } from 'vitest';
 import { user, login, logout } from '$lib/auth';
 import { get } from 'svelte/store';

@@ -1,3 +1,6 @@
+// Integration tests for main page functionality
+// Related user stories: agents/stories/view-calendar.md, agents/stories/create-event.md
+
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/svelte';
 import { writable } from 'svelte/store';

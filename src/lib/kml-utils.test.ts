@@ -1,3 +1,6 @@
+// Tests for KML import utilities
+// Related user story: agents/stories/create-event.md
+
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { parseEventName, parseDateString, importKML } from '$lib/kml-utils';
 
