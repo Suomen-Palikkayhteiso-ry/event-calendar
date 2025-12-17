@@ -49,6 +49,7 @@ type alias Model =
     , auth : Maybe Types.Auth
     , loginEmail : String
     , loginPassword : String
+    , error : Maybe String
     }
 
 
@@ -58,7 +59,7 @@ init flags url key =
         ( eventsModel, eventsCmd ) =
             Events.update Events.FetchEvents Events.init
     in
-    ( Model key url (parseUrl url) Calendar.init eventsModel Map.init EventForm.init Nothing "" ""
+    ( Model key url (parseUrl url) Calendar.init eventsModel Map.init EventForm.init Nothing "" "" Nothing
     , Cmd.map EventsMsg eventsCmd
     )
 
@@ -95,6 +96,29 @@ parseUrl url =
 
         Nothing ->
             NotFound
+
+
+
+-- HELPERS
+
+
+httpErrorToString : Http.Error -> String
+httpErrorToString error =
+    case error of
+        Http.BadUrl url ->
+            "Bad URL: " ++ url
+
+        Http.Timeout ->
+            "Request timed out"
+
+        Http.NetworkError ->
+            "Network error"
+
+        Http.BadStatus status ->
+            "Bad status: " ++ String.fromInt status
+
+        Http.BadBody body ->
+            "Bad body: " ++ body
 
 
 
@@ -213,18 +237,18 @@ update msg model =
         LoginResult result ->
             case result of
                 Ok auth ->
-                    ( { model | auth = Just auth }, Ports.storeAuth auth )
+                    ( { model | auth = Just auth, error = Nothing }, Ports.storeAuth auth )
 
-                Err _ ->
-                    ( model, Cmd.none )
+                Err err ->
+                    ( { model | error = Just (httpErrorToString err) }, Cmd.none )
 
         LogoutResult result ->
             case result of
                 Ok _ ->
-                    ( { model | auth = Nothing }, Ports.removeAuth () )
+                    ( { model | auth = Nothing, error = Nothing }, Ports.removeAuth () )
 
-                Err _ ->
-                    ( model, Cmd.none )
+                Err err ->
+                    ( { model | error = Just (httpErrorToString err) }, Cmd.none )
 
         UpdateLoginEmail email ->
             ( { model | loginEmail = email }, Cmd.none )
@@ -282,6 +306,12 @@ view model =
                                 , Html.button [ onClick Login ] [ text "Login" ]
                                 ]
                     ]
+                , case model.error of
+                    Just err ->
+                        div [ style "color" "red" ] [ text err ]
+
+                    Nothing ->
+                        text ""
                 ]
             , main_ []
                 [ case model.route of
