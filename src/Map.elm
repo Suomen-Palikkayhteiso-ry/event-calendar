@@ -61,4 +61,4 @@ update msg model =
 
 view : Model -> Html.Html Msg
 view model =
-    div [ id "map" ] []
+    div [ id "map", Html.Attributes.style "height" "400px" ] []

@@ -6,9 +6,13 @@ import Calendar
 import Events
 import Html exposing (Html, a, div, h1, header, main_, nav, text)
 import Html.Attributes exposing (..)
+import Map
+import Ports
 import Time
+import Types
 import Url
 import Url.Parser as Parser exposing ((</>), Parser, oneOf, s, string)
+
 
 
 -- MAIN
@@ -26,6 +30,7 @@ main =
         }
 
 
+
 -- MODEL
 
 
@@ -35,17 +40,20 @@ type alias Model =
     , route : Route
     , calendar : Calendar.Model
     , events : Events.Model
+    , map : Map.Model
     }
 
 
 init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init flags url key =
     let
-        ( eventsModel, eventsCmd ) = Events.update Events.FetchEvents Events.init
+        ( eventsModel, eventsCmd ) =
+            Events.update Events.FetchEvents Events.init
     in
-    ( Model key url (parseUrl url) Calendar.init eventsModel
+    ( Model key url (parseUrl url) Calendar.init eventsModel Map.init
     , Cmd.map EventsMsg eventsCmd
     )
+
 
 
 -- ROUTE
@@ -53,6 +61,7 @@ init flags url key =
 
 type Route
     = Home
+    | MapRoute
     | EventDetail String
     | EditEvent String
     | Callback
@@ -63,6 +72,7 @@ routeParser : Parser (Route -> a) a
 routeParser =
     oneOf
         [ Parser.map Home Parser.top
+        , Parser.map MapRoute (s "map")
         , Parser.map EventDetail (s "events" </> string)
         , Parser.map EditEvent (s "events" </> string </> s "edit")
         , Parser.map Callback (s "callback")
@@ -79,6 +89,7 @@ parseUrl url =
             NotFound
 
 
+
 -- UPDATE
 
 
@@ -87,6 +98,10 @@ type Msg
     | UrlChanged Url.Url
     | CalendarMsg Calendar.Msg
     | EventsMsg Events.Msg
+    | MapMsg Map.Msg
+    | AuthStored Types.Auth
+    | AuthRemoved
+    | MapMarkerMoved ( Float, Float )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -127,13 +142,43 @@ update msg model =
             , Cmd.map EventsMsg eventsCmd
             )
 
+        MapMsg mapMsg ->
+            let
+                ( updatedMap, mapCmd ) =
+                    Map.update mapMsg model.map
+            in
+            ( { model | map = updatedMap }
+            , Cmd.map MapMsg mapCmd
+            )
+
+        AuthStored auth ->
+            ( model, Cmd.none )
+
+        AuthRemoved ->
+            ( model, Cmd.none )
+
+        MapMarkerMoved pos ->
+            let
+                ( updatedMap, _ ) =
+                    Map.update (Map.MarkerMoved pos) model.map
+            in
+            ( { model | map = updatedMap }
+            , Cmd.none
+            )
+
+
 
 -- SUBSCRIPTIONS
 
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
-    Sub.none
+    Sub.batch
+        [ Ports.authStored AuthStored
+        , Ports.authRemoved (always AuthRemoved)
+        , Ports.mapMarkerMoved MapMarkerMoved
+        ]
+
 
 
 -- VIEW
@@ -148,6 +193,8 @@ view model =
                 [ nav []
                     [ a [ href "/" ] [ text "Home" ]
                     , text " | "
+                    , a [ href "/map" ] [ text "Map" ]
+                    , text " | "
                     , a [ href "/events/123" ] [ text "Event Detail" ]
                     , text " | "
                     , a [ href "/events/123/edit" ] [ text "Edit Event" ]
@@ -159,6 +206,9 @@ view model =
                 [ case model.route of
                     Home ->
                         Html.map CalendarMsg (Calendar.view model.calendar)
+
+                    MapRoute ->
+                        Html.map MapMsg (Map.view model.map)
 
                     EventDetail id ->
                         h1 [] [ text ("Event Detail Page for " ++ id) ]
