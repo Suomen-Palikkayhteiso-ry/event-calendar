@@ -244,9 +244,12 @@ utcToHelsinkiDateTimeLocal utcString =
         ++ String.padLeft 2 '0' (String.fromInt minute)
 
 
-dateToHelsinkiDateString : Time.Posix -> String
-dateToHelsinkiDateString posix =
+utcToHelsinkiDate : String -> String
+utcToHelsinkiDate utcString =
     let
+        posix =
+            parseUTCDate utcString
+
         helsinkiMillis =
             Time.posixToMillis posix + 2 * 60 * 60 * 1000
 
