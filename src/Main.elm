@@ -10,6 +10,7 @@ import Html exposing (Html, a, div, h1, header, main_, nav, p, text)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Http
+import Input
 import Map
 import PocketBase
 import Ports
@@ -310,8 +311,56 @@ view model =
 
                         Nothing ->
                             div []
-                                [ Html.input [ type_ "email", placeholder "Email", value model.loginEmail, onInput UpdateLoginEmail ] []
-                                , Html.input [ type_ "password", placeholder "Password", value model.loginPassword, onInput UpdateLoginPassword ] []
+                                [ Input.view
+                                    { type_ = "email"
+                                    , value = model.loginEmail
+                                    , placeholder = Just "Email"
+                                    , required = False
+                                    , disabled = False
+                                    , readonly = False
+                                    , ariaLabel = Nothing
+                                    , ariaDescribedBy = Nothing
+                                    , ariaInvalid = False
+                                    , ariaRequired = False
+                                    , id = Nothing
+                                    , name = Nothing
+                                    , pattern = Nothing
+                                    , min = Nothing
+                                    , max = Nothing
+                                    , step = Nothing
+                                    , accept = Nothing
+                                    , autofocus = False
+                                    , class = Nothing
+                                    , onInput = Just UpdateLoginEmail
+                                    , onChange = Nothing
+                                    , onBlur = Nothing
+                                    , onFocus = Nothing
+                                    }
+                                , Input.view
+                                    { type_ = "password"
+                                    , value = model.loginPassword
+                                    , placeholder = Just "Password"
+                                    , required = False
+                                    , disabled = False
+                                    , readonly = False
+                                    , ariaLabel = Nothing
+                                    , ariaDescribedBy = Nothing
+                                    , ariaInvalid = False
+                                    , ariaRequired = False
+                                    , id = Nothing
+                                    , name = Nothing
+                                    , pattern = Nothing
+                                    , min = Nothing
+                                    , max = Nothing
+                                    , step = Nothing
+                                    , accept = Nothing
+                                    , autofocus = False
+                                    , class = Nothing
+                                    , onInput = Just UpdateLoginPassword
+                                    , onChange = Nothing
+                                    , onBlur = Nothing
+                                    , onFocus = Nothing
+                                    }
                                 , Button.view
                                     { variant = Button.Primary
                                     , size = Button.Md
