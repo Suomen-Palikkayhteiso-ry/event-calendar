@@ -176,7 +176,7 @@ describe('Map', () => {
 	it('adds marker when markerPosition is set after initial render', () => {
 		const center: [number, number] = [60.1699, 24.9384];
 		const zoom = 10;
-		let markerPosition: [number, number] | null = null;
+		const markerPosition: [number, number] | null = null;
 
 		render(Map, { props: { center, zoom, markerPosition } });
 

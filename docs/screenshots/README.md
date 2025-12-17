@@ -4,12 +4,12 @@ These screenshots are automatically generated for documentation purposes using P
 
 ## Generated Screenshots
 
-| Screenshot | Description |
-|------------|-------------|
-| ![calendar-overview](./calendar-overview.png) | Main calendar view showing monthly overview |
-| ![calendar-mobile](./calendar-mobile.png) | Calendar view on mobile viewport |
-| ![calendar-navigation](./calendar-navigation.png) | Calendar with navigation controls |
-| ![event-detail](./event-detail.png) | Event detail page (if events exist) |
+| Screenshot                                        | Description                                 |
+| ------------------------------------------------- | ------------------------------------------- |
+| ![calendar-overview](./calendar-overview.png)     | Main calendar view showing monthly overview |
+| ![calendar-mobile](./calendar-mobile.png)         | Calendar view on mobile viewport            |
+| ![calendar-navigation](./calendar-navigation.png) | Calendar with navigation controls           |
+| ![event-detail](./event-detail.png)               | Event detail page (if events exist)         |
 
 ## Regenerating Screenshots
 

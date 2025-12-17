@@ -59,7 +59,10 @@ export function parseEventName(name: string): ParsedEventName {
  * @param year - The year to use
  * @returns Object with startDate and endDate
  */
-export function parseDateString(dateStr: string, year: number): { startDate: Date | null; endDate: Date | null } {
+export function parseDateString(
+	dateStr: string,
+	year: number
+): { startDate: Date | null; endDate: Date | null } {
 	let startDate: Date | null = null;
 	let endDate: Date | null = null;
 

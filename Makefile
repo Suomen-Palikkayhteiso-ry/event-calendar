@@ -74,3 +74,7 @@ check: format
 .PHONY: shell
 shell:
 	devenv shell
+
+.PHONY: test-ci
+test-ci: install test test-coverage test-e2e clean build
+	@echo "✅ All GitHub Actions tests passed locally!"

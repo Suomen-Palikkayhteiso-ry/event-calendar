@@ -28,7 +28,7 @@ vi.mock('$lib/date-utils', () => ({
 
 // Mock DOMParser
 const mockParseFromString = vi.fn();
-global.DOMParser = vi.fn().mockImplementation(function() {
+global.DOMParser = vi.fn().mockImplementation(function () {
 	return {
 		parseFromString: mockParseFromString
 	};
