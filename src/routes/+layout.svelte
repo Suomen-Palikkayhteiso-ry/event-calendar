@@ -14,7 +14,14 @@
 	<Header />
 
 	<main class="mx-auto box-border flex w-full max-w-4xl flex-1 flex-col p-4">
-		<SvelteToast />
+		<SvelteToast
+			options={{
+				position: 'bottom-center',
+				theme: {
+					'--toastFontSize': '2rem'
+				}
+			} as any}
+		/>
 		{@render children()}
 	</main>
 

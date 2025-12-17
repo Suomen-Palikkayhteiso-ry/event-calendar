@@ -43,6 +43,12 @@ addMessages('fi', {
 	image_label: 'Kuva',
 	image_description_label: 'Kuvan kuvaus',
 	image_description_optional: 'Kuvan kuvaus (valinnainen)',
+	image_help_text: 'Valitse kuva tapahtumalle (valinnainen)',
+	view_on_map: 'Näytä kartalla',
+	edit_event: 'Muokkaa tapahtumaa',
+	previous_page: 'Edellinen sivu',
+	next_page: 'Seuraava sivu',
+	events_table: 'Tapahtumat taulukko',
 	start_date_required: 'Aloituspäivä *',
 	end_date: 'Lopetuspäivä',
 	all_day_event_label: 'Koko päivän tapahtuma',
@@ -60,16 +66,20 @@ addMessages('fi', {
 	next_button: 'Seuraava',
 	failed_create_event: 'Tapahtuman luonti epäonnistui. Yritä uudelleen.',
 	event_created_successfully: 'Tapahtuma luotu onnistuneesti.',
+	failed_fetch_events: 'Tapahtumien lataaminen epäonnistui. Yritä uudelleen.',
+	failed_kml_import: 'KML-tuonnin epäonnistui. Tarkista tiedosto ja yritä uudelleen.',
+	failed_load_event: 'Tapahtuman lataaminen epäonnistui.',
+	invalid_event_id: 'Virheellinen tapahtuman tunniste.',
 	// Event detail
 	deleting: 'Poistetaan...',
 	delete: 'Poista',
 	back_to_calendar_detail: 'Takaisin kalenteriin',
 	loading_event: 'Ladataan tapahtumaa...',
+	loading_events: 'Ladataan tapahtumia...',
 	failed_delete_event: 'Tapahtuman poistaminen epäonnistui. Yritä uudelleen.',
 	event_deleted_successfully: 'Tapahtuma poistettu onnistuneesti.',
 	confirm_delete_event: 'Haluatko varmasti poistaa tämän tapahtuman?',
 	// Event edit
-	edit_event: 'Muokkaa tapahtumaa',
 	current_image: 'Nykyinen kuva:',
 	saving: 'Tallennetaan...',
 	save_changes: 'Tallenna muutokset',
@@ -103,7 +113,26 @@ addMessages('fi', {
 	completing_login: 'Viimeistellään kirjautumista...',
 	// Non-member instructions
 	non_member_prefix: 'Jos et ole Suomen Palikkayhteisö ry:n jäsen, ',
-	send_event_email: 'lähetä tapahtumasi meille sähköpostilla'
+	send_event_email: 'lähetä tapahtumasi meille sähköpostilla',
+	// Error page
+	error_page_title: 'Virhe',
+	something_went_wrong: 'Jotain meni pieleen',
+	page_not_found: 'Sivua ei löytynyt',
+	page_not_found_description: 'Etsimääsi sivua ei löytynyt.',
+	error_page_description: 'Tapahtui odottamaton virhe. Yritä myöhemmin uudelleen.',
+	error_details: 'Virheen tiedot',
+	reload_page: 'Lataa sivu uudelleen',
+	// Error boundary
+	component_error_title: 'Komponentin virhe',
+	component_error_description: 'Tässä komponentissa tapahtui virhe.',
+	try_again: 'Yritä uudelleen',
+	// Validation messages
+	title_required_error: 'Otsikko on pakollinen',
+	start_date_required_error: 'Aloituspäivä on pakollinen',
+	end_date_after_start_error: 'Lopetuspäivän täytyy olla aloituspäivän jälkeen',
+	url_invalid_error: 'URL:n täytyy alkaa http:// tai https://',
+	latitude_invalid_error: 'Leveysasteen täytyy olla välillä -90 ja 90',
+	longitude_invalid_error: 'Pituusasteen täytyy olla välillä -180 ja 180'
 });
 
 init({

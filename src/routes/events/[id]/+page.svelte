@@ -10,6 +10,7 @@
 	import { formatDateInHelsinki } from '$lib/date-utils';
 	import { user } from '$lib/auth';
 	import { toast } from '@zerodevx/svelte-toast';
+	import { eventsStore } from '$lib/stores/events';
 
 	let event: Event;
 	let isDeleting = false;
@@ -25,11 +26,10 @@
 		const eventId = $page.params.id;
 		if (!eventId) return;
 
-		// Load event
-		pb.collection('events')
-			.getOne(eventId)
+		eventsStore
+			.getEventById(eventId)
 			.then((loadedEvent) => {
-				event = loadedEvent as unknown as Event;
+				event = loadedEvent;
 			})
 			.catch(() => {
 				goto(resolve('/events'));
@@ -55,11 +55,10 @@
 
 		isDeleting = true;
 		try {
-			await pb.collection('events').update(event.id, { state: 'deleted' });
+			await eventsStore.deleteEvent(event.id);
 			toast.push($_('event_deleted_successfully'));
 			goto(resolve('/'));
 		} catch (error) {
-			console.error('Error deleting event:', error);
 			toast.push($_('failed_delete_event'));
 		} finally {
 			isDeleting = false;

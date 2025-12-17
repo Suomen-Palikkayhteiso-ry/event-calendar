@@ -3,6 +3,8 @@
  * Follows OSM usage policies: https://operations.osmfoundation.org/policies/nominatim/
  */
 
+import { logger } from '$lib/logger';
+
 const NOMINATIM_BASE_URL = 'https://nominatim.openstreetmap.org';
 const USER_AGENT = 'EventCalendar/1.0 (https://github.com/datakurre/event-calendar)';
 
@@ -49,15 +51,19 @@ export async function geocodeLocation(location: string): Promise<[number, number
 	if (!location.trim()) return null;
 
 	try {
+		logger.debug('Geocoding location', { location });
 		const url = `${NOMINATIM_BASE_URL}/search?q=${encodeURIComponent(location)}&format=json&limit=1`;
 		const data = await makeRequest(url);
 
 		if (Array.isArray(data) && data.length > 0) {
 			const result = data[0];
-			return [parseFloat(result.lat), parseFloat(result.lon)];
+			const coords: [number, number] = [parseFloat(result.lat), parseFloat(result.lon)];
+			logger.debug('Geocoding successful', { location, coords });
+			return coords;
 		}
+		logger.warn('No geocoding results found', { location });
 	} catch (error) {
-		console.error('Geocoding error:', error);
+		logger.error('Geocoding error', { error, location });
 	}
 
 	return null;
@@ -68,14 +74,17 @@ export async function geocodeLocation(location: string): Promise<[number, number
  */
 export async function reverseGeocode(lat: number, lng: number): Promise<string | null> {
 	try {
+		logger.debug('Reverse geocoding coordinates', { lat, lng });
 		const url = `${NOMINATIM_BASE_URL}/reverse?lat=${lat}&lon=${lng}&format=json`;
 		const data = await makeRequest(url);
 
 		if (!Array.isArray(data) && data.display_name) {
+			logger.debug('Reverse geocoding successful', { lat, lng, address: data.display_name });
 			return data.display_name;
 		}
+		logger.warn('No reverse geocoding results found', { lat, lng });
 	} catch (error) {
-		console.error('Reverse geocoding error:', error);
+		logger.error('Reverse geocoding error', { error, lat, lng });
 	}
 
 	return null;
