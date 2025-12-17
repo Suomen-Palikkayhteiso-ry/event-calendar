@@ -44,7 +44,8 @@ start:
 	$(PNPM) dev
 
 .PHONY: watch
-watch: start
+watch:
+	$(ELM) reactor
 
 .PHONY: elm-build
 elm-build:
