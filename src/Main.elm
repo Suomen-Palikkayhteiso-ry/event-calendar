@@ -2,8 +2,10 @@ module Main exposing (..)
 
 import Browser
 import Browser.Navigation as Nav
+import Calendar
 import Html exposing (Html, a, div, h1, header, main_, nav, text)
 import Html.Attributes exposing (..)
+import Time
 import Url
 import Url.Parser as Parser exposing ((</>), Parser, oneOf, s, string)
 
@@ -30,12 +32,13 @@ type alias Model =
     { key : Nav.Key
     , url : Url.Url
     , route : Route
+    , calendar : Calendar.Model
     }
 
 
 init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init flags url key =
-    ( Model key url (parseUrl url), Cmd.none )
+    ( Model key url (parseUrl url) Calendar.init, Cmd.none )
 
 
 -- ROUTE
@@ -75,6 +78,7 @@ parseUrl url =
 type Msg
     = LinkClicked Browser.UrlRequest
     | UrlChanged Url.Url
+    | CalendarMsg Calendar.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -90,6 +94,11 @@ update msg model =
 
         UrlChanged url ->
             ( { model | url = url, route = parseUrl url }
+            , Cmd.none
+            )
+
+        CalendarMsg calendarMsg ->
+            ( { model | calendar = Calendar.update calendarMsg model.calendar }
             , Cmd.none
             )
 
@@ -124,7 +133,7 @@ view model =
             , main_ []
                 [ case model.route of
                     Home ->
-                        h1 [] [ text "Home/Dashboard Page" ]
+                        Html.map CalendarMsg (Calendar.view model.calendar)
 
                     EventDetail id ->
                         h1 [] [ text ("Event Detail Page for " ++ id) ]

@@ -1,6 +1,8 @@
 module Calendar exposing (..)
 
-import Html exposing (div, text)
+import Html exposing (Html, button, div, h2, text)
+import Html.Attributes exposing (class)
+import Html.Events exposing (onClick)
 import Time
 import Types exposing (Event)
 
@@ -44,8 +46,8 @@ type Msg
 update : Msg -> Model -> Model
 update msg model =
     case msg of
-        SetView view ->
-            { model | view = view }
+        SetView newView ->
+            { model | view = newView }
 
         SetDate date ->
             { model | currentDate = date }
@@ -95,7 +97,7 @@ daysSince1970 year month day =
         years = year - 1970
         leapYears = (years // 4) - (years // 100) + (years // 400)
         daysInYears = years * 365 + leapYears
-        daysInMonths = daysInMonthsBefore month + (if month > Time.Feb && isLeapYear year then 1 else 0)
+        daysInMonths = daysInMonthsBefore month + (if monthToInt month > 1 && isLeapYear year then 1 else 0)
     in
     daysInYears + daysInMonths + day - 1
 
@@ -185,10 +187,10 @@ getCalendarDays model =
         month = Time.toMonth Time.utc model.currentDate
         firstOfMonth = firstOfMonthPosix year month
         lastOfMonth = lastOfMonthPosix year month
-        startOfWeek = startOfWeek firstOfMonth model.firstDay
-        endOfWeek = endOfWeek lastOfMonth model.firstDay
+        startOfWeekDate = startOfWeek firstOfMonth model.firstDay
+        endOfWeekDate = endOfWeek lastOfMonth model.firstDay
     in
-    generateDays startOfWeek endOfWeek month
+    generateDays startOfWeekDate endOfWeekDate month
 
 
 firstOfMonthPosix : Int -> Time.Month -> Time.Posix
@@ -206,7 +208,7 @@ startOfWeek posix firstDay =
     let
         weekday = Time.toWeekday Time.utc posix
         weekdayInt = weekdayToInt weekday
-        offset = (weekdayInt - firstDay + 7) % 7
+        offset = modBy 7 (weekdayInt - firstDay + 7)
         daysBack = if offset == 0 then 0 else offset
     in
     addDays -daysBack posix
@@ -217,7 +219,7 @@ endOfWeek posix firstDay =
     let
         weekday = Time.toWeekday Time.utc posix
         weekdayInt = weekdayToInt weekday
-        offset = (firstDay - weekdayInt + 6) % 7
+        offset = modBy 7 (firstDay - weekdayInt + 6)
         daysForward = if offset == 6 then 6 else offset
     in
     addDays daysForward posix
@@ -238,9 +240,9 @@ weekdayToInt weekday =
 addDays : Int -> Time.Posix -> Time.Posix
 addDays days posix =
     let
-        millis = Time.posixToMillis posix + toFloat days * 24 * 60 * 60 * 1000
+        millis = Time.posixToMillis posix + round (toFloat days * 24 * 60 * 60 * 1000)
     in
-    Time.millisToPosix (round millis)
+    Time.millisToPosix millis
 
 
 generateDays : Time.Posix -> Time.Posix -> Time.Month -> List CalendarDay
@@ -271,4 +273,116 @@ generateDaysHelper currentMillis endMillis currentMonth acc =
 
 view : Model -> Html.Html Msg
 view model =
-    div [] [ text "Calendar" ] -- placeholder
+    let
+        days = getCalendarDays model
+        weeks = groupByWeeks days
+    in
+    div [ class "calendar" ]
+        [ div [ class "calendar-header" ]
+            [ button [ onClick Previous ] [ text "<" ]
+            , h2 [] [ text (monthYearString model.currentDate) ]
+            , button [ onClick Next ] [ text ">" ]
+            ]
+        , div [ class "calendar-grid" ]
+            (List.concat
+                [ [ div [ class "calendar-week-header" ] (List.map weekdayHeader (List.range 0 6)) ]
+                , List.map viewWeek weeks
+                ]
+            )
+        ]
+
+
+monthYearString : Time.Posix -> String
+monthYearString posix =
+    let
+        year = Time.toYear Time.utc posix
+        month = Time.toMonth Time.utc posix
+    in
+    monthToString month ++ " " ++ String.fromInt year
+
+
+monthToString : Time.Month -> String
+monthToString month =
+    case month of
+        Time.Jan -> "January"
+        Time.Feb -> "February"
+        Time.Mar -> "March"
+        Time.Apr -> "April"
+        Time.May -> "May"
+        Time.Jun -> "June"
+        Time.Jul -> "July"
+        Time.Aug -> "August"
+        Time.Sep -> "September"
+        Time.Oct -> "October"
+        Time.Nov -> "November"
+        Time.Dec -> "December"
+
+
+weekdayHeader : Int -> Html.Html Msg
+weekdayHeader weekdayInt =
+    let
+        weekday = intToWeekday weekdayInt
+    in
+    div [ class "calendar-weekday" ] [ text (weekdayToString weekday) ]
+
+
+intToWeekday : Int -> Time.Weekday
+intToWeekday int =
+    case int of
+        0 -> Time.Sun
+        1 -> Time.Mon
+        2 -> Time.Tue
+        3 -> Time.Wed
+        4 -> Time.Thu
+        5 -> Time.Fri
+        6 -> Time.Sat
+        _ -> Time.Mon
+
+
+weekdayToString : Time.Weekday -> String
+weekdayToString weekday =
+    case weekday of
+        Time.Mon -> "Mon"
+        Time.Tue -> "Tue"
+        Time.Wed -> "Wed"
+        Time.Thu -> "Thu"
+        Time.Fri -> "Fri"
+        Time.Sat -> "Sat"
+        Time.Sun -> "Sun"
+
+
+viewWeek : List CalendarDay -> Html.Html Msg
+viewWeek days =
+    div [ class "calendar-week" ] (List.map viewDay days)
+
+
+viewDay : CalendarDay -> Html.Html Msg
+viewDay day =
+    let
+        dayClasses =
+            if day.isCurrentMonth then
+                "calendar-day current-month"
+            else
+                "calendar-day other-month"
+    in
+    div [ class dayClasses ]
+        [ div [ class "calendar-day-number" ] [ text (String.fromInt (Time.toDay Time.utc day.date)) ]
+        , div [ class "calendar-day-events" ] (List.map viewEvent day.events)
+        ]
+
+
+viewEvent : Event -> Html.Html Msg
+viewEvent event =
+    div [ class "calendar-event" ] [ text event.title ]
+
+
+groupByWeeks : List CalendarDay -> List (List CalendarDay)
+groupByWeeks days =
+    case days of
+        [] -> []
+        _ -> 
+            let
+                week = List.take 7 days
+                rest = List.drop 7 days
+            in
+            week :: groupByWeeks rest
