@@ -1,5 +1,6 @@
 module EventForm exposing (..)
 
+import DateTimePicker
 import Html exposing (Html, div, input, textarea, label, button, text, br, ul, li)
 import Html.Attributes exposing (type_, value, checked, placeholder, id, for, disabled, name)
 import Html.Events exposing (onInput, onCheck, onClick)
@@ -233,14 +234,22 @@ view model =
             [ label [ for "title" ] [ text "Title" ]
             , input [ type_ "text", id "title", value model.title, onInput SetTitle, placeholder "Event title" ] []
             ]
-        , div []
-            [ label [ for "startDate" ] [ text "Start Date" ]
-            , input [ type_ "datetime-local", id "startDate", value model.startDate, onInput SetStartDate ] []
-            ]
-        , div []
-            [ label [ for "endDate" ] [ text "End Date" ]
-            , input [ type_ "datetime-local", id "endDate", value model.endDate, onInput SetEndDate ] []
-            ]
+        , DateTimePicker.view
+            { value = model.startDate
+            , label = "Start Date"
+            , id = "startDate"
+            , disabled = False
+            , allDay = model.allDay
+            , onChange = SetStartDate
+            }
+        , DateTimePicker.view
+            { value = model.endDate
+            , label = "End Date"
+            , id = "endDate"
+            , disabled = False
+            , allDay = model.allDay
+            , onChange = SetEndDate
+            }
         , div []
             [ label [ for "allDay" ] [ text "All Day" ]
             , input [ type_ "checkbox", id "allDay", checked model.allDay, onCheck SetAllDay ] []
