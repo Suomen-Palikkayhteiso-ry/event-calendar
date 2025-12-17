@@ -39,3 +39,8 @@ static/events/
 
 # Agents
 TODO*
+
+# Elm
+elm-stuff/
+elm.js
+elm.json

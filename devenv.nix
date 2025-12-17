@@ -18,6 +18,8 @@ in
   languages.javascript.enable = true;
   languages.javascript.pnpm.enable = true;
 
+  languages.elm.enable = true;
+
   packages = with pkgs; [
     chromium
     playwright-driver
@@ -25,6 +27,10 @@ in
     playwrightBrowsersCompat
     python3
     nodejs
+    elmPackages.elm-review
+    elmPackages.elm-format
+    elmPackages.elm-test
+    elmPackages.elm-language-server
   ];
 
   dotenv.disableHint = true;
