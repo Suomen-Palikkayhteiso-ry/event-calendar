@@ -2,6 +2,7 @@ module Main exposing (..)
 
 import Browser
 import Browser.Navigation as Nav
+import Button
 import Calendar
 import EventForm
 import Events
@@ -296,14 +297,30 @@ view model =
                         Just auth ->
                             div []
                                 [ text ("Logged in as: " ++ (Maybe.withDefault "Unknown" (Maybe.map .email auth.user)))
-                                , Html.button [ onClick Logout ] [ text "Logout" ]
+                                , Button.view
+                                    { variant = Button.Secondary
+                                    , size = Button.Md
+                                    , disabled = False
+                                    , type_ = "button"
+                                    , ariaLabel = Nothing
+                                    , onClick = Just Logout
+                                    , children = [ text "Logout" ]
+                                    }
                                 ]
 
                         Nothing ->
                             div []
                                 [ Html.input [ type_ "email", placeholder "Email", value model.loginEmail, onInput UpdateLoginEmail ] []
                                 , Html.input [ type_ "password", placeholder "Password", value model.loginPassword, onInput UpdateLoginPassword ] []
-                                , Html.button [ onClick Login ] [ text "Login" ]
+                                , Button.view
+                                    { variant = Button.Primary
+                                    , size = Button.Md
+                                    , disabled = False
+                                    , type_ = "button"
+                                    , ariaLabel = Nothing
+                                    , onClick = Just Login
+                                    , children = [ text "Login" ]
+                                    }
                                 ]
                     ]
                 , case model.error of
