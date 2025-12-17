@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 import { execSync } from 'child_process';
 
-execSync('npx playwright test --config=playwright.config.ts --grep="feature"', { stdio: 'inherit' });
+execSync('npx playwright test --config=playwright-bdd.config.ts --grep="feature"', { stdio: 'inherit' });

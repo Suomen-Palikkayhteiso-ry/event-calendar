@@ -1,12 +1,9 @@
-import { defineBddConfig } from 'playwright-bdd';
 import { devices } from '@playwright/test';
 
 /**
  * @see https://playwright.dev/docs/test-configuration
  */
-export default defineBddConfig({
-	features: 'tests/features/*.feature',
-	steps: 'tests/steps/**/*.ts',
+export default {
 	testDir: './tests',
 	/* Run tests in files in parallel */
 	fullyParallel: true,
@@ -18,8 +15,7 @@ export default defineBddConfig({
 	workers: process.env.CI ? 1 : undefined,
 	/* Reporter to use. See https://playwright.dev/docs/test-reporters */
 	reporter: [
-		['html'],
-		['cucumber-json', { outputFile: 'test-results/cucumber-report.json' }]
+		['html']
 	],
 	/* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
 	use: {
@@ -77,4 +73,4 @@ export default defineBddConfig({
 		url: 'http://localhost:5174',
 		reuseExistingServer: !process.env.CI
 	}
-});
+};
