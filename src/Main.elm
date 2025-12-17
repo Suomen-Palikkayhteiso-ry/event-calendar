@@ -5,7 +5,7 @@ import Browser.Navigation as Nav
 import Calendar
 import EventForm
 import Events
-import Html exposing (Html, a, div, h1, header, main_, nav, text)
+import Html exposing (Html, a, div, h1, header, main_, nav, p, text)
 import Html.Attributes exposing (..)
 import Map
 import Ports
@@ -223,16 +223,34 @@ view model =
                         Html.map MapMsg (Map.view model.map)
 
                     EventDetail id ->
-                        h1 [] [ text ("Event Detail Page for " ++ id) ]
+                        case List.head (List.filter (\e -> e.id == id) model.events.events) of
+                            Just event ->
+                                div []
+                                    [ h1 [] [ text event.title ]
+                                    , p [] [ text (Maybe.withDefault "" event.description) ]
+                                    , p [] [ text ("Start: " ++ event.startDate) ]
+                                    , p [] [ text ("Location: " ++ Maybe.withDefault "" event.location) ]
+                                    , a [ href ("/events/" ++ id ++ "/edit") ] [ text "Edit" ]
+                                    ]
+
+                            Nothing ->
+                                h1 [] [ text ("Event not found: " ++ id) ]
 
                     EditEvent id ->
                         Html.map EventFormMsg (EventForm.view model.eventForm)
 
                     Callback ->
-                        h1 [] [ text "Auth Callback Page" ]
+                        div []
+                            [ h1 [] [ text "Authentication Callback" ]
+                            , p [] [ text "Processing authentication..." ]
+                            ]
 
                     NotFound ->
-                        h1 [] [ text "Not Found" ]
+                        div []
+                            [ h1 [] [ text "404 - Page Not Found" ]
+                            , p [] [ text "The page you are looking for does not exist." ]
+                            , a [ href "/" ] [ text "Go Home" ]
+                            ]
                 ]
             ]
         ]
