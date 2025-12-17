@@ -15,7 +15,7 @@
 		"generate-statics": "node scripts/generate-statics.js",
 		"generate-screenshots": "npx tsx scripts/generate-screenshots.ts",
 		"screenshots": "playwright test tests/screenshots.spec.ts --project=chromium",
-		"test": "vitest run",
+		"test": "vitest run && elm-test",
 		"test:watch": "vitest",
 		"test:coverage": "vitest run --coverage",
 		"test:ui": "vitest --ui",
