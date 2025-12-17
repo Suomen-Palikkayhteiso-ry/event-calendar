@@ -3,7 +3,6 @@ name: Hourly update
 on:
   schedule:
     - cron: '0 * * * *'
-    branches: [main]
 
 permissions:
   contents: read
