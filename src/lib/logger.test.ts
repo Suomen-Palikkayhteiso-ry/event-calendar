@@ -68,4 +68,32 @@ describe('logger', () => {
 		logger.clear();
 		expect(logger.getRecentLogs()).toHaveLength(0);
 	});
+
+	it('should log errors and warnings in production', () => {
+		// Mock the isDevelopment property
+		const originalIsDevelopment = (logger as any).isDevelopment;
+		(logger as any).isDevelopment = false;
+
+		const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+		const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+		const debugSpy = vi.spyOn(console, 'debug').mockImplementation(() => {});
+		const infoSpy = vi.spyOn(console, 'info').mockImplementation(() => {});
+
+		logger.error('Error message');
+		logger.warn('Warn message');
+		logger.debug('Debug message'); // Should not log in production
+		logger.info('Info message'); // Should not log in production
+
+		expect(errorSpy).toHaveBeenCalledWith('[ERROR] Error message', '');
+		expect(warnSpy).toHaveBeenCalledWith('[WARN] Warn message', '');
+		expect(debugSpy).not.toHaveBeenCalled();
+		expect(infoSpy).not.toHaveBeenCalled();
+
+		// Restore
+		(logger as any).isDevelopment = originalIsDevelopment;
+		errorSpy.mockRestore();
+		warnSpy.mockRestore();
+		debugSpy.mockRestore();
+		infoSpy.mockRestore();
+	});
 });
