@@ -27,6 +27,11 @@ jobs:
           node-version: 20
           cache: 'pnpm'
 
+      - name: Setup Elm
+        uses: jorelali/setup-elm@v3
+        with:
+          elm-version: 0.19.1
+
       - name: Install dependencies
         run: pnpm install
 
