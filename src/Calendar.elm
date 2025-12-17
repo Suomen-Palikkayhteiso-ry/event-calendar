@@ -1,14 +1,20 @@
-module Calendar exposing (..)module Calendar exposing (..)
+module Calendar exposing (..)
 
+import Html exposing (div, text)
 import Time
-import Types exposing (CalendarState, Event)
+import Types exposing (Event)
 
 
 -- Model
 
 
 type alias Model =
-    CalendarState
+    { view : String
+    , events : List Event
+    , currentDate : Time.Posix
+    , locale : String
+    , firstDay : Int
+    }
 
 
 init : Model
@@ -48,9 +54,221 @@ update msg model =
             { model | events = events }
 
         Next ->
-            -- TODO: calculate next date based on view
-            model
+            { model | currentDate = addMonths 1 model.currentDate }
 
         Previous ->
-            -- TODO: calculate previous date based on view
-            model
+            { model | currentDate = addMonths -1 model.currentDate }
+
+
+-- Helpers
+
+
+addMonths : Int -> Time.Posix -> Time.Posix
+addMonths months posix =
+    let
+        year = Time.toYear Time.utc posix
+        month = Time.toMonth Time.utc posix
+        day = Time.toDay Time.utc posix
+        totalMonths = monthToInt month + months
+        newYear = year + (totalMonths // 12)
+        newMonthInt = modBy 12 totalMonths
+        newMonth = intToMonth newMonthInt
+        daysInNewMonth = daysInMonth newYear newMonth
+        newDay = min day daysInNewMonth
+    in
+    dateToPosix newYear newMonth newDay
+
+
+dateToPosix : Int -> Time.Month -> Int -> Time.Posix
+dateToPosix year month day =
+    -- Approximate calculation, ignoring time zones and leap seconds
+    let
+        daysSinceEpoch = daysSince1970 year month day
+        millis = daysSinceEpoch * 24 * 60 * 60 * 1000
+    in
+    Time.millisToPosix millis
+
+
+daysSince1970 : Int -> Time.Month -> Int -> Int
+daysSince1970 year month day =
+    let
+        years = year - 1970
+        leapYears = (years // 4) - (years // 100) + (years // 400)
+        daysInYears = years * 365 + leapYears
+        daysInMonths = daysInMonthsBefore month + (if month > Time.Feb && isLeapYear year then 1 else 0)
+    in
+    daysInYears + daysInMonths + day - 1
+
+
+daysInMonthsBefore : Time.Month -> Int
+daysInMonthsBefore month =
+    case month of
+        Time.Jan -> 0
+        Time.Feb -> 31
+        Time.Mar -> 59
+        Time.Apr -> 90
+        Time.May -> 120
+        Time.Jun -> 151
+        Time.Jul -> 181
+        Time.Aug -> 212
+        Time.Sep -> 243
+        Time.Oct -> 273
+        Time.Nov -> 304
+        Time.Dec -> 334
+
+
+monthToInt : Time.Month -> Int
+monthToInt month =
+    case month of
+        Time.Jan -> 0
+        Time.Feb -> 1
+        Time.Mar -> 2
+        Time.Apr -> 3
+        Time.May -> 4
+        Time.Jun -> 5
+        Time.Jul -> 6
+        Time.Aug -> 7
+        Time.Sep -> 8
+        Time.Oct -> 9
+        Time.Nov -> 10
+        Time.Dec -> 11
+
+
+intToMonth : Int -> Time.Month
+intToMonth int =
+    case int of
+        0 -> Time.Jan
+        1 -> Time.Feb
+        2 -> Time.Mar
+        3 -> Time.Apr
+        4 -> Time.May
+        5 -> Time.Jun
+        6 -> Time.Jul
+        7 -> Time.Aug
+        8 -> Time.Sep
+        9 -> Time.Oct
+        10 -> Time.Nov
+        _ -> Time.Dec
+
+
+daysInMonth : Int -> Time.Month -> Int
+daysInMonth year month =
+    case month of
+        Time.Feb ->
+            if isLeapYear year then 29 else 28
+        Time.Apr -> 30
+        Time.Jun -> 30
+        Time.Sep -> 30
+        Time.Nov -> 30
+        _ -> 31
+
+
+isLeapYear : Int -> Bool
+isLeapYear year =
+    (modBy 4 year == 0) && (modBy 100 year /= 0 || modBy 400 year == 0)
+
+
+-- View helpers
+
+
+type alias CalendarDay =
+    { date : Time.Posix
+    , isCurrentMonth : Bool
+    , events : List Event
+    }
+
+
+getCalendarDays : Model -> List CalendarDay
+getCalendarDays model =
+    let
+        year = Time.toYear Time.utc model.currentDate
+        month = Time.toMonth Time.utc model.currentDate
+        firstOfMonth = firstOfMonthPosix year month
+        lastOfMonth = lastOfMonthPosix year month
+        startOfWeek = startOfWeek firstOfMonth model.firstDay
+        endOfWeek = endOfWeek lastOfMonth model.firstDay
+    in
+    generateDays startOfWeek endOfWeek month
+
+
+firstOfMonthPosix : Int -> Time.Month -> Time.Posix
+firstOfMonthPosix year month =
+    dateToPosix year month 1
+
+
+lastOfMonthPosix : Int -> Time.Month -> Time.Posix
+lastOfMonthPosix year month =
+    dateToPosix year month (daysInMonth year month)
+
+
+startOfWeek : Time.Posix -> Int -> Time.Posix
+startOfWeek posix firstDay =
+    let
+        weekday = Time.toWeekday Time.utc posix
+        weekdayInt = weekdayToInt weekday
+        offset = (weekdayInt - firstDay + 7) % 7
+        daysBack = if offset == 0 then 0 else offset
+    in
+    addDays -daysBack posix
+
+
+endOfWeek : Time.Posix -> Int -> Time.Posix
+endOfWeek posix firstDay =
+    let
+        weekday = Time.toWeekday Time.utc posix
+        weekdayInt = weekdayToInt weekday
+        offset = (firstDay - weekdayInt + 6) % 7
+        daysForward = if offset == 6 then 6 else offset
+    in
+    addDays daysForward posix
+
+
+weekdayToInt : Time.Weekday -> Int
+weekdayToInt weekday =
+    case weekday of
+        Time.Mon -> 1
+        Time.Tue -> 2
+        Time.Wed -> 3
+        Time.Thu -> 4
+        Time.Fri -> 5
+        Time.Sat -> 6
+        Time.Sun -> 0
+
+
+addDays : Int -> Time.Posix -> Time.Posix
+addDays days posix =
+    let
+        millis = Time.posixToMillis posix + toFloat days * 24 * 60 * 60 * 1000
+    in
+    Time.millisToPosix (round millis)
+
+
+generateDays : Time.Posix -> Time.Posix -> Time.Month -> List CalendarDay
+generateDays start end currentMonth =
+    let
+        startMillis = Time.posixToMillis start
+        endMillis = Time.posixToMillis end
+        days = generateDaysHelper startMillis endMillis currentMonth []
+    in
+    List.reverse days
+
+
+generateDaysHelper : Int -> Int -> Time.Month -> List CalendarDay -> List CalendarDay
+generateDaysHelper currentMillis endMillis currentMonth acc =
+    if currentMillis > endMillis then
+        acc
+    else
+        let
+            posix = Time.millisToPosix currentMillis
+            isCurrent = Time.toMonth Time.utc posix == currentMonth
+            day = { date = posix, isCurrentMonth = isCurrent, events = [] } -- events to be filtered later
+        in
+        generateDaysHelper (currentMillis + 24 * 60 * 60 * 1000) endMillis currentMonth (day :: acc)
+
+
+-- View
+
+
+view : Model -> Html.Html Msg
+view model =
+    div [] [ text "Calendar" ] -- placeholder

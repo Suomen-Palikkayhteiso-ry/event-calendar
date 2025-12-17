@@ -1,4 +1,4 @@
-port module Ports exposing (..)module Ports exposing (..)
+port module Ports exposing (..)
 
 import Types exposing (Auth)
 
@@ -12,6 +12,12 @@ port storeAuth : Auth -> Cmd msg
 port removeAuth : () -> Cmd msg
 
 
+port initMap : { center : (Float, Float), zoom : Int, marker : Maybe (Float, Float) } -> Cmd msg
+
+
+port updateMap : { center : (Float, Float), zoom : Int, marker : Maybe (Float, Float) } -> Cmd msg
+
+
 -- Incoming ports
 
 
@@ -19,3 +25,6 @@ port authStored : (Auth -> msg) -> Sub msg
 
 
 port authRemoved : (() -> msg) -> Sub msg
+
+
+port mapMarkerMoved : ((Float, Float) -> msg) -> Sub msg

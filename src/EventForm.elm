@@ -1,5 +1,6 @@
-module EventForm exposing (..)module EventForm exposing (..)
+module EventForm exposing (..)
 
+import Html exposing (div, text)
 import Types exposing (Event, EventState(..), Point)
 
 
@@ -149,3 +150,11 @@ toEvent model =
     , created = "" -- server
     , updated = "" -- server
     }
+
+
+-- View
+
+
+view : Model -> Html.Html Msg
+view model =
+    div [] [ text "Event Form" ] -- placeholder
