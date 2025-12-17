@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 
+// User Story: edit-event, delete-event
 test.describe('Event Editing and Deletion', () => {
 	test('should allow editing existing events', async ({ page }) => {
 		// Mock authentication

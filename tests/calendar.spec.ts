@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 
+// User Story: view-calendar
 test.describe('Calendar Navigation and Event Viewing', () => {
 	test('should display the calendar page', async ({ page }) => {
 		await page.goto('/');

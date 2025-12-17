@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 
+// User Story: create-event, authentication
 test.describe('Event Creation Workflow', () => {
 	test('should redirect non-authenticated users to home page', async ({ page }) => {
 		await page.goto('/events');
