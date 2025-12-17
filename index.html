@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Event Calendar</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+    nav a {
+      margin-right: 10px;
+      color: blue;
+      text-decoration: none;
+    }
+    nav a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div id="elm"></div>
+  <script src="elm.js"></script>
+  <script>
+    var app = Elm.Main.init({
+      node: document.getElementById('elm')
+    });
+  </script>
+</body>
+</html>
