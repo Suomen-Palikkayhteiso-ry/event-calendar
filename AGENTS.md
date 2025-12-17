@@ -39,11 +39,13 @@ See [Development Setup](./agents/development-setup.md) for environment setup and
 
 ## Testing Practices
 
-Enforce Test-Driven Development (TDD) approach:
+Enforce Behavior-Driven Development (BDD) with Test-Driven Development (TDD) approach:
 
 - Write tests before implementing features
 - Maintain 70% minimum test coverage
 - Run tests before commits: `pnpm test`
+- Each test should be connected to a related user story in `./agents/stories/`
+- If a user story does not exist for a test, create one
 - Component tests are currently unavailable due to Svelte 5 compatibility issues
 - Focus on unit tests for utilities and integration tests for data flow
 - Use Playwright for critical E2E workflows
