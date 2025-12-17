@@ -39,7 +39,7 @@ See [Development Setup](./agents/development-setup.md) for environment setup and
 
 ## Testing Practices
 
-Follow Test-Driven Development (TDD) principles:
+Enforce Test-Driven Development (TDD) approach:
 
 - Write tests before implementing features
 - Maintain 70% minimum test coverage
