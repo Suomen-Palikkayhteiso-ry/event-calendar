@@ -7,7 +7,10 @@ import EventForm
 import Events
 import Html exposing (Html, a, div, h1, header, main_, nav, p, text)
 import Html.Attributes exposing (..)
+import Html.Events exposing (onClick, onInput)
+import Http
 import Map
+import PocketBase
 import Ports
 import Time
 import Types
@@ -43,6 +46,9 @@ type alias Model =
     , events : Events.Model
     , map : Map.Model
     , eventForm : EventForm.Model
+    , auth : Maybe Types.Auth
+    , loginEmail : String
+    , loginPassword : String
     }
 
 
@@ -52,7 +58,7 @@ init flags url key =
         ( eventsModel, eventsCmd ) =
             Events.update Events.FetchEvents Events.init
     in
-    ( Model key url (parseUrl url) Calendar.init eventsModel Map.init EventForm.init
+    ( Model key url (parseUrl url) Calendar.init eventsModel Map.init EventForm.init Nothing "" ""
     , Cmd.map EventsMsg eventsCmd
     )
 
@@ -105,6 +111,12 @@ type Msg
     | AuthStored Types.Auth
     | AuthRemoved
     | MapMarkerMoved ( Float, Float )
+    | Login
+    | Logout
+    | LoginResult (Result Http.Error Types.Auth)
+    | LogoutResult (Result Http.Error ())
+    | UpdateLoginEmail String
+    | UpdateLoginPassword String
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -164,10 +176,10 @@ update msg model =
             )
 
         AuthStored auth ->
-            ( model, Cmd.none )
+            ( { model | auth = Just auth }, Cmd.none )
 
         AuthRemoved ->
-            ( model, Cmd.none )
+            ( { model | auth = Nothing }, Cmd.none )
 
         MapMarkerMoved pos ->
             let
@@ -177,6 +189,48 @@ update msg model =
             ( { model | map = updatedMap }
             , Cmd.none
             )
+
+        Login ->
+            let
+                credentials =
+                    { email = model.loginEmail, password = model.loginPassword }
+            in
+            ( model, PocketBase.login credentials LoginResult )
+
+        Logout ->
+            case model.auth of
+                Just auth ->
+                    case auth.token of
+                        Just token ->
+                            ( model, PocketBase.logout token LogoutResult )
+
+                        Nothing ->
+                            ( model, Cmd.none )
+
+                Nothing ->
+                    ( model, Cmd.none )
+
+        LoginResult result ->
+            case result of
+                Ok auth ->
+                    ( { model | auth = Just auth }, Ports.storeAuth auth )
+
+                Err _ ->
+                    ( model, Cmd.none )
+
+        LogoutResult result ->
+            case result of
+                Ok _ ->
+                    ( { model | auth = Nothing }, Ports.removeAuth () )
+
+                Err _ ->
+                    ( model, Cmd.none )
+
+        UpdateLoginEmail email ->
+            ( { model | loginEmail = email }, Cmd.none )
+
+        UpdateLoginPassword password ->
+            ( { model | loginPassword = password }, Cmd.none )
 
 
 
@@ -212,6 +266,21 @@ view model =
                     , a [ href "/events/123/edit" ] [ text "Edit Event" ]
                     , text " | "
                     , a [ href "/callback" ] [ text "Callback" ]
+                    ]
+                , div []
+                    [ case model.auth of
+                        Just auth ->
+                            div []
+                                [ text ("Logged in as: " ++ (Maybe.withDefault "Unknown" (Maybe.map .email auth.user)))
+                                , Html.button [ onClick Logout ] [ text "Logout" ]
+                                ]
+
+                        Nothing ->
+                            div []
+                                [ Html.input [ type_ "email", placeholder "Email", value model.loginEmail, onInput UpdateLoginEmail ] []
+                                , Html.input [ type_ "password", placeholder "Password", value model.loginPassword, onInput UpdateLoginPassword ] []
+                                , Html.button [ onClick Login ] [ text "Login" ]
+                                ]
                     ]
                 ]
             , main_ []
