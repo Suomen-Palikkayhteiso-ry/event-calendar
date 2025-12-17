@@ -1,8 +1,10 @@
 module EventUtilsTests exposing (..)
 
+import DateUtils
 import EventUtils
 import Expect
 import Test exposing (..)
+import Time
 import Types exposing (Event, EventFormData, EventState(..), Point, DisplayEvent)
 
 
@@ -137,10 +139,31 @@ suite =
                             , updated = "2024-01-01T09:00:00Z"
                             }
 
-                        -- Mock current time to be during the event
-                        -- For simplicity, assume it's ongoing if start < now < end
-                        -- But since we can't mock time, skip or assume
+                        now = Time.millisToPosix (Time.posixToMillis (DateUtils.parseUTCDate "2024-01-01T11:00:00Z"))
                     in
-                    Expect.equal (EventUtils.isEventOngoing event) False -- placeholder
+                    Expect.equal (EventUtils.isEventOngoing now event) True
+            , test "should return false if event is in the past" <|
+                \_ ->
+                    let
+                        event = 
+                            { id = "test-id"
+                            , title = "Test Event"
+                            , description = Just "Test description"
+                            , location = Just "Helsinki"
+                            , startDate = "2024-01-01T10:00:00Z"
+                            , endDate = Just "2024-01-01T12:00:00Z"
+                            , allDay = False
+                            , url = Just "https://example.com"
+                            , image = Just "test-image.jpg"
+                            , imageDescription = Just "Test image"
+                            , point = Just { lat = 60.1699, lon = 24.9384 }
+                            , state = Published
+                            , created = "2024-01-01T09:00:00Z"
+                            , updated = "2024-01-01T09:00:00Z"
+                            }
+
+                        now = Time.millisToPosix (Time.posixToMillis (DateUtils.parseUTCDate "2024-01-02T11:00:00Z"))
+                    in
+                    Expect.equal (EventUtils.isEventOngoing now event) False
             ]
         ]

@@ -63,13 +63,9 @@ formatEventForDisplay event =
     { event = event, displayDate = displayDate, displayTime = displayTime }
 
 
-isEventOngoing : Event -> Bool
-isEventOngoing event =
+isEventOngoing : Time.Posix -> Event -> Bool
+isEventOngoing now event =
     let
-        now =
-            Time.millisToPosix 0
-
-        -- placeholder for current time
         start =
             DateUtils.parseUTCDate event.startDate
 
@@ -79,24 +75,18 @@ isEventOngoing event =
     Time.posixToMillis now >= Time.posixToMillis start && Time.posixToMillis now <= Time.posixToMillis end
 
 
-isEventUpcoming : Event -> Bool
-isEventUpcoming event =
+isEventUpcoming : Time.Posix -> Event -> Bool
+isEventUpcoming now event =
     let
-        now =
-            Time.millisToPosix 0
-
         start =
             DateUtils.parseUTCDate event.startDate
     in
     Time.posixToMillis start > Time.posixToMillis now
 
 
-isEventPast : Event -> Bool
-isEventPast event =
+isEventPast : Time.Posix -> Event -> Bool
+isEventPast now event =
     let
-        now =
-            Time.millisToPosix 0
-
         end =
             event.endDate |> Maybe.map DateUtils.parseUTCDate |> Maybe.withDefault (DateUtils.parseUTCDate event.startDate)
     in
