@@ -6,9 +6,7 @@ import Button
 import Calendar
 import EventForm
 import Events
-import Html exposing (Html, a, div, h1, header, main_, nav, p, text)
-import Html.Attributes exposing (..)
-import Html.Events exposing (onClick, onInput)
+import Dict
 import Http
 import Input
 import Map
@@ -16,8 +14,7 @@ import PocketBase
 import Ports
 import Time
 import Types
-import Url
-import Url.Parser as Parser exposing ((</>), Parser, oneOf, s, string)
+import Url.Parser.Query as Query
 
 
 
@@ -101,6 +98,31 @@ parseUrl url =
             NotFound
 
 
+parseCallbackParams : String -> Maybe ( String, Maybe String )
+parseCallbackParams query =
+    let
+        params =
+            String.split "&" query
+                |> List.map (String.split "=")
+                |> List.filterMap
+                    (\parts ->
+                        case parts of
+                            [ key, value ] ->
+                                Just ( key, value )
+
+                            _ ->
+                                Nothing
+                    )
+                |> Dict.fromList
+
+        code =
+            Dict.get "code" params
+
+        state =
+            Dict.get "state" params
+    in
+    Maybe.map (\c -> ( c, state )) code
+
 
 -- HELPERS
 
@@ -144,6 +166,7 @@ type Msg
     | LogoutResult (Result Http.Error ())
     | UpdateLoginEmail String
     | UpdateLoginPassword String
+    | AuthCallbackResult (Result Http.Error Types.Auth)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -170,6 +193,14 @@ update msg model =
                                 ( updatedEventForm, _ ) = EventForm.update (EventForm.LoadEvent event) model.eventForm
                             in
                             ( { newModel | eventForm = updatedEventForm }, Cmd.none )
+
+                        Nothing ->
+                            ( newModel, Cmd.none )
+
+                Callback ->
+                    case parseCallbackParams url.query of
+                        Just ( code, state ) ->
+                            ( newModel, PocketBase.authWithOAuth2Code code state AuthCallbackResult )
 
                         Nothing ->
                             ( newModel, Cmd.none )
@@ -299,6 +330,14 @@ update msg model =
             case result of
                 Ok _ ->
                     ( { model | auth = Nothing, error = Nothing }, Ports.removeAuth () )
+
+                Err err ->
+                    ( { model | error = Just (httpErrorToString err) }, Cmd.none )
+
+        AuthCallbackResult result ->
+            case result of
+                Ok auth ->
+                    ( { model | auth = Just auth, error = Nothing }, Ports.storeAuth auth )
 
                 Err err ->
                     ( { model | error = Just (httpErrorToString err) }, Cmd.none )

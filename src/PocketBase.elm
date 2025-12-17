@@ -42,11 +42,21 @@ loginEncoder credentials =
         ]
 
 
-authResponseDecoder : Decode.Decoder Auth
-authResponseDecoder =
-    Decode.map2 Auth
-        (Decode.field "record" (Decode.nullable userDecoder))
-        (Decode.field "token" (Decode.nullable Decode.string))
+authWithOAuth2Code : String -> Maybe String -> (Result Http.Error Auth -> msg) -> Cmd msg
+authWithOAuth2Code code state toMsg =
+    Http.post
+        { url = baseUrl ++ "/api/oauth2-redirect"
+        , body = Http.jsonBody (oauth2Encoder code state)
+        , expect = Http.expectJson toMsg authResponseDecoder
+        }
+
+
+oauth2Encoder : String -> Maybe String -> Encode.Value
+oauth2Encoder code state =
+    Encode.object
+        [ ( "code", Encode.string code )
+        , ( "state", Encode.string (Maybe.withDefault "" state) )
+        ]
 
 
 userDecoder : Decode.Decoder User
