@@ -1,13 +1,14 @@
-# Makefile for SvelteKit project
+# Makefile for Elm/SvelteKit project
 
 # Variables
 PNPM = pnpm
+ELM = elm
 
 .PHONY: all
 all: build
 
 .PHONY: build
-build: install
+build: install elm-build
 	$(PNPM) build
 
 .PHONY: clean
@@ -45,8 +46,20 @@ start:
 .PHONY: watch
 watch: start
 
+.PHONY: elm-build
+elm-build:
+	$(ELM) make src/Main.elm --output=src/main.js
+
+.PHONY: elm-test
+elm-test:
+	$(ELM)-test
+
+.PHONY: elm-format
+elm-format:
+	$(ELM)-format --yes src/
+
 .PHONY: test
-test: node_modules
+test: elm-test
 	$(PNPM) test
 
 .PHONY: test-coverage
@@ -62,7 +75,7 @@ screenshots: node_modules
 	$(PNPM) screenshots
 
 .PHONY: format
-format:
+format: elm-format
 	$(PNPM) format
 
 .PHONY: check
