@@ -29,6 +29,7 @@ type alias Model =
     , point : Maybe Point
     , errors : List String
     , mode : Mode
+    , loading : Bool
     }
 
 
@@ -52,6 +53,7 @@ init =
     , point = Nothing
     , errors = []
     , mode = Create
+    , loading = False
     }
 
 
@@ -74,6 +76,7 @@ type Msg
     | Submit
     | Validate
     | LoadEvent Event
+    | SetLoading Bool
 
 
 
@@ -124,10 +127,10 @@ update msg model =
             if List.isEmpty newModel.errors then
                 case model.mode of
                     Create ->
-                        ( newModel, Just (CreateEvent (toEvent newModel)) )
+                        ( { newModel | loading = True }, Just (CreateEvent (toEvent newModel)) )
 
                     Edit id ->
-                        ( newModel, Just (UpdateEvent id (toEvent newModel)) )
+                        ( { newModel | loading = True }, Just (UpdateEvent id (toEvent newModel)) )
 
             else
                 ( newModel, Nothing )
@@ -137,6 +140,9 @@ update msg model =
 
         LoadEvent event ->
             ( fromEvent event, Nothing )
+
+        SetLoading loading ->
+            ( { model | loading = loading }, Nothing )
 
 
 validate : Model -> Model
@@ -272,6 +278,6 @@ view model =
             ul [] (List.map (\error -> li [] [ text error ]) model.errors)
           else
             text ""
-        , button [ onClick Submit, disabled (not (List.isEmpty model.errors)) ] [ text "Submit" ]
+        , button [ onClick Submit, disabled (not (List.isEmpty model.errors) || model.loading) ] [ text (if model.loading then "Submitting..." else "Submit") ]
         , button [ onClick Validate ] [ text "Validate" ]
         ]

@@ -244,9 +244,22 @@ update msg model =
 
                         _ ->
                             model.loading
+
+                newError = updatedEvents.error
+
+                eventFormCmd =
+                    case eventsMsg of
+                        Events.EventCreated _ ->
+                            Cmd.map EventFormMsg (Tuple.second (EventForm.update (EventForm.SetLoading False) model.eventForm))
+
+                        Events.EventUpdated _ ->
+                            Cmd.map EventFormMsg (Tuple.second (EventForm.update (EventForm.SetLoading False) model.eventForm))
+
+                        _ ->
+                            Cmd.none
             in
-            ( { model | events = updatedEvents, calendar = updatedCalendar, loading = newLoading }
-            , Cmd.map EventsMsg eventsCmd
+            ( { model | events = updatedEvents, calendar = updatedCalendar, loading = newLoading, error = newError }
+            , Cmd.batch [ Cmd.map EventsMsg eventsCmd, eventFormCmd ]
             )
 
         MapMsg mapMsg ->
