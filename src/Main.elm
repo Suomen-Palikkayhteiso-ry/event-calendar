@@ -6,14 +6,20 @@ import Button
 import Calendar
 import EventForm
 import Events
-import Dict
+import Html exposing (Html, a, div, h1, header, main_, nav, p, text)
+import Html.Attributes exposing (..)
+import Html.Events exposing (onClick, onInput)
 import Http
+import Input
 import Input
 import Map
 import PocketBase
 import Ports
 import Time
+import Task
 import Types
+import Url
+import Url.Parser as Parser exposing ((</>), Parser, oneOf, s, string)
 import Url.Parser.Query as Query
 
 
@@ -57,7 +63,7 @@ init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init flags url key =
     let
         ( eventsModel, eventsCmd ) =
-            Events.update Events.FetchEvents Events.init
+            Events.update (Events.FetchEvents Nothing) Events.init
     in
     ( Model key url (parseUrl url) Calendar.init eventsModel Map.init EventForm.init Nothing "" "" Nothing True
     , Cmd.map EventsMsg eventsCmd
@@ -113,13 +119,12 @@ parseCallbackParams query =
                             _ ->
                                 Nothing
                     )
-                |> Dict.fromList
 
-        code =
-            Dict.get "code" params
+        findParam name = 
+            params |> List.filter (\(k, _) -> k == name) |> List.head |> Maybe.map Tuple.second
 
-        state =
-            Dict.get "state" params
+        code = findParam "code"
+        state = findParam "state"
     in
     Maybe.map (\c -> ( c, state )) code
 
@@ -198,7 +203,7 @@ update msg model =
                             ( newModel, Cmd.none )
 
                 Callback ->
-                    case parseCallbackParams url.query of
+                    case parseCallbackParams (Maybe.withDefault "" url.query) of
                         Just ( code, state ) ->
                             ( newModel, PocketBase.authWithOAuth2Code code state AuthCallbackResult )
 
@@ -261,20 +266,10 @@ update msg model =
                 cmd =
                     case action of
                         Just (EventForm.CreateEvent event) ->
-                            case model.auth of
-                                Just auth ->
-                                    PocketBase.createEvent auth.token event (Events.EventCreated >> EventsMsg)
-
-                                Nothing ->
-                                    Cmd.none
+                            Task.perform identity (Task.succeed (EventsMsg (Events.CreateEvent (model.auth |> Maybe.andThen .token) event)))
 
                         Just (EventForm.UpdateEvent id event) ->
-                            case model.auth of
-                                Just auth ->
-                                    PocketBase.updateEvent auth.token id event (Events.EventUpdated >> EventsMsg)
-
-                                Nothing ->
-                                    Cmd.none
+                            Task.perform identity (Task.succeed (EventsMsg (Events.UpdateEvent (model.auth |> Maybe.andThen .token) id event)))
 
                         Nothing ->
                             Cmd.none
@@ -303,7 +298,7 @@ update msg model =
                 credentials =
                     { email = model.loginEmail, password = model.loginPassword }
             in
-            ( model, PocketBase.login credentials LoginResult )
+            ( { model | loading = True, error = Nothing }, PocketBase.login credentials LoginResult )
 
         Logout ->
             case model.auth of
@@ -321,26 +316,26 @@ update msg model =
         LoginResult result ->
             case result of
                 Ok auth ->
-                    ( { model | auth = Just auth, error = Nothing }, Ports.storeAuth auth )
+                    ( { model | auth = Just auth, error = Nothing, loading = False }, Ports.storeAuth auth )
 
                 Err err ->
-                    ( { model | error = Just (httpErrorToString err) }, Cmd.none )
+                    ( { model | error = Just (httpErrorToString err), loading = False }, Cmd.none )
 
         LogoutResult result ->
             case result of
                 Ok _ ->
-                    ( { model | auth = Nothing, error = Nothing }, Ports.removeAuth () )
+                    ( { model | auth = Nothing, error = Nothing, loading = False }, Ports.removeAuth () )
 
                 Err err ->
-                    ( { model | error = Just (httpErrorToString err) }, Cmd.none )
+                    ( { model | error = Just (httpErrorToString err), loading = False }, Cmd.none )
 
         AuthCallbackResult result ->
             case result of
                 Ok auth ->
-                    ( { model | auth = Just auth, error = Nothing }, Ports.storeAuth auth )
+                    ( { model | auth = Just auth, error = Nothing, loading = False }, Ports.storeAuth auth )
 
                 Err err ->
-                    ( { model | error = Just (httpErrorToString err) }, Cmd.none )
+                    ( { model | error = Just (httpErrorToString err), loading = False }, Cmd.none )
 
         UpdateLoginEmail email ->
             ( { model | loginEmail = email }, Cmd.none )

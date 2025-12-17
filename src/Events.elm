@@ -29,13 +29,13 @@ init =
 
 
 type Msg
-    = FetchEvents
+    = FetchEvents (Maybe String)
     | EventsFetched (Result Http.Error (List Event))
-    | CreateEvent Event
+    | CreateEvent (Maybe String) Event
     | EventCreated (Result Http.Error Event)
-    | UpdateEvent String Event
+    | UpdateEvent (Maybe String) String Event
     | EventUpdated (Result Http.Error Event)
-    | DeleteEvent String
+    | DeleteEvent (Maybe String) String
     | EventDeleted String (Result Http.Error ())
 
 
@@ -46,9 +46,9 @@ type Msg
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        FetchEvents ->
+        FetchEvents token ->
             ( { model | loading = True, error = Nothing }
-            , PocketBase.getEvents Nothing EventsFetched
+            , PocketBase.getEvents token EventsFetched
             )
 
         EventsFetched result ->
@@ -63,9 +63,9 @@ update msg model =
                     , Cmd.none
                     )
 
-        CreateEvent event ->
+        CreateEvent token event ->
             ( model
-            , PocketBase.createEvent Nothing event EventCreated
+            , PocketBase.createEvent token event EventCreated
             )
 
         EventCreated result ->
@@ -80,9 +80,9 @@ update msg model =
                     , Cmd.none
                     )
 
-        UpdateEvent id updatedEvent ->
+        UpdateEvent token id updatedEvent ->
             ( model
-            , PocketBase.updateEvent Nothing id updatedEvent EventUpdated
+            , PocketBase.updateEvent token id updatedEvent EventUpdated
             )
 
         EventUpdated result ->
@@ -108,9 +108,9 @@ update msg model =
                     , Cmd.none
                     )
 
-        DeleteEvent id ->
+        DeleteEvent token id ->
             ( model
-            , PocketBase.deleteEvent Nothing id (EventDeleted id)
+            , PocketBase.deleteEvent token id (EventDeleted id)
             )
 
         EventDeleted id result ->

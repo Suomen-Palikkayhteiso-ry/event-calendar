@@ -59,6 +59,13 @@ oauth2Encoder code state =
         ]
 
 
+authResponseDecoder : Decode.Decoder Auth
+authResponseDecoder =
+    Decode.map2 Auth
+        (Decode.field "record" (Decode.nullable userDecoder))
+        (Decode.field "token" (Decode.nullable Decode.string))
+
+
 userDecoder : Decode.Decoder User
 userDecoder =
     Decode.map4 User
