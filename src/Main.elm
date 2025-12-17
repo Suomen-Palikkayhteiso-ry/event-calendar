@@ -52,6 +52,7 @@ type alias Model =
     , loginEmail : String
     , loginPassword : String
     , error : Maybe String
+    , loading : Bool
     }
 
 
@@ -61,7 +62,7 @@ init flags url key =
         ( eventsModel, eventsCmd ) =
             Events.update Events.FetchEvents Events.init
     in
-    ( Model key url (parseUrl url) Calendar.init eventsModel Map.init EventForm.init Nothing "" "" Nothing
+    ( Model key url (parseUrl url) Calendar.init eventsModel Map.init EventForm.init Nothing "" "" Nothing True
     , Cmd.map EventsMsg eventsCmd
     )
 
@@ -199,8 +200,16 @@ update msg model =
 
                         _ ->
                             model.calendar
+
+                newLoading =
+                    case eventsMsg of
+                        Events.EventsFetched _ ->
+                            False
+
+                        _ ->
+                            model.loading
             in
-            ( { model | events = updatedEvents, calendar = updatedCalendar }
+            ( { model | events = updatedEvents, calendar = updatedCalendar, loading = newLoading }
             , Cmd.map EventsMsg eventsCmd
             )
 
@@ -422,42 +431,45 @@ view model =
                         text ""
                 ]
             , main_ []
-                [ case model.route of
-                    Home ->
-                        Html.map CalendarMsg (Calendar.view model.calendar)
+                [ if model.loading then
+                    div [] [ text "Loading..." ]
+                  else
+                    case model.route of
+                        Home ->
+                            Html.map CalendarMsg (Calendar.view model.calendar)
 
-                    MapRoute ->
-                        Html.map MapMsg (Map.view model.map)
+                        MapRoute ->
+                            Html.map MapMsg (Map.view model.map)
 
-                    EventDetail id ->
-                        case List.head (List.filter (\e -> e.id == id) model.events.events) of
-                            Just event ->
-                                div []
-                                    [ h1 [] [ text event.title ]
-                                    , p [] [ text (Maybe.withDefault "" event.description) ]
-                                    , p [] [ text ("Start: " ++ event.startDate) ]
-                                    , p [] [ text ("Location: " ++ Maybe.withDefault "" event.location) ]
-                                    , a [ href ("/events/" ++ id ++ "/edit") ] [ text "Edit" ]
-                                    ]
+                        EventDetail id ->
+                            case List.head (List.filter (\e -> e.id == id) model.events.events) of
+                                Just event ->
+                                    div []
+                                        [ h1 [] [ text event.title ]
+                                        , p [] [ text (Maybe.withDefault "" event.description) ]
+                                        , p [] [ text ("Start: " ++ event.startDate) ]
+                                        , p [] [ text ("Location: " ++ Maybe.withDefault "" event.location) ]
+                                        , a [ href ("/events/" ++ id ++ "/edit") ] [ text "Edit" ]
+                                        ]
 
-                            Nothing ->
-                                h1 [] [ text ("Event not found: " ++ id) ]
+                                Nothing ->
+                                    h1 [] [ text ("Event not found: " ++ id) ]
 
-                    EditEvent id ->
-                        Html.map EventFormMsg (EventForm.view model.eventForm)
+                        EditEvent id ->
+                            Html.map EventFormMsg (EventForm.view model.eventForm)
 
-                    Callback ->
-                        div []
-                            [ h1 [] [ text "Authentication Callback" ]
-                            , p [] [ text "Processing authentication..." ]
-                            ]
+                        Callback ->
+                            div []
+                                [ h1 [] [ text "Authentication Callback" ]
+                                , p [] [ text "Processing authentication..." ]
+                                ]
 
-                    NotFound ->
-                        div []
-                            [ h1 [] [ text "404 - Page Not Found" ]
-                            , p [] [ text "The page you are looking for does not exist." ]
-                            , a [ href "/" ] [ text "Go Home" ]
-                            ]
+                        NotFound ->
+                            div []
+                                [ h1 [] [ text "404 - Page Not Found" ]
+                                , p [] [ text "The page you are looking for does not exist." ]
+                                , a [ href "/" ] [ text "Go Home" ]
+                                ]
                 ]
             ]
         ]

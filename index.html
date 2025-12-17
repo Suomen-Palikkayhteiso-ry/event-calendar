@@ -5394,7 +5394,9 @@ var $author$project$Main$Model = function (key) {
 								return function (loginEmail) {
 									return function (loginPassword) {
 										return function (error) {
-											return {auth: auth, calendar: calendar, error: error, eventForm: eventForm, events: events, key: key, loginEmail: loginEmail, loginPassword: loginPassword, map: map, route: route, url: url};
+											return function (loading) {
+												return {auth: auth, calendar: calendar, error: error, eventForm: eventForm, events: events, key: key, loading: loading, loginEmail: loginEmail, loginPassword: loginPassword, map: map, route: route, url: url};
+											};
 										};
 									};
 								};
@@ -7069,7 +7071,7 @@ var $author$project$Main$init = F3(
 		var eventsCmd = _v0.b;
 		return _Utils_Tuple2(
 			$author$project$Main$Model(key)(url)(
-				$author$project$Main$parseUrl(url))($author$project$Calendar$init)(eventsModel)($author$project$Map$init)($author$project$EventForm$init)($elm$core$Maybe$Nothing)('')('')($elm$core$Maybe$Nothing),
+				$author$project$Main$parseUrl(url))($author$project$Calendar$init)(eventsModel)($author$project$Map$init)($author$project$EventForm$init)($elm$core$Maybe$Nothing)('')('')($elm$core$Maybe$Nothing)(true),
 			A2($elm$core$Platform$Cmd$map, $author$project$Main$EventsMsg, eventsCmd));
 	});
 var $author$project$Main$AuthRemoved = {$: 'AuthRemoved'};
@@ -8098,7 +8100,7 @@ var $author$project$Main$update = F2(
 			case 'EventsMsg':
 				var eventsMsg = msg.a;
 				var updatedCalendar = function () {
-					_v6$3:
+					_v7$3:
 					while (true) {
 						switch (eventsMsg.$) {
 							case 'EventsFetched':
@@ -8109,7 +8111,7 @@ var $author$project$Main$update = F2(
 										$author$project$Calendar$SetEvents(events),
 										model.calendar);
 								} else {
-									break _v6$3;
+									break _v7$3;
 								}
 							case 'EventCreated':
 								if (eventsMsg.a.$ === 'Ok') {
@@ -8119,7 +8121,7 @@ var $author$project$Main$update = F2(
 										$author$project$Calendar$AddEvent(event),
 										model.calendar);
 								} else {
-									break _v6$3;
+									break _v7$3;
 								}
 							case 'EventUpdated':
 								if (eventsMsg.a.$ === 'Ok') {
@@ -8129,13 +8131,20 @@ var $author$project$Main$update = F2(
 										$author$project$Calendar$UpdateEvent(event),
 										model.calendar);
 								} else {
-									break _v6$3;
+									break _v7$3;
 								}
 							default:
-								break _v6$3;
+								break _v7$3;
 						}
 					}
 					return model.calendar;
+				}();
+				var newLoading = function () {
+					if (eventsMsg.$ === 'EventsFetched') {
+						return false;
+					} else {
+						return model.loading;
+					}
 				}();
 				var _v5 = A2($author$project$Events$update, eventsMsg, model.events);
 				var updatedEvents = _v5.a;
@@ -8143,13 +8152,13 @@ var $author$project$Main$update = F2(
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{calendar: updatedCalendar, events: updatedEvents}),
+						{calendar: updatedCalendar, events: updatedEvents, loading: newLoading}),
 					A2($elm$core$Platform$Cmd$map, $author$project$Main$EventsMsg, eventsCmd));
 			case 'MapMsg':
 				var mapMsg = msg.a;
-				var _v7 = A2($author$project$Map$update, mapMsg, model.map);
-				var updatedMap = _v7.a;
-				var mapCmd = _v7.b;
+				var _v8 = A2($author$project$Map$update, mapMsg, model.map);
+				var updatedMap = _v8.a;
+				var mapCmd = _v8.b;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
@@ -8157,16 +8166,16 @@ var $author$project$Main$update = F2(
 					A2($elm$core$Platform$Cmd$map, $author$project$Main$MapMsg, mapCmd));
 			case 'EventFormMsg':
 				var eventFormMsg = msg.a;
-				var _v8 = A2($author$project$EventForm$update, eventFormMsg, model.eventForm);
-				var updatedEventForm = _v8.a;
-				var action = _v8.b;
+				var _v9 = A2($author$project$EventForm$update, eventFormMsg, model.eventForm);
+				var updatedEventForm = _v9.a;
+				var action = _v9.b;
 				var cmd = function () {
 					if (action.$ === 'Just') {
 						if (action.a.$ === 'CreateEvent') {
 							var event = action.a.a;
-							var _v10 = model.auth;
-							if (_v10.$ === 'Just') {
-								var auth = _v10.a;
+							var _v11 = model.auth;
+							if (_v11.$ === 'Just') {
+								var auth = _v11.a;
 								return A3(
 									$author$project$PocketBase$createEvent,
 									auth.token,
@@ -8176,12 +8185,12 @@ var $author$project$Main$update = F2(
 								return $elm$core$Platform$Cmd$none;
 							}
 						} else {
-							var _v11 = action.a;
-							var id = _v11.a;
-							var event = _v11.b;
-							var _v12 = model.auth;
-							if (_v12.$ === 'Just') {
-								var auth = _v12.a;
+							var _v12 = action.a;
+							var id = _v12.a;
+							var event = _v12.b;
+							var _v13 = model.auth;
+							if (_v13.$ === 'Just') {
+								var auth = _v13.a;
 								return A4(
 									$author$project$PocketBase$updateEvent,
 									auth.token,
@@ -8218,11 +8227,11 @@ var $author$project$Main$update = F2(
 					$elm$core$Platform$Cmd$none);
 			case 'MapMarkerMoved':
 				var pos = msg.a;
-				var _v13 = A2(
+				var _v14 = A2(
 					$author$project$Map$update,
 					$author$project$Map$MarkerMoved(pos),
 					model.map);
-				var updatedMap = _v13.a;
+				var updatedMap = _v14.a;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
@@ -8234,12 +8243,12 @@ var $author$project$Main$update = F2(
 					model,
 					A2($author$project$PocketBase$login, credentials, $author$project$Main$LoginResult));
 			case 'Logout':
-				var _v14 = model.auth;
-				if (_v14.$ === 'Just') {
-					var auth = _v14.a;
-					var _v15 = auth.token;
-					if (_v15.$ === 'Just') {
-						var token = _v15.a;
+				var _v15 = model.auth;
+				if (_v15.$ === 'Just') {
+					var auth = _v15.a;
+					var _v16 = auth.token;
+					if (_v16.$ === 'Just') {
+						var token = _v16.a;
 						return _Utils_Tuple2(
 							model,
 							A2($author$project$PocketBase$logout, token, $author$project$Main$LogoutResult));
@@ -9733,29 +9742,100 @@ var $author$project$Main$view = function (model) {
 						_List_fromArray(
 							[
 								function () {
-								var _v2 = model.route;
-								switch (_v2.$) {
-									case 'Home':
-										return A2(
-											$elm$html$Html$map,
-											$author$project$Main$CalendarMsg,
-											$author$project$Calendar$view(model.calendar));
-									case 'MapRoute':
-										return A2(
-											$elm$html$Html$map,
-											$author$project$Main$MapMsg,
-											$author$project$Map$view(model.map));
-									case 'EventDetail':
-										var id = _v2.a;
-										var _v3 = $elm$core$List$head(
-											A2(
-												$elm$core$List$filter,
-												function (e) {
-													return _Utils_eq(e.id, id);
-												},
-												model.events.events));
-										if (_v3.$ === 'Just') {
-											var event = _v3.a;
+								if (model.loading) {
+									return A2(
+										$elm$html$Html$div,
+										_List_Nil,
+										_List_fromArray(
+											[
+												$elm$html$Html$text('Loading...')
+											]));
+								} else {
+									var _v2 = model.route;
+									switch (_v2.$) {
+										case 'Home':
+											return A2(
+												$elm$html$Html$map,
+												$author$project$Main$CalendarMsg,
+												$author$project$Calendar$view(model.calendar));
+										case 'MapRoute':
+											return A2(
+												$elm$html$Html$map,
+												$author$project$Main$MapMsg,
+												$author$project$Map$view(model.map));
+										case 'EventDetail':
+											var id = _v2.a;
+											var _v3 = $elm$core$List$head(
+												A2(
+													$elm$core$List$filter,
+													function (e) {
+														return _Utils_eq(e.id, id);
+													},
+													model.events.events));
+											if (_v3.$ === 'Just') {
+												var event = _v3.a;
+												return A2(
+													$elm$html$Html$div,
+													_List_Nil,
+													_List_fromArray(
+														[
+															A2(
+															$elm$html$Html$h1,
+															_List_Nil,
+															_List_fromArray(
+																[
+																	$elm$html$Html$text(event.title)
+																])),
+															A2(
+															$elm$html$Html$p,
+															_List_Nil,
+															_List_fromArray(
+																[
+																	$elm$html$Html$text(
+																	A2($elm$core$Maybe$withDefault, '', event.description))
+																])),
+															A2(
+															$elm$html$Html$p,
+															_List_Nil,
+															_List_fromArray(
+																[
+																	$elm$html$Html$text('Start: ' + event.startDate)
+																])),
+															A2(
+															$elm$html$Html$p,
+															_List_Nil,
+															_List_fromArray(
+																[
+																	$elm$html$Html$text(
+																	'Location: ' + A2($elm$core$Maybe$withDefault, '', event.location))
+																])),
+															A2(
+															$elm$html$Html$a,
+															_List_fromArray(
+																[
+																	$elm$html$Html$Attributes$href('/events/' + (id + '/edit'))
+																]),
+															_List_fromArray(
+																[
+																	$elm$html$Html$text('Edit')
+																]))
+														]));
+											} else {
+												return A2(
+													$elm$html$Html$h1,
+													_List_Nil,
+													_List_fromArray(
+														[
+															$elm$html$Html$text('Event not found: ' + id)
+														]));
+											}
+										case 'EditEvent':
+											var id = _v2.a;
+											return A2(
+												$elm$html$Html$map,
+												$author$project$Main$EventFormMsg,
+												$author$project$EventForm$view(model.eventForm));
+										case 'Callback':
 											return A2(
 												$elm$html$Html$div,
 												_List_Nil,
@@ -9766,109 +9846,48 @@ var $author$project$Main$view = function (model) {
 														_List_Nil,
 														_List_fromArray(
 															[
-																$elm$html$Html$text(event.title)
+																$elm$html$Html$text('Authentication Callback')
 															])),
 														A2(
 														$elm$html$Html$p,
 														_List_Nil,
 														_List_fromArray(
 															[
-																$elm$html$Html$text(
-																A2($elm$core$Maybe$withDefault, '', event.description))
+																$elm$html$Html$text('Processing authentication...')
+															]))
+													]));
+										default:
+											return A2(
+												$elm$html$Html$div,
+												_List_Nil,
+												_List_fromArray(
+													[
+														A2(
+														$elm$html$Html$h1,
+														_List_Nil,
+														_List_fromArray(
+															[
+																$elm$html$Html$text('404 - Page Not Found')
 															])),
 														A2(
 														$elm$html$Html$p,
 														_List_Nil,
 														_List_fromArray(
 															[
-																$elm$html$Html$text('Start: ' + event.startDate)
-															])),
-														A2(
-														$elm$html$Html$p,
-														_List_Nil,
-														_List_fromArray(
-															[
-																$elm$html$Html$text(
-																'Location: ' + A2($elm$core$Maybe$withDefault, '', event.location))
+																$elm$html$Html$text('The page you are looking for does not exist.')
 															])),
 														A2(
 														$elm$html$Html$a,
 														_List_fromArray(
 															[
-																$elm$html$Html$Attributes$href('/events/' + (id + '/edit'))
+																$elm$html$Html$Attributes$href('/')
 															]),
 														_List_fromArray(
 															[
-																$elm$html$Html$text('Edit')
+																$elm$html$Html$text('Go Home')
 															]))
 													]));
-										} else {
-											return A2(
-												$elm$html$Html$h1,
-												_List_Nil,
-												_List_fromArray(
-													[
-														$elm$html$Html$text('Event not found: ' + id)
-													]));
-										}
-									case 'EditEvent':
-										var id = _v2.a;
-										return A2(
-											$elm$html$Html$map,
-											$author$project$Main$EventFormMsg,
-											$author$project$EventForm$view(model.eventForm));
-									case 'Callback':
-										return A2(
-											$elm$html$Html$div,
-											_List_Nil,
-											_List_fromArray(
-												[
-													A2(
-													$elm$html$Html$h1,
-													_List_Nil,
-													_List_fromArray(
-														[
-															$elm$html$Html$text('Authentication Callback')
-														])),
-													A2(
-													$elm$html$Html$p,
-													_List_Nil,
-													_List_fromArray(
-														[
-															$elm$html$Html$text('Processing authentication...')
-														]))
-												]));
-									default:
-										return A2(
-											$elm$html$Html$div,
-											_List_Nil,
-											_List_fromArray(
-												[
-													A2(
-													$elm$html$Html$h1,
-													_List_Nil,
-													_List_fromArray(
-														[
-															$elm$html$Html$text('404 - Page Not Found')
-														])),
-													A2(
-													$elm$html$Html$p,
-													_List_Nil,
-													_List_fromArray(
-														[
-															$elm$html$Html$text('The page you are looking for does not exist.')
-														])),
-													A2(
-													$elm$html$Html$a,
-													_List_fromArray(
-														[
-															$elm$html$Html$Attributes$href('/')
-														]),
-													_List_fromArray(
-														[
-															$elm$html$Html$text('Go Home')
-														]))
-												]));
+									}
 								}
 							}()
 							]))
