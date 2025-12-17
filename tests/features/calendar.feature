@@ -1,3 +1,5 @@
+# Reference: agents/stories/view-calendar.md
+
 Feature: Calendar Navigation and Event Viewing
   As a user
   I want to view and navigate the calendar

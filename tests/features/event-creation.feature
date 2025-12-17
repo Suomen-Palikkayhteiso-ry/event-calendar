@@ -1,3 +1,5 @@
+# Reference: agents/stories/create-event.md
+
 Feature: Event Creation
   As an authenticated member
   I want to create events

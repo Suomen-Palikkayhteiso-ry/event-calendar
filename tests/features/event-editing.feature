@@ -1,3 +1,5 @@
+# Reference: agents/stories/edit-event.md, agents/stories/delete-event.md
+
 Feature: Event Editing and Deletion
   As an authenticated member
   I want to edit and delete events
