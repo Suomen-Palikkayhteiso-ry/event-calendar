@@ -1,0 +1,6 @@
+{
+  "require": ["tests/steps/**/*.ts"],
+  "format": ["html:cucumber-report.html"],
+  "publishQuiet": true,
+  "import": ["playwright-bdd"]
+}
