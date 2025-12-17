@@ -3,6 +3,7 @@ module Main exposing (..)
 import Browser
 import Browser.Navigation as Nav
 import Calendar
+import EventForm
 import Events
 import Html exposing (Html, a, div, h1, header, main_, nav, text)
 import Html.Attributes exposing (..)
@@ -41,6 +42,7 @@ type alias Model =
     , calendar : Calendar.Model
     , events : Events.Model
     , map : Map.Model
+    , eventForm : EventForm.Model
     }
 
 
@@ -50,7 +52,7 @@ init flags url key =
         ( eventsModel, eventsCmd ) =
             Events.update Events.FetchEvents Events.init
     in
-    ( Model key url (parseUrl url) Calendar.init eventsModel Map.init
+    ( Model key url (parseUrl url) Calendar.init eventsModel Map.init EventForm.init
     , Cmd.map EventsMsg eventsCmd
     )
 
@@ -99,6 +101,7 @@ type Msg
     | CalendarMsg Calendar.Msg
     | EventsMsg Events.Msg
     | MapMsg Map.Msg
+    | EventFormMsg EventForm.Msg
     | AuthStored Types.Auth
     | AuthRemoved
     | MapMarkerMoved ( Float, Float )
@@ -149,6 +152,15 @@ update msg model =
             in
             ( { model | map = updatedMap }
             , Cmd.map MapMsg mapCmd
+            )
+
+        EventFormMsg eventFormMsg ->
+            let
+                ( updatedEventForm, eventFormCmd ) =
+                    EventForm.update eventFormMsg model.eventForm
+            in
+            ( { model | eventForm = updatedEventForm }
+            , Cmd.map EventFormMsg eventFormCmd
             )
 
         AuthStored auth ->
@@ -214,7 +226,7 @@ view model =
                         h1 [] [ text ("Event Detail Page for " ++ id) ]
 
                     EditEvent id ->
-                        h1 [] [ text ("Edit Event Page for " ++ id) ]
+                        Html.map EventFormMsg (EventForm.view model.eventForm)
 
                     Callback ->
                         h1 [] [ text "Auth Callback Page" ]
