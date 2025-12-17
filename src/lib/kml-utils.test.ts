@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { parseEventName, importKML } from '$lib/kml-utils';
+import { parseEventName, parseDateString, importKML } from '$lib/kml-utils';
 
 // Mock pocketbase to avoid env issues
 vi.mock('$lib/pocketbase', () => ({
@@ -89,6 +89,44 @@ describe('kml-utils', () => {
 				country: 'NOR',
 				dates: 'in June'
 			});
+		});
+	});
+
+	describe('parseDateString', () => {
+		it('should parse mid month format', () => {
+			const result = parseDateString('mid March', 2025);
+			expect(result.startDate).toEqual(new Date(2025, 2, 15)); // March is 2 (0-indexed)
+			expect(result.endDate).toEqual(new Date(2025, 2, 15));
+		});
+
+		it('should parse in month format', () => {
+			const result = parseDateString('in June', 2025);
+			expect(result.startDate).toEqual(new Date(2025, 5, 1)); // June is 5
+			expect(result.endDate).toEqual(new Date(2025, 5, 30)); // Last day of June
+		});
+
+		it('should parse single day format', () => {
+			const result = parseDateString('January 15', 2025);
+			expect(result.startDate).toEqual(new Date(2025, 0, 15));
+			expect(result.endDate).toEqual(new Date(2025, 0, 15));
+		});
+
+		it('should parse date range format', () => {
+			const result = parseDateString('February 10-12', 2025);
+			expect(result.startDate).toEqual(new Date(2025, 1, 10));
+			expect(result.endDate).toEqual(new Date(2025, 1, 12));
+		});
+
+		it('should return null dates for invalid format', () => {
+			const result = parseDateString('invalid date', 2025);
+			expect(result.startDate).toBeNull();
+			expect(result.endDate).toBeNull();
+		});
+
+		it('should handle case insensitive month names', () => {
+			const result = parseDateString('mid april', 2025);
+			expect(result.startDate).toEqual(new Date(2025, 3, 15)); // April is 3
+			expect(result.endDate).toEqual(new Date(2025, 3, 15));
 		});
 	});
 

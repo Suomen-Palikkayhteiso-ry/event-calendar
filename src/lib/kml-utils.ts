@@ -54,6 +54,53 @@ export function parseEventName(name: string): ParsedEventName {
 }
 
 /**
+ * Parses a date string from KML into start and end dates
+ * @param dateStr - The date string
+ * @param year - The year to use
+ * @returns Object with startDate and endDate
+ */
+export function parseDateString(dateStr: string, year: number): { startDate: Date | null; endDate: Date | null } {
+	let startDate: Date | null = null;
+	let endDate: Date | null = null;
+
+	if (dateStr.toLowerCase().includes('mid')) {
+		const monthMatch = dateStr.match(/mid\s+(\w+)/i);
+		if (monthMatch) {
+			const monthName = monthMatch[1].toLowerCase();
+			const month = months[monthName];
+			if (month !== undefined) {
+				startDate = new Date(year, month, 15);
+				endDate = new Date(year, month, 15);
+			}
+		}
+	} else if (dateStr.toLowerCase().startsWith('in ')) {
+		const monthMatch = dateStr.match(/in\s+(\w+)/i);
+		if (monthMatch) {
+			const monthName = monthMatch[1].toLowerCase();
+			const month = months[monthName];
+			if (month !== undefined) {
+				startDate = new Date(year, month, 1);
+				endDate = new Date(year, month + 1, 0);
+			}
+		}
+	} else {
+		const dateMatch = dateStr.match(/(\w+)\s+(\d+)(?:-(\d+))?/i);
+		if (dateMatch) {
+			const monthName = dateMatch[1].toLowerCase();
+			const month = months[monthName];
+			if (month !== undefined) {
+				const day1 = parseInt(dateMatch[2]);
+				const day2 = dateMatch[3] ? parseInt(dateMatch[3]) : day1;
+				startDate = new Date(year, month, day1);
+				endDate = new Date(year, month, day2);
+			}
+		}
+	}
+
+	return { startDate, endDate };
+}
+
+/**
  * Imports events from a KML file and creates them in the database
  * @param kmlFile - The KML file to import
  * @param onSuccess - Callback function called on successful import
@@ -89,39 +136,9 @@ export async function importKML(kmlFile: File, onSuccess: () => void) {
 			let endDate: Date | null = null;
 
 			if (parsed.dates) {
-				if (parsed.dates.toLowerCase().includes('mid')) {
-					const monthMatch = parsed.dates.match(/mid\s+(\w+)/i);
-					if (monthMatch) {
-						const monthName = monthMatch[1].toLowerCase();
-						const month = months[monthName];
-						if (month !== undefined) {
-							startDate = new Date(year, month, 15);
-							endDate = new Date(year, month, 15);
-						}
-					}
-				} else if (parsed.dates.toLowerCase().startsWith('in ')) {
-					const monthMatch = parsed.dates.match(/in\s+(\w+)/i);
-					if (monthMatch) {
-						const monthName = monthMatch[1].toLowerCase();
-						const month = months[monthName];
-						if (month !== undefined) {
-							startDate = new Date(year, month, 1);
-							endDate = new Date(year, month + 1, 0);
-						}
-					}
-				} else {
-					const dateMatch = parsed.dates.match(/(\w+)\s+(\d+)(?:-(\d+))?/i);
-					if (dateMatch) {
-						const monthName = dateMatch[1].toLowerCase();
-						const month = months[monthName];
-						if (month !== undefined) {
-							const day1 = parseInt(dateMatch[2]);
-							const day2 = dateMatch[3] ? parseInt(dateMatch[3]) : day1;
-							startDate = new Date(year, month, day1);
-							endDate = new Date(year, month, day2);
-						}
-					}
-				}
+				const { startDate: parsedStart, endDate: parsedEnd } = parseDateString(parsed.dates, year);
+				startDate = parsedStart;
+				endDate = parsedEnd;
 			}
 
 			if (!startDate) continue;
