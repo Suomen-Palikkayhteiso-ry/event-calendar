@@ -12,6 +12,13 @@ let
     # Vitest 3.2.4 + Playwright 1.56 expect revision 1194, which isn't yet packaged in nixpkgs.
     ln -s ${pkgs.playwright-driver.browsers}/chromium-1181 $out/chromium-1194
     ln -s ${pkgs.playwright-driver.browsers}/chromium_headless_shell-1181 $out/chromium_headless_shell-1194
+    
+    # Playwright 1.57+ expects revision 1200
+    ln -s ${pkgs.playwright-driver.browsers}/chromium_headless_shell-1181 $out/chromium_headless_shell-1200
+    
+    # Firefox and webkit symlinks for older expected revisions
+    ln -s ${pkgs.playwright-driver.browsers}/firefox-1489 $out/firefox-1497
+    ln -s ${pkgs.playwright-driver.browsers}/webkit-2191 $out/webkit-2227
   '';
 in
 {
