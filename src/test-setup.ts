@@ -1,5 +1,5 @@
 import * as matchers from '@testing-library/jest-dom/matchers';
-import { expect } from 'vitest';
+import { expect, vi } from 'vitest';
 import type { TestingLibraryMatchers } from '@testing-library/jest-dom/matchers';
 
 declare module 'vitest' {
@@ -9,3 +9,18 @@ declare module 'vitest' {
 }
 
 expect.extend(matchers);
+
+// Mock matchMedia for Svelte 5
+Object.defineProperty(window, 'matchMedia', {
+	writable: true,
+	value: vi.fn().mockImplementation(query => ({
+		matches: false,
+		media: query,
+		onchange: null,
+		addListener: vi.fn(), // deprecated
+		removeListener: vi.fn(), // deprecated
+		addEventListener: vi.fn(),
+		removeEventListener: vi.fn(),
+		dispatchEvent: vi.fn(),
+	})),
+});
