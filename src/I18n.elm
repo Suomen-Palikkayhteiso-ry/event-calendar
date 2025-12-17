@@ -1,4 +1,4 @@
-module I18n exposing (..)module I18n exposing (..)
+module I18n exposing (..)
 
 
 type alias Translations =
@@ -7,6 +7,7 @@ type alias Translations =
     , today : String
     , prev : String
     , next_button : String
+
     -- Add more as needed
     }
 
@@ -24,9 +25,20 @@ fi =
 get : String -> String
 get key =
     case key of
-        "calendar" -> fi.calendar
-        "list" -> fi.list
-        "today" -> fi.today
-        "prev" -> fi.prev
-        "next_button" -> fi.next_button
-        _ -> key
+        "calendar" ->
+            fi.calendar
+
+        "list" ->
+            fi.list
+
+        "today" ->
+            fi.today
+
+        "prev" ->
+            fi.prev
+
+        "next_button" ->
+            fi.next_button
+
+        _ ->
+            key

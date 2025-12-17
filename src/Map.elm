@@ -1,26 +1,28 @@
-module Map exposing (..)module Map exposing (..)
+module Map exposing (..)
 
 import Html exposing (div)
 import Html.Attributes exposing (id)
 import Ports
 
 
+
 -- Model
 
 
 type alias Model =
-    { center : (Float, Float)
+    { center : ( Float, Float )
     , zoom : Int
-    , marker : Maybe (Float, Float)
+    , marker : Maybe ( Float, Float )
     }
 
 
 init : Model
 init =
-    { center = (60.1699, 24.9384) -- Helsinki
+    { center = ( 60.1699, 24.9384 ) -- Helsinki
     , zoom = 10
     , marker = Nothing
     }
+
 
 
 -- Msg
@@ -28,14 +30,15 @@ init =
 
 type Msg
     = InitMap
-    | UpdateMap (Float, Float) Int (Maybe (Float, Float))
-    | MarkerMoved (Float, Float)
+    | UpdateMap ( Float, Float ) Int (Maybe ( Float, Float ))
+    | MarkerMoved ( Float, Float )
+
 
 
 -- Update
 
 
-update : Msg -> Model -> (Model, Cmd Msg)
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         InitMap ->
@@ -43,12 +46,14 @@ update msg model =
 
         UpdateMap center zoom marker ->
             let
-                newModel = { model | center = center, zoom = zoom, marker = marker }
+                newModel =
+                    { model | center = center, zoom = zoom, marker = marker }
             in
             ( newModel, Ports.updateMap { center = center, zoom = zoom, marker = marker } )
 
         MarkerMoved pos ->
             ( { model | marker = Just pos }, Cmd.none )
+
 
 
 -- View
