@@ -27,7 +27,7 @@ test.describe('Documentation Screenshots', () => {
 			await page.goto('/');
 
 			// Wait for calendar to render
-			await page.waitForSelector('.ec', { timeout: 10000 });
+			await page.waitForSelector('.calendar', { timeout: 10000 });
 
 			// Wait for animations to settle
 			await page.waitForTimeout(1000);
@@ -38,7 +38,7 @@ test.describe('Documentation Screenshots', () => {
 			});
 
 			// Verify calendar rendered
-			await expect(page.locator('.ec')).toBeVisible();
+			await expect(page.locator('.calendar')).toBeVisible();
 		});
 
 		test('calendar-mobile - Mobile viewport', async ({ page }) => {
@@ -46,7 +46,7 @@ test.describe('Documentation Screenshots', () => {
 			await page.goto('/');
 
 			// Wait for calendar to render
-			await page.waitForSelector('.ec', { timeout: 10000 });
+			await page.waitForSelector('.calendar', { timeout: 10000 });
 			await page.waitForTimeout(1000);
 
 			await page.screenshot({
@@ -61,8 +61,8 @@ test.describe('Documentation Screenshots', () => {
 			await page.setViewportSize({ width: 1280, height: 900 });
 			await page.goto('/');
 
-			// Wait for toolbar to render
-			await page.waitForSelector('.ec-toolbar', { timeout: 10000 });
+			// Wait for calendar header to render
+			await page.waitForSelector('.calendar-header', { timeout: 10000 });
 			await page.waitForTimeout(1000);
 
 			await page.screenshot({
@@ -70,7 +70,7 @@ test.describe('Documentation Screenshots', () => {
 				fullPage: false
 			});
 
-			await expect(page.locator('.ec-toolbar')).toBeVisible();
+			await expect(page.locator('.calendar-header')).toBeVisible();
 		});
 	});
 
@@ -80,17 +80,16 @@ test.describe('Documentation Screenshots', () => {
 			await page.goto('/');
 
 			// Wait for calendar to load
-			await page.waitForSelector('.ec', { timeout: 10000 });
+			await page.waitForSelector('.calendar', { timeout: 10000 });
 
 			// Try to click on first event if available
-			const eventElement = page.locator('.ec-event').first();
+			const eventElement = page.locator('.calendar-event').first();
 			const hasEvents = (await eventElement.count()) > 0;
 
 			if (hasEvents) {
 				await eventElement.click();
 
-				// Wait for navigation to event detail page
-				await page.waitForURL(/\/events\//, { timeout: 5000 });
+				// Wait for event detail to show
 				await page.waitForTimeout(500);
 
 				await page.screenshot({
