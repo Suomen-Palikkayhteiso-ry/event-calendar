@@ -4,13 +4,13 @@ import Browser
 import Browser.Navigation as Nav
 import Button
 import Calendar
-import DateUtils
 import DateTimePicker
-import EventForm
+import DateUtils
 import EventDetail
+import EventForm
 import EventList
 import Events exposing (Msg(..))
-import Html exposing (Html, a, div, h1, header, main_, nav, p, text, img, button, strong)
+import Html exposing (Html, a, button, div, h1, header, img, main_, nav, p, strong, text)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Http
@@ -20,8 +20,8 @@ import KMLUtils
 import Map
 import PocketBase
 import Ports
-import Time
 import Task
+import Time
 import Types
 import Url
 import Url.Parser as Parser exposing ((</>), Parser, oneOf, s, string)
@@ -95,8 +95,7 @@ type Route
 routeParser : Parser (Route -> a) a
 routeParser =
     oneOf
-        [
-          Parser.map Home Parser.top
+        [ Parser.map Home Parser.top
         , Parser.map MapRoute (s "map")
         , Parser.map CreateEvent (s "events" </> s "create")
         , Parser.map EventDetail (s "events" </> string)
@@ -132,13 +131,17 @@ parseCallbackParams query =
                                 Nothing
                     )
 
-        findParam name = 
-            params |> List.filter (\(k, _) -> k == name) |> List.head |> Maybe.map Tuple.second
+        findParam name =
+            params |> List.filter (\( k, _ ) -> k == name) |> List.head |> Maybe.map Tuple.second
 
-        code = findParam "code"
-        state = findParam "state"
+        code =
+            findParam "code"
+
+        state =
+            findParam "state"
     in
     Maybe.map (\c -> ( c, state )) code
+
 
 
 -- HELPERS
@@ -205,8 +208,11 @@ update msg model =
 
         UrlChanged url ->
             let
-                newRoute = parseUrl url
-                newModel = { model | url = url, route = newRoute }
+                newRoute =
+                    parseUrl url
+
+                newModel =
+                    { model | url = url, route = newRoute }
             in
             case newRoute of
                 CreateEvent ->
@@ -216,7 +222,8 @@ update msg model =
                     case List.head (List.filter (\e -> e.id == id) model.events.events) of
                         Just event ->
                             let
-                                ( updatedEventForm, _ ) = EventForm.update (EventForm.LoadEvent event) model.eventForm
+                                ( updatedEventForm, _ ) =
+                                    EventForm.update (EventForm.LoadEvent event) model.eventForm
                             in
                             ( { newModel | eventForm = updatedEventForm }, Cmd.none )
 
@@ -266,7 +273,8 @@ update msg model =
                         _ ->
                             model.loading
 
-                newError = updatedEvents.error
+                newError =
+                    updatedEvents.error
 
                 updatedEventForm =
                     case eventsMsg of
@@ -278,21 +286,20 @@ update msg model =
 
                         _ ->
                             model.eventForm
-                
-                redirectCmd = 
-                     case eventsMsg of
+
+                redirectCmd =
+                    case eventsMsg of
                         Events.EventDeleted _ (Ok ()) ->
                             Nav.pushUrl model.key "/"
-                        
+
                         Events.EventCreated (Ok _) ->
                             Nav.pushUrl model.key "/"
-                        
+
                         Events.EventUpdated (Ok _) ->
                             Nav.pushUrl model.key "/"
 
                         _ ->
                             Cmd.none
-
             in
             ( { model | events = updatedEvents, calendar = updatedCalendar, loading = newLoading, error = newError, eventForm = updatedEventForm }
             , Cmd.batch [ Cmd.map EventsMsg eventsCmd, redirectCmd ]
@@ -328,30 +335,30 @@ update msg model =
             )
 
         EventListMsg eventListMsg ->
-             case eventListMsg of
-                 EventList.DeleteEvent id ->
-                     ( model
-                     , Task.perform identity (Task.succeed (EventsMsg (Events.DeleteEvent (model.auth |> Maybe.andThen .token) id)))
-                     )
-                 
-                 EventList.EditEvent id ->
-                     ( model, Nav.pushUrl model.key ("/events/" ++ id ++ "/edit") )
-                
-                 EventList.FileLoaded content ->
-                     ( model, Ports.parseKMLContent content )
+            case eventListMsg of
+                EventList.DeleteEvent id ->
+                    ( model
+                    , Task.perform identity (Task.succeed (EventsMsg (Events.DeleteEvent (model.auth |> Maybe.andThen .token) id)))
+                    )
 
-                 _ ->
-                     let
-                         ( updatedEventList, cmd ) =
-                             EventList.update eventListMsg model.eventList
-                     in
-                     ( { model | eventList = updatedEventList }, Cmd.map EventListMsg cmd )
-        
+                EventList.EditEvent id ->
+                    ( model, Nav.pushUrl model.key ("/events/" ++ id ++ "/edit") )
+
+                EventList.FileLoaded content ->
+                    ( model, Ports.parseKMLContent content )
+
+                _ ->
+                    let
+                        ( updatedEventList, cmd ) =
+                            EventList.update eventListMsg model.eventList
+                    in
+                    ( { model | eventList = updatedEventList }, Cmd.map EventListMsg cmd )
+
         EventDetailMsg eventDetailMsg ->
             case eventDetailMsg of
                 EventDetail.EditEvent id ->
                     ( model, Nav.pushUrl model.key ("/events/" ++ id ++ "/edit") )
-                
+
                 EventDetail.DeleteEvent id ->
                     ( model
                     , Task.perform identity (Task.succeed (EventsMsg (Events.DeleteEvent (model.auth |> Maybe.andThen .token) id)))
@@ -361,17 +368,21 @@ update msg model =
                     ( model, Nav.pushUrl model.key "/events" )
 
         KMLParsed value ->
-             case Decode.decodeValue (Decode.list KMLUtils.rawKMLDecoder) value of
-                 Ok rawList ->
-                     let
-                         events = List.filterMap KMLUtils.processRawKML rawList
-                         cmds = List.map (\e -> Task.perform identity (Task.succeed (EventsMsg (Events.CreateEvent (model.auth |> Maybe.andThen .token) e)))) events
-                     in
-                     ( model, Cmd.batch cmds )
+            case Decode.decodeValue (Decode.list KMLUtils.rawKMLDecoder) value of
+                Ok rawList ->
+                    let
+                        events =
+                            List.filterMap KMLUtils.processRawKML rawList
 
-                 Err _ ->
-                     ( model, Cmd.none ) -- Handle error?
+                        cmds =
+                            List.map (\e -> Task.perform identity (Task.succeed (EventsMsg (Events.CreateEvent (model.auth |> Maybe.andThen .token) e)))) events
+                    in
+                    ( model, Cmd.batch cmds )
 
+                Err _ ->
+                    ( model, Cmd.none )
+
+        -- Handle error?
         AuthStored auth ->
             ( { model | auth = Just auth }, Cmd.none )
 
@@ -438,13 +449,14 @@ update msg model =
             ( { model | loginPassword = password }, Cmd.none )
 
         SetDate dateStr ->
-             let
-                 -- Parse date string YYYY-MM-DD
-                 posix = DateUtils.parseUTCDate (dateStr ++ "T00:00:00Z")
-             in
-             ( { model | selectedDate = dateStr, calendar = Calendar.update (Calendar.SetDate posix) model.calendar }
-             , Cmd.none
-             )
+            let
+                -- Parse date string YYYY-MM-DD
+                posix =
+                    DateUtils.parseUTCDate (dateStr ++ "T00:00:00Z")
+            in
+            ( { model | selectedDate = dateStr, calendar = Calendar.update (Calendar.SetDate posix) model.calendar }
+            , Cmd.none
+            )
 
         RequestDeleteEvent id ->
             ( model
@@ -486,6 +498,7 @@ view model =
                     , text " | "
                     , if model.auth /= Nothing then
                         a [ href "/events" ] [ text "Events" ]
+
                       else
                         text ""
                     , text " | "
@@ -495,7 +508,7 @@ view model =
                     [ case model.auth of
                         Just auth ->
                             div []
-                                [ text ("Logged in as: " ++ (Maybe.withDefault "Unknown" (Maybe.map .email auth.user)))
+                                [ text ("Logged in as: " ++ Maybe.withDefault "Unknown" (Maybe.map .email auth.user))
                                 , Button.view
                                     { variant = Button.Secondary
                                     , size = Button.Md
@@ -580,81 +593,83 @@ view model =
             , main_ []
                 [ if model.loading then
                     div [] [ text "Loading..." ]
+
                   else
                     case model.route of
                         Home ->
-                             div []
+                            div []
                                 [ case model.auth of
-                                     Just _ ->
-                                         div [ class "mb-4 flex items-end gap-4" ]
-                                             [ div [ class "flex-1" ]
-                                                 [ Input.view
-                                                     { type_ = "date"
-                                                     , value = model.selectedDate
-                                                     , placeholder = Nothing
-                                                     , required = False
-                                                     , disabled = False
-                                                     , readonly = False
-                                                     , ariaLabel = Just "Select Date"
-                                                     , ariaDescribedBy = Nothing
-                                                     , ariaInvalid = False
-                                                     , ariaRequired = False
-                                                     , id = Just "calendar-date"
-                                                     , name = Nothing
-                                                     , pattern = Nothing
-                                                     , min = Nothing
-                                                     , max = Nothing
-                                                     , step = Nothing
-                                                     , accept = Nothing
-                                                     , autofocus = False
-                                                     , class = Nothing
-                                                     , onInput = Just SetDate
-                                                     , onChange = Nothing
-                                                     , onBlur = Nothing
-                                                     , onFocus = Nothing
-                                                     }
-                                                 ]
-                                             , button [ class "btn-icon", onClick GoToCreateEvent, title "Add new event" ] [ text "+" ]
-                                             ]
-                                     Nothing ->
-                                         div [ class "mb-4" ]
-                                              [ p [] 
-                                                  [ text "Non-members can send events to "
-                                                  , a [ href "mailto:suomenpalikkayhteisory@outlook.com" ] [ text "email" ]
-                                                  , text "."
-                                                  ]
-                                              , Input.view
-                                                      { type_ = "date"
-                                                      , value = model.selectedDate
-                                                      , placeholder = Nothing
-                                                      , required = False
-                                                      , disabled = False
-                                                      , readonly = False
-                                                      , ariaLabel = Just "Select Date"
-                                                      , ariaDescribedBy = Nothing
-                                                      , ariaInvalid = False
-                                                      , ariaRequired = False
-                                                      , id = Just "calendar-date"
-                                                      , name = Nothing
-                                                      , pattern = Nothing
-                                                      , min = Nothing
-                                                      , max = Nothing
-                                                      , step = Nothing
-                                                      , accept = Nothing
-                                                      , autofocus = False
-                                                      , class = Nothing
-                                                      , onInput = Just SetDate
-                                                      , onChange = Nothing
-                                                      , onBlur = Nothing
-                                                      , onFocus = Nothing
-                                                      }
-                                              ]
+                                    Just _ ->
+                                        div [ class "mb-4 flex items-end gap-4" ]
+                                            [ div [ class "flex-1" ]
+                                                [ Input.view
+                                                    { type_ = "date"
+                                                    , value = model.selectedDate
+                                                    , placeholder = Nothing
+                                                    , required = False
+                                                    , disabled = False
+                                                    , readonly = False
+                                                    , ariaLabel = Just "Select Date"
+                                                    , ariaDescribedBy = Nothing
+                                                    , ariaInvalid = False
+                                                    , ariaRequired = False
+                                                    , id = Just "calendar-date"
+                                                    , name = Nothing
+                                                    , pattern = Nothing
+                                                    , min = Nothing
+                                                    , max = Nothing
+                                                    , step = Nothing
+                                                    , accept = Nothing
+                                                    , autofocus = False
+                                                    , class = Nothing
+                                                    , onInput = Just SetDate
+                                                    , onChange = Nothing
+                                                    , onBlur = Nothing
+                                                    , onFocus = Nothing
+                                                    }
+                                                ]
+                                            , button [ class "btn-icon", onClick GoToCreateEvent, title "Add new event" ] [ text "+" ]
+                                            ]
+
+                                    Nothing ->
+                                        div [ class "mb-4" ]
+                                            [ p []
+                                                [ text "Non-members can send events to "
+                                                , a [ href "mailto:suomenpalikkayhteisory@outlook.com" ] [ text "email" ]
+                                                , text "."
+                                                ]
+                                            , Input.view
+                                                { type_ = "date"
+                                                , value = model.selectedDate
+                                                , placeholder = Nothing
+                                                , required = False
+                                                , disabled = False
+                                                , readonly = False
+                                                , ariaLabel = Just "Select Date"
+                                                , ariaDescribedBy = Nothing
+                                                , ariaInvalid = False
+                                                , ariaRequired = False
+                                                , id = Just "calendar-date"
+                                                , name = Nothing
+                                                , pattern = Nothing
+                                                , min = Nothing
+                                                , max = Nothing
+                                                , step = Nothing
+                                                , accept = Nothing
+                                                , autofocus = False
+                                                , class = Nothing
+                                                , onInput = Just SetDate
+                                                , onChange = Nothing
+                                                , onBlur = Nothing
+                                                , onFocus = Nothing
+                                                }
+                                            ]
                                 , Html.map CalendarMsg (Calendar.view model.calendar)
                                 ]
 
                         MapRoute ->
                             Html.map MapMsg (Map.view model.map)
-                        
+
                         EventsRoute ->
                             Html.map EventListMsg (EventList.view model.eventList model.events.events)
 

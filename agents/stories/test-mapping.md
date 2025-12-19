@@ -2,21 +2,27 @@
 
 This document maps test cases to their corresponding user stories.
 
-## calendar.spec.ts
+## tests/features/calendar.feature
 
-- `should display the calendar page` -> view-calendar.md
-- `should navigate calendar dates` -> view-calendar.md
-- `should display events on calendar` -> view-calendar.md
-- `should handle date selection` -> view-calendar.md
+- `Scenario: Display the calendar page` -> view-calendar.md
+- `Scenario: Navigate calendar dates` -> view-calendar.md
+- `Scenario: Display events on calendar` -> view-calendar.md
+- `Scenario: Handle date selection` -> view-calendar.md
 
-## event-creation.spec.ts
+## tests/features/event-creation.feature
 
-- `should redirect non-authenticated users to home page` -> authentication.md, create-event.md
-- `should allow authenticated users to create events` -> create-event.md
-- `should validate required fields` -> create-event.md
+- `Scenario: Redirect non-authenticated users` -> authentication.md, create-event.md
+- `Scenario: Create event as authenticated user` -> create-event.md
+- `Scenario: Validate required fields` -> create-event.md
 
-## event-editing.spec.ts
+## tests/features/event-editing.feature
 
-- `should allow editing existing events` -> edit-event.md
-- `should allow deleting events` -> delete-event.md
-- `should handle event detail viewing` -> view-calendar.md (implicit)
+- `Scenario: Edit existing event` -> edit-event.md
+- `Scenario: Delete event` -> delete-event.md
+
+## tests/screenshots.spec.ts
+
+- `calendar-overview` -> view-calendar.md
+- `calendar-mobile` -> view-calendar.md
+- `calendar-navigation` -> view-calendar.md
+- `event-detail` -> view-calendar.md

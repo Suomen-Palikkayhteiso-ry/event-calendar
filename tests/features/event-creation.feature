@@ -1,4 +1,5 @@
 # Reference: agents/stories/create-event.md
+# ADRs: ADR-0012, ADR-0004, ADR-0006
 
 Feature: Event Creation
   As an authenticated member

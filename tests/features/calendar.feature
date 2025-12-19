@@ -1,4 +1,5 @@
 # Reference: agents/stories/view-calendar.md
+# ADRs: ADR-0012, ADR-0007
 
 Feature: Calendar Navigation and Event Viewing
   As a user

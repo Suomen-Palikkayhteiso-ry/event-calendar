@@ -1,4 +1,5 @@
 # Reference: agents/stories/edit-event.md, agents/stories/delete-event.md
+# ADRs: ADR-0012, ADR-0004
 
 Feature: Event Editing and Deletion
   As an authenticated member

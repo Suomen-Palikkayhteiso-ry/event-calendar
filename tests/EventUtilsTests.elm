@@ -1,5 +1,10 @@
 module EventUtilsTests exposing (..)
 
+{-| Tests for EventUtils
+Reference: agents/stories/view-calendar.md, agents/stories/create-event.md
+ADRs: ADR-0012
+-}
+
 import DateUtils
 import EventUtils
 import Expect

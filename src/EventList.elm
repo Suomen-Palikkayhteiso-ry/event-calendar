@@ -1,12 +1,13 @@
 module EventList exposing (Model, Msg(..), init, update, view)
 
+import File exposing (File)
+import File.Select as Select
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
-import Types exposing (Event, EventState(..))
-import File exposing (File)
-import File.Select as Select
 import Task
+import Types exposing (Event, EventState(..))
+
 
 
 -- MODEL
@@ -65,13 +66,13 @@ update msg model =
             ( model, Cmd.none )
 
         SelectKMLFile ->
-             ( model, Select.file ["application/vnd.google-earth.kml+xml", ".kml"] FileSelected )
-        
+            ( model, Select.file [ "application/vnd.google-earth.kml+xml", ".kml" ] FileSelected )
+
         FileSelected file ->
-             ( { model | showImportModal = False }, Task.perform FileLoaded (File.toString file) )
+            ( { model | showImportModal = False }, Task.perform FileLoaded (File.toString file) )
 
         FileLoaded _ ->
-             ( model, Cmd.none )
+            ( model, Cmd.none )
 
 
 
@@ -84,24 +85,23 @@ view model events =
         [ div [ class "flex justify-between items-center mb-6" ]
             [ h1 [ class "text-2xl font-bold" ] [ text "Events" ]
             , div [ class "flex gap-2" ]
-                [ button 
+                [ button
                     [ class "bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                    , onClick ToggleImportModal 
-                    ] 
+                    , onClick ToggleImportModal
+                    ]
                     [ text "Import KML" ]
-                , a 
+                , a
                     [ class "bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 block"
-                    , href "/events/create" 
-                    ] 
+                    , href "/events/create"
+                    ]
                     [ text "Add Event" ]
                 ]
             ]
-        
         , if model.showImportModal then
             viewImportModal
+
           else
             text ""
-
         , div [ class "bg-white shadow-md rounded-lg overflow-hidden" ]
             [ table [ class "min-w-full divide-y divide-gray-200" ]
                 [ thead [ class "bg-gray-50" ]
@@ -123,27 +123,27 @@ view model events =
 viewEventRow : Event -> Html Msg
 viewEventRow event =
     tr []
-        [ td [ class "px-6 py-4 whitespace-nowrap" ] 
+        [ td [ class "px-6 py-4 whitespace-nowrap" ]
             [ div [ class "text-sm font-medium text-gray-900" ] [ text event.title ]
             , div [ class "text-sm text-gray-500" ] [ text (Maybe.withDefault "" event.location) ]
             ]
-        , td [ class "px-6 py-4 whitespace-nowrap text-sm text-gray-500" ] 
+        , td [ class "px-6 py-4 whitespace-nowrap text-sm text-gray-500" ]
             [ text event.startDate ]
         , td [ class "px-6 py-4 whitespace-nowrap" ]
-            [ span 
+            [ span
                 [ class ("px-2 inline-flex text-xs leading-5 font-semibold rounded-full " ++ statusColor event.state) ]
                 [ text (stateToString event.state) ]
             ]
         , td [ class "px-6 py-4 whitespace-nowrap text-right text-sm font-medium" ]
-            [ a 
+            [ a
                 [ href ("/events/" ++ event.id ++ "/edit")
                 , class "text-indigo-600 hover:text-indigo-900 mr-4"
-                ] 
+                ]
                 [ text "Edit" ]
-            , button 
+            , button
                 [ onClick (DeleteEvent event.id)
                 , class "text-red-600 hover:text-red-900"
-                ] 
+                ]
                 [ text "Delete" ]
             ]
         ]
@@ -152,20 +152,22 @@ viewEventRow event =
 viewPagination : Model -> Int -> Html Msg
 viewPagination model totalItems =
     let
-        totalPages = ceiling (toFloat totalItems / toFloat model.pageSize)
+        totalPages =
+            ceiling (toFloat totalItems / toFloat model.pageSize)
     in
     if totalPages <= 1 then
         text ""
+
     else
         div [ class "bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6" ]
             [ div [ class "flex-1 flex justify-between sm:hidden" ]
-                [ button 
+                [ button
                     [ onClick (SetPage (Basics.max 1 (model.currentPage - 1)))
                     , disabled (model.currentPage == 1)
                     , class "relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
                     ]
                     [ text "Previous" ]
-                , button 
+                , button
                     [ onClick (SetPage (Basics.min totalPages (model.currentPage + 1)))
                     , disabled (model.currentPage == totalPages)
                     , class "ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
@@ -183,21 +185,21 @@ viewPagination model totalItems =
                     ]
                 , div []
                     [ nav [ class "relative z-0 inline-flex rounded-md shadow-sm -space-x-px", attribute "aria-label" "Pagination" ]
-                        [ button 
+                        [ button
                             [ onClick (SetPage (Basics.max 1 (model.currentPage - 1)))
                             , disabled (model.currentPage == 1)
                             , class "relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
                             ]
                             [ span [ class "sr-only" ] [ text "Previous" ]
-                            , text "<" 
+                            , text "<"
                             ]
-                        , button 
+                        , button
                             [ onClick (SetPage (Basics.min totalPages (model.currentPage + 1)))
                             , disabled (model.currentPage == totalPages)
                             , class "relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
                             ]
                             [ span [ class "sr-only" ] [ text "Next" ]
-                            , text ">" 
+                            , text ">"
                             ]
                         ]
                     ]
@@ -210,7 +212,7 @@ viewImportModal =
     div [ class "fixed inset-0 z-50 overflow-y-auto", attribute "aria-labelledby" "modal-title", attribute "role" "dialog", attribute "aria-modal" "true" ]
         [ div [ class "flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0" ]
             [ div [ class "fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity", attribute "aria-hidden" "true", onClick ToggleImportModal ] []
-            , span [ class "hidden sm:inline-block sm:align-middle sm:h-screen", attribute "aria-hidden" "true" ] [ text "​" ]
+            , span [ class "hidden sm:inline-block sm:align-middle sm:h-screen", attribute "aria-hidden" "true" ] [ text "\u{200B}" ]
             , div [ class "inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full" ]
                 [ div [ class "bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4" ]
                     [ div [ class "sm:flex sm:items-start" ]
@@ -219,10 +221,10 @@ viewImportModal =
                             , div [ class "mt-2" ]
                                 [ p [ class "text-sm text-gray-500 mb-4" ] [ text "Select a .kml file to import events." ]
                                 , div [ class "flex justify-center" ]
-                                    [ button 
+                                    [ button
                                         [ class "bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                                        , onClick SelectKMLFile 
-                                        ] 
+                                        , onClick SelectKMLFile
+                                        ]
                                         [ text "Select File..." ]
                                     ]
                                 ]
@@ -230,16 +232,17 @@ viewImportModal =
                         ]
                     ]
                 , div [ class "bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse" ]
-                    [ button 
+                    [ button
                         [ type_ "button"
                         , class "mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
                         , onClick ToggleImportModal
-                        ] 
+                        ]
                         [ text "Cancel" ]
                     ]
                 ]
             ]
         ]
+
 
 
 -- HELPERS
@@ -255,16 +258,30 @@ paginate page size list =
 statusColor : EventState -> String
 statusColor state =
     case state of
-        Draft -> "bg-gray-100 text-gray-800"
-        Pending -> "bg-yellow-100 text-yellow-800"
-        Published -> "bg-green-100 text-green-800"
-        Deleted -> "bg-red-100 text-red-800"
+        Draft ->
+            "bg-gray-100 text-gray-800"
+
+        Pending ->
+            "bg-yellow-100 text-yellow-800"
+
+        Published ->
+            "bg-green-100 text-green-800"
+
+        Deleted ->
+            "bg-red-100 text-red-800"
 
 
 stateToString : EventState -> String
 stateToString state =
     case state of
-        Draft -> "Draft"
-        Pending -> "Pending"
-        Published -> "Published"
-        Deleted -> "Deleted"
+        Draft ->
+            "Draft"
+
+        Pending ->
+            "Pending"
+
+        Published ->
+            "Published"
+
+        Deleted ->
+            "Deleted"

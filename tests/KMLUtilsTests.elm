@@ -1,5 +1,10 @@
 module KMLUtilsTests exposing (..)
 
+{-| Tests for KMLUtils
+Reference: agents/stories/create-event.md (KML Import logic)
+ADRs: ADR-0012
+-}
+
 import Expect
 import KMLUtils
 import Test exposing (..)

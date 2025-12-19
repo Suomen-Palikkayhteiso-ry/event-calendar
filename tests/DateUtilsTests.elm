@@ -1,5 +1,10 @@
 module DateUtilsTests exposing (..)
 
+{-| Tests for DateUtils
+Reference: agents/stories/view-calendar.md
+ADRs: ADR-0012, ADR-0005
+-}
+
 import DateUtils
 import Expect
 import Test exposing (..)
