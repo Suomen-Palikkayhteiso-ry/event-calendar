@@ -1,4 +1,4 @@
-module Textarea exposing (..)module Textarea exposing (..)
+module Textarea exposing (..)
 
 import Html exposing (Attribute, Html, textarea)
 import Html.Attributes exposing (attribute, class, cols, disabled, id, name, placeholder, readonly, required, rows, value)
@@ -45,7 +45,13 @@ view config =
             , required config.required
             , disabled config.disabled
             , readonly config.readonly
-            , attribute "aria-invalid" (if config.ariaInvalid then "true" else "false")
+            , attribute "aria-invalid"
+                (if config.ariaInvalid then
+                    "true"
+
+                 else
+                    "false"
+                )
             ]
                 ++ List.filterMap identity
                     [ config.placeholder |> Maybe.map placeholder

@@ -1,5 +1,6 @@
 port module Ports exposing (..)
 
+import Json.Encode as Encode
 import Types exposing (Auth)
 
 
@@ -19,6 +20,9 @@ port initMap : { center : ( Float, Float ), zoom : Int, marker : Maybe ( Float, 
 port updateMap : { center : ( Float, Float ), zoom : Int, marker : Maybe ( Float, Float ) } -> Cmd msg
 
 
+port parseKMLContent : String -> Cmd msg
+
+
 
 -- Incoming ports
 
@@ -30,3 +34,6 @@ port authRemoved : (() -> msg) -> Sub msg
 
 
 port mapMarkerMoved : (( Float, Float ) -> msg) -> Sub msg
+
+
+port kmlContentParsed : (Encode.Value -> msg) -> Sub msg

@@ -1,7 +1,7 @@
-module Label exposing (..)module Label exposing (..)
+module Label exposing (..)
 
 import Html exposing (Html, label, span, text)
-import Html.Attributes exposing (class, for, attribute)
+import Html.Attributes exposing (attribute, class, for)
 
 
 view :

@@ -1,89 +1,77 @@
-# Makefile for Elm/SvelteKit project
-
-# Variables
-PNPM = pnpm
-ELM = elm
+# Makefile for Elm project
 
 .PHONY: all
 all: build
 
 .PHONY: build
-build: install elm-build
-	$(PNPM) build
+build: install elm-check
+	pnpm build
 
 .PHONY: clean
 clean:
-	rm -rf build
+	rm -rf dist
 	rm -rf node_modules
+	rm -rf elm-stuff
+	rm -rf .svelte-kit
 
 .PHONY: install
 install:
-	$(PNPM) install
+	pnpm install
 
 node_modules:
-	$(PNPM) install
-
-.PHONY: pages-install
-pages-install:
-	$(PNPM) install --frozen-lockfile
-
-.PHONY: pages-build
-pages-build: pages-install
-	$(PNPM) build
-	mkdir -p public
-	cp -r build/* public/
-
-.PHONY: pages-clean
-pages-clean:
-	rm -rf build
-	rm -rf public
-	rm -rf .svelte-kit
+	pnpm install
 
 .PHONY: start
 start:
-	$(PNPM) dev
+	pnpm dev
 
 .PHONY: watch
 watch:
-	$(ELM) reactor
+	elm reactor
 
 .PHONY: elm-build
 elm-build:
-	$(ELM) make src/Main.elm --output=src/main.js
+	elm make src/Main.elm --output=/dev/null
 
 .PHONY: elm-test
 elm-test:
-	$(ELM)-test
+	elm-test
 
 .PHONY: elm-format
 elm-format:
-	$(ELM)-format --yes src/
+	elm-format --yes src/
+
+.PHONY: elm-check
+elm-check:
+	elm-format src/ --validate
+	elm-review
+	elm-test
 
 .PHONY: test
 test: elm-test
-	$(PNPM) test
+	pnpm test
 
 .PHONY: test-coverage
 test-coverage: node_modules
-	$(PNPM) test:coverage
+	pnpm test:coverage
 
 .PHONY: test-e2e
 test-e2e: node_modules
-	$(PNPM) test:e2e
+	pnpm test:e2e
 
 .PHONY: screenshots
 screenshots: node_modules
-	$(PNPM) screenshots
+	pnpm screenshots
 
 .PHONY: format
 format: elm-format
-	$(PNPM) format
+	pnpm format
 
 .PHONY: check
-check: format
-	$(PNPM) run lint
-	$(PNPM) run check
-	$(PNPM) run test
+check: elm-check
+	pnpm run lint
+	pnpm run check
+	pnpm run test
 
 .PHONY: shell
 shell:

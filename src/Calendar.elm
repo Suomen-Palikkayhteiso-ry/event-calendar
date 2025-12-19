@@ -64,7 +64,18 @@ update msg model =
             { model | events = event :: model.events }
 
         UpdateEvent event ->
-            { model | events = List.map (\e -> if e.id == event.id then event else e) model.events }
+            { model
+                | events =
+                    List.map
+                        (\e ->
+                            if e.id == event.id then
+                                event
+
+                            else
+                                e
+                        )
+                        model.events
+            }
 
         Next ->
             { model | currentDate = addMonths 1 model.currentDate }

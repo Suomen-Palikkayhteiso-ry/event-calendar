@@ -1,6 +1,6 @@
-module Select exposing (..)module Select exposing (..)
+module Select exposing (..)
 
-import Html exposing (Attribute, Html, select, option)
+import Html exposing (Attribute, Html, option, select)
 import Html.Attributes exposing (attribute, class, disabled, id, name, required, selected, value)
 import Html.Events exposing (onBlur, onFocus, onInput)
 import Json.Decode
@@ -40,7 +40,13 @@ view config =
             [ class fullClass
             , required config.required
             , disabled config.disabled
-            , attribute "aria-invalid" (if config.ariaInvalid then "true" else "false")
+            , attribute "aria-invalid"
+                (if config.ariaInvalid then
+                    "true"
+
+                 else
+                    "false"
+                )
             ]
                 ++ List.filterMap identity
                     [ config.ariaLabel |> Maybe.map (\label -> attribute "aria-label" label)
@@ -54,6 +60,6 @@ view config =
                     ]
 
         optionElements =
-            List.map (\(val, text) -> option [ value val, selected (val == config.value) ] [ Html.text text ]) config.options
+            List.map (\( val, text ) -> option [ value val, selected (val == config.value) ] [ Html.text text ]) config.options
     in
     select attributes optionElements

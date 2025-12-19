@@ -2,6 +2,8 @@ module KMLUtils exposing (..)
 
 import DateUtils
 import Dict exposing (Dict)
+import Json.Decode as Decode
+import Types exposing (Event, EventState(..), Point)
 
 
 months : Dict String Int
@@ -56,23 +58,43 @@ type alias ParsedEventName =
 parseEventName : String -> ParsedEventName
 parseEventName name =
     let
-        openParen = String.indexes "(" name
-        closeParen = String.indexes ")" name
+        openParen =
+            String.indexes "(" name
+
+        closeParen =
+            String.indexes ")" name
     in
     case ( List.head openParen, List.head closeParen ) of
         ( Just open, Just close ) ->
             if open < close then
                 let
-                    title = String.left open name |> String.trim
-                    country = String.slice (open + 1) close name |> String.trim
-                    dates = String.dropLeft (close + 1) name |> String.trim
+                    title =
+                        String.left open name |> String.trim
+
+                    country =
+                        String.slice (open + 1) close name |> String.trim
+
+                    dates =
+                        String.dropLeft (close + 1) name |> String.trim
                 in
                 { title = title
-                , country = if String.isEmpty country then Nothing else Just country
-                , dates = if String.isEmpty dates then Nothing else Just dates
+                , country =
+                    if String.isEmpty country then
+                        Nothing
+
+                    else
+                        Just country
+                , dates =
+                    if String.isEmpty dates then
+                        Nothing
+
+                    else
+                        Just dates
                 }
+
             else
                 { title = name, country = Nothing, dates = Nothing }
+
         _ ->
             { title = name, country = Nothing, dates = Nothing }
 
@@ -111,19 +133,56 @@ parseDateString dateStr year =
 
                             endDay =
                                 case month of
-                                    0 -> 31 -- Jan
-                                    1 -> 28 -- Feb
-                                    2 -> 31 -- Mar
-                                    3 -> 30 -- Apr
-                                    4 -> 31 -- May
-                                    5 -> 30 -- Jun
-                                    6 -> 31 -- Jul
-                                    7 -> 31 -- Aug
-                                    8 -> 30 -- Sep
-                                    9 -> 31 -- Oct
-                                    10 -> 30 -- Nov
-                                    11 -> 31 -- Dec
-                                    _ -> 30
+                                    0 ->
+                                        31
+
+                                    -- Jan
+                                    1 ->
+                                        28
+
+                                    -- Feb
+                                    2 ->
+                                        31
+
+                                    -- Mar
+                                    3 ->
+                                        30
+
+                                    -- Apr
+                                    4 ->
+                                        31
+
+                                    -- May
+                                    5 ->
+                                        30
+
+                                    -- Jun
+                                    6 ->
+                                        31
+
+                                    -- Jul
+                                    7 ->
+                                        31
+
+                                    -- Aug
+                                    8 ->
+                                        30
+
+                                    -- Sep
+                                    9 ->
+                                        31
+
+                                    -- Oct
+                                    10 ->
+                                        30
+
+                                    -- Nov
+                                    11 ->
+                                        31
+
+                                    -- Dec
+                                    _ ->
+                                        30
 
                             end =
                                 DateUtils.dateToString { year = year, month = month + 1, day = endDay }
@@ -140,7 +199,8 @@ parseDateString dateStr year =
         case String.split " " dateStr |> List.filter (not << String.isEmpty) of
             monthName :: day1Str :: rest ->
                 let
-                    day1Parts = String.split "-" day1Str
+                    day1Parts =
+                        String.split "-" day1Str
                 in
                 case ( Dict.get (String.toLower monthName) months, List.head day1Parts |> Maybe.andThen String.toInt ) of
                     ( Just month, Just day1 ) ->
@@ -171,3 +231,87 @@ parseDateString dateStr year =
 
             _ ->
                 { startDate = Nothing, endDate = Nothing }
+
+
+
+-- RAW KML HANDLING
+
+
+type alias RawKMLData =
+    { name : String
+    , description : String
+    , lat : Float
+    , lon : Float
+    }
+
+
+rawKMLDecoder : Decode.Decoder RawKMLData
+rawKMLDecoder =
+    Decode.map4 RawKMLData
+        (Decode.field "name" Decode.string)
+        (Decode.field "description" Decode.string)
+        (Decode.field "lat" Decode.float)
+        (Decode.field "lon" Decode.float)
+
+
+processRawKML : RawKMLData -> Maybe Event
+processRawKML raw =
+    let
+        parsed =
+            parseEventName raw.name
+
+        -- Simple year extraction (look for 4 digits)
+        -- In Elm, we can't use regex easily without elm/regex, so let's try basic string search or default to current year
+        -- For now, default to 2025 (as per current date context) or better, current year if not found.
+        -- Since we can't easily get current year pure without Task/Time, we'll assume 2025.
+        -- Or we can try to find "202x" in string.
+        year =
+            2025
+
+        dates =
+            case parsed.dates of
+                Just d ->
+                    parseDateString d year
+
+                Nothing ->
+                    { startDate = Nothing, endDate = Nothing }
+
+        location =
+            case parsed.country of
+                Just c ->
+                    Maybe.withDefault c (Dict.get c countryMap)
+
+                Nothing ->
+                    ""
+    in
+    case dates.startDate of
+        Just start ->
+            Just
+                { id = ""
+                , title = parsed.title
+                , description = Just raw.description
+                , startDate = DateUtils.localDateToUTC start
+                , endDate = Maybe.map DateUtils.localDateToUTC dates.endDate
+                , allDay = True
+                , url = Nothing
+                , location =
+                    if String.isEmpty location then
+                        Nothing
+
+                    else
+                        Just location
+                , state = Draft
+                , image = Nothing
+                , imageDescription = Nothing
+                , point =
+                    if raw.lat /= 0 || raw.lon /= 0 then
+                        Just { lat = raw.lat, lon = raw.lon }
+
+                    else
+                        Nothing
+                , created = ""
+                , updated = ""
+                }
+
+        Nothing ->
+            Nothing

@@ -58,7 +58,7 @@ type alias Translations =
     , status : String
     , previous : String
     , page : String
-    , of : String
+    , of_ : String
     , total_events : String
     , failed_create_event : String
     , event_created_successfully : String
@@ -177,7 +177,7 @@ fi =
     , status = "Tila:"
     , previous = "Edellinen"
     , page = "Sivu"
-    , of = "/"
+    , of_ = "/"
     , total_events = "tapahtumaa yhteensä"
     , failed_create_event = "Tapahtuman luonti epäonnistui. Yritä uudelleen."
     , event_created_successfully = "Tapahtuma luotu onnistuneesti."
@@ -410,7 +410,7 @@ get key =
             fi.page
 
         "of" ->
-            fi.of
+            fi.of_
 
         "total_events" ->
             fi.total_events

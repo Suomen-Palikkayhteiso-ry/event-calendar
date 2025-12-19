@@ -53,8 +53,20 @@ view config =
             , disabled config.disabled
             , readonly config.readonly
             , autofocus config.autofocus
-            , attribute "aria-invalid" (if config.ariaInvalid then "true" else "false")
-            , attribute "aria-required" (if config.ariaRequired then "true" else "false")
+            , attribute "aria-invalid"
+                (if config.ariaInvalid then
+                    "true"
+
+                 else
+                    "false"
+                )
+            , attribute "aria-required"
+                (if config.ariaRequired then
+                    "true"
+
+                 else
+                    "false"
+                )
             ]
                 ++ List.filterMap identity
                     [ config.placeholder |> Maybe.map placeholder

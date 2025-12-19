@@ -1,4 +1,4 @@
-module Geocode exposing (..)module Geocode exposing (..)
+module Geocode exposing (..)
 
 import Http
 import Json.Decode as Decode

@@ -2,7 +2,7 @@
 
 ## Description
 
-This is a SvelteKit application for an event calendar. It serves as the digital calendar for Suomen Palikkayhteisö ry (Finnish LEGO Community Association), providing an interactive calendar interface for browsing events, as well as generating static feeds for syndication.
+This is an event calendar application, currently migrating from SvelteKit to Elm. It serves as the digital calendar for Suomen Palikkayhteisö ry (Finnish LEGO Community Association), providing an interactive calendar interface for browsing events, as well as generating static feeds for syndication.
 
 ## Key Features
 
@@ -17,23 +17,24 @@ This is a SvelteKit application for an event calendar. It serves as the digital 
 
 ## Technology Stack
 
-- **Frontend Framework**: SvelteKit v2 with TypeScript
+- **Frontend Framework**: Elm 0.19.1 (Migrating from SvelteKit)
 - **Backend**: PocketBase (self-hosted)
 - **Styling**: Tailwind CSS v4
 - **Authentication**: OAuth2 with OIDC
-- **Maps**: Leaflet with geocoding
-- **Calendar Component**: @event-calendar/core
-- **Internationalization**: svelte-i18n
-- **Build Tool**: Vite
+- **Maps**: Leaflet (via Elm Ports)
+- **Calendar Component**: Custom Elm implementation
+- **Internationalization**: Elm (Custom i18n module)
+- **Build Tool**: Vite (via vite-plugin-elm)
 - **Deployment**: Static site generation
 
 ## Architecture
 
-The application follows a hybrid architecture:
+The application follows a client-side architecture using The Elm Architecture (TEA):
 
-- **Dynamic App**: SvelteKit handles user interactions, authentication, and event management
-- **Static Generation**: Custom Node.js scripts generate feeds and static content from PocketBase data
-- **Backend**: PocketBase provides data persistence, authentication, and file storage
+- **Frontend**: Pure Elm application managing state, routing, and UI logic.
+- **Interop**: JavaScript Ports handle maps, local storage, and static assets.
+- **Static Generation**: Custom scripts (transitioning to Elm/Node) generate feeds and static content from PocketBase data.
+- **Backend**: PocketBase provides data persistence, authentication, and file storage.
 
 ## Development Environment
 
@@ -41,9 +42,9 @@ The project uses `devenv` for reproducible development environments and `pnpm` f
 
 ## Code Quality
 
-- **Linting**: ESLint with Svelte and TypeScript support
-- **Formatting**: Prettier with custom configuration
-- **Type Checking**: SvelteKit's built-in TypeScript checking
+- **Linting**: `elm-review`
+- **Formatting**: `elm-format`
+- **Type Checking**: Elm Compiler (Built-in strict static typing)
 
 ## Security
 

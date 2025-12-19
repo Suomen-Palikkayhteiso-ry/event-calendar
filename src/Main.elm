@@ -4,14 +4,19 @@ import Browser
 import Browser.Navigation as Nav
 import Button
 import Calendar
+import DateUtils
+import DateTimePicker
 import EventForm
-import Events
-import Html exposing (Html, a, div, h1, header, main_, nav, p, text)
+import EventDetail
+import EventList
+import Events exposing (Msg(..))
+import Html exposing (Html, a, div, h1, header, main_, nav, p, text, img, button, strong)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Http
 import Input
-import Input
+import Json.Decode as Decode
+import KMLUtils
 import Map
 import PocketBase
 import Ports
@@ -51,11 +56,13 @@ type alias Model =
     , events : Events.Model
     , map : Map.Model
     , eventForm : EventForm.Model
+    , eventList : EventList.Model
     , auth : Maybe Types.Auth
     , loginEmail : String
     , loginPassword : String
     , error : Maybe String
     , loading : Bool
+    , selectedDate : String
     }
 
 
@@ -65,7 +72,7 @@ init flags url key =
         ( eventsModel, eventsCmd ) =
             Events.update (Events.FetchEvents Nothing) Events.init
     in
-    ( Model key url (parseUrl url) Calendar.init eventsModel Map.init EventForm.init Nothing "" "" Nothing True
+    ( Model key url (parseUrl url) Calendar.init eventsModel Map.init EventForm.init EventList.init Nothing "" "" Nothing True ""
     , Cmd.map EventsMsg eventsCmd
     )
 
@@ -76,7 +83,9 @@ init flags url key =
 
 type Route
     = Home
+    | EventsRoute
     | MapRoute
+    | CreateEvent
     | EventDetail String
     | EditEvent String
     | Callback
@@ -86,10 +95,13 @@ type Route
 routeParser : Parser (Route -> a) a
 routeParser =
     oneOf
-        [ Parser.map Home Parser.top
+        [
+          Parser.map Home Parser.top
         , Parser.map MapRoute (s "map")
+        , Parser.map CreateEvent (s "events" </> s "create")
         , Parser.map EventDetail (s "events" </> string)
         , Parser.map EditEvent (s "events" </> string </> s "edit")
+        , Parser.map EventsRoute (s "events")
         , Parser.map Callback (s "callback")
         ]
 
@@ -162,6 +174,8 @@ type Msg
     | EventsMsg Events.Msg
     | MapMsg Map.Msg
     | EventFormMsg EventForm.Msg
+    | EventListMsg EventList.Msg
+    | EventDetailMsg EventDetail.Msg
     | AuthStored Types.Auth
     | AuthRemoved
     | MapMarkerMoved ( Float, Float )
@@ -172,6 +186,10 @@ type Msg
     | UpdateLoginEmail String
     | UpdateLoginPassword String
     | AuthCallbackResult (Result Http.Error Types.Auth)
+    | SetDate String
+    | RequestDeleteEvent String
+    | GoToCreateEvent
+    | KMLParsed Decode.Value
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -191,6 +209,9 @@ update msg model =
                 newModel = { model | url = url, route = newRoute }
             in
             case newRoute of
+                CreateEvent ->
+                    ( { newModel | eventForm = EventForm.init }, Cmd.none )
+
                 EditEvent id ->
                     case List.head (List.filter (\e -> e.id == id) model.events.events) of
                         Just event ->
@@ -247,19 +268,34 @@ update msg model =
 
                 newError = updatedEvents.error
 
-                eventFormCmd =
+                updatedEventForm =
                     case eventsMsg of
                         Events.EventCreated _ ->
-                            Cmd.map EventFormMsg (Tuple.second (EventForm.update (EventForm.SetLoading False) model.eventForm))
+                            Tuple.first (EventForm.update (EventForm.SetLoading False) model.eventForm)
 
                         Events.EventUpdated _ ->
-                            Cmd.map EventFormMsg (Tuple.second (EventForm.update (EventForm.SetLoading False) model.eventForm))
+                            Tuple.first (EventForm.update (EventForm.SetLoading False) model.eventForm)
+
+                        _ ->
+                            model.eventForm
+                
+                redirectCmd = 
+                     case eventsMsg of
+                        Events.EventDeleted _ (Ok ()) ->
+                            Nav.pushUrl model.key "/"
+                        
+                        Events.EventCreated (Ok _) ->
+                            Nav.pushUrl model.key "/"
+                        
+                        Events.EventUpdated (Ok _) ->
+                            Nav.pushUrl model.key "/"
 
                         _ ->
                             Cmd.none
+
             in
-            ( { model | events = updatedEvents, calendar = updatedCalendar, loading = newLoading, error = newError }
-            , Cmd.batch [ Cmd.map EventsMsg eventsCmd, eventFormCmd ]
+            ( { model | events = updatedEvents, calendar = updatedCalendar, loading = newLoading, error = newError, eventForm = updatedEventForm }
+            , Cmd.batch [ Cmd.map EventsMsg eventsCmd, redirectCmd ]
             )
 
         MapMsg mapMsg ->
@@ -290,6 +326,51 @@ update msg model =
             ( { model | eventForm = updatedEventForm }
             , cmd
             )
+
+        EventListMsg eventListMsg ->
+             case eventListMsg of
+                 EventList.DeleteEvent id ->
+                     ( model
+                     , Task.perform identity (Task.succeed (EventsMsg (Events.DeleteEvent (model.auth |> Maybe.andThen .token) id)))
+                     )
+                 
+                 EventList.EditEvent id ->
+                     ( model, Nav.pushUrl model.key ("/events/" ++ id ++ "/edit") )
+                
+                 EventList.FileLoaded content ->
+                     ( model, Ports.parseKMLContent content )
+
+                 _ ->
+                     let
+                         ( updatedEventList, cmd ) =
+                             EventList.update eventListMsg model.eventList
+                     in
+                     ( { model | eventList = updatedEventList }, Cmd.map EventListMsg cmd )
+        
+        EventDetailMsg eventDetailMsg ->
+            case eventDetailMsg of
+                EventDetail.EditEvent id ->
+                    ( model, Nav.pushUrl model.key ("/events/" ++ id ++ "/edit") )
+                
+                EventDetail.DeleteEvent id ->
+                    ( model
+                    , Task.perform identity (Task.succeed (EventsMsg (Events.DeleteEvent (model.auth |> Maybe.andThen .token) id)))
+                    )
+
+                EventDetail.Back ->
+                    ( model, Nav.pushUrl model.key "/events" )
+
+        KMLParsed value ->
+             case Decode.decodeValue (Decode.list KMLUtils.rawKMLDecoder) value of
+                 Ok rawList ->
+                     let
+                         events = List.filterMap KMLUtils.processRawKML rawList
+                         cmds = List.map (\e -> Task.perform identity (Task.succeed (EventsMsg (Events.CreateEvent (model.auth |> Maybe.andThen .token) e)))) events
+                     in
+                     ( model, Cmd.batch cmds )
+
+                 Err _ ->
+                     ( model, Cmd.none ) -- Handle error?
 
         AuthStored auth ->
             ( { model | auth = Just auth }, Cmd.none )
@@ -356,6 +437,23 @@ update msg model =
         UpdateLoginPassword password ->
             ( { model | loginPassword = password }, Cmd.none )
 
+        SetDate dateStr ->
+             let
+                 -- Parse date string YYYY-MM-DD
+                 posix = DateUtils.parseUTCDate (dateStr ++ "T00:00:00Z")
+             in
+             ( { model | selectedDate = dateStr, calendar = Calendar.update (Calendar.SetDate posix) model.calendar }
+             , Cmd.none
+             )
+
+        RequestDeleteEvent id ->
+            ( model
+            , Task.perform identity (Task.succeed (EventsMsg (Events.DeleteEvent (model.auth |> Maybe.andThen .token) id)))
+            )
+
+        GoToCreateEvent ->
+            ( model, Nav.pushUrl model.key "/events/create" )
+
 
 
 -- SUBSCRIPTIONS
@@ -367,6 +465,7 @@ subscriptions _ =
         [ Ports.authStored AuthStored
         , Ports.authRemoved (always AuthRemoved)
         , Ports.mapMarkerMoved MapMarkerMoved
+        , Ports.kmlContentParsed KMLParsed
         ]
 
 
@@ -385,9 +484,10 @@ view model =
                     , text " | "
                     , a [ href "/map" ] [ text "Map" ]
                     , text " | "
-                    , a [ href "/events/123" ] [ text "Event Detail" ]
-                    , text " | "
-                    , a [ href "/events/123/edit" ] [ text "Edit Event" ]
+                    , if model.auth /= Nothing then
+                        a [ href "/events" ] [ text "Events" ]
+                      else
+                        text ""
                     , text " | "
                     , a [ href "/callback" ] [ text "Callback" ]
                     ]
@@ -483,26 +583,93 @@ view model =
                   else
                     case model.route of
                         Home ->
-                            Html.map CalendarMsg (Calendar.view model.calendar)
+                             div []
+                                [ case model.auth of
+                                     Just _ ->
+                                         div [ class "mb-4 flex items-end gap-4" ]
+                                             [ div [ class "flex-1" ]
+                                                 [ Input.view
+                                                     { type_ = "date"
+                                                     , value = model.selectedDate
+                                                     , placeholder = Nothing
+                                                     , required = False
+                                                     , disabled = False
+                                                     , readonly = False
+                                                     , ariaLabel = Just "Select Date"
+                                                     , ariaDescribedBy = Nothing
+                                                     , ariaInvalid = False
+                                                     , ariaRequired = False
+                                                     , id = Just "calendar-date"
+                                                     , name = Nothing
+                                                     , pattern = Nothing
+                                                     , min = Nothing
+                                                     , max = Nothing
+                                                     , step = Nothing
+                                                     , accept = Nothing
+                                                     , autofocus = False
+                                                     , class = Nothing
+                                                     , onInput = Just SetDate
+                                                     , onChange = Nothing
+                                                     , onBlur = Nothing
+                                                     , onFocus = Nothing
+                                                     }
+                                                 ]
+                                             , button [ class "btn-icon", onClick GoToCreateEvent, title "Add new event" ] [ text "+" ]
+                                             ]
+                                     Nothing ->
+                                         div [ class "mb-4" ]
+                                              [ p [] 
+                                                  [ text "Non-members can send events to "
+                                                  , a [ href "mailto:suomenpalikkayhteisory@outlook.com" ] [ text "email" ]
+                                                  , text "."
+                                                  ]
+                                              , Input.view
+                                                      { type_ = "date"
+                                                      , value = model.selectedDate
+                                                      , placeholder = Nothing
+                                                      , required = False
+                                                      , disabled = False
+                                                      , readonly = False
+                                                      , ariaLabel = Just "Select Date"
+                                                      , ariaDescribedBy = Nothing
+                                                      , ariaInvalid = False
+                                                      , ariaRequired = False
+                                                      , id = Just "calendar-date"
+                                                      , name = Nothing
+                                                      , pattern = Nothing
+                                                      , min = Nothing
+                                                      , max = Nothing
+                                                      , step = Nothing
+                                                      , accept = Nothing
+                                                      , autofocus = False
+                                                      , class = Nothing
+                                                      , onInput = Just SetDate
+                                                      , onChange = Nothing
+                                                      , onBlur = Nothing
+                                                      , onFocus = Nothing
+                                                      }
+                                              ]
+                                , Html.map CalendarMsg (Calendar.view model.calendar)
+                                ]
 
                         MapRoute ->
                             Html.map MapMsg (Map.view model.map)
+                        
+                        EventsRoute ->
+                            Html.map EventListMsg (EventList.view model.eventList model.events.events)
 
                         EventDetail id ->
                             case List.head (List.filter (\e -> e.id == id) model.events.events) of
                                 Just event ->
-                                    div []
-                                        [ h1 [] [ text event.title ]
-                                        , p [] [ text (Maybe.withDefault "" event.description) ]
-                                        , p [] [ text ("Start: " ++ event.startDate) ]
-                                        , p [] [ text ("Location: " ++ Maybe.withDefault "" event.location) ]
-                                        , a [ href ("/events/" ++ id ++ "/edit") ] [ text "Edit" ]
-                                        ]
+                                    Html.map EventDetailMsg (EventDetail.view event model.auth)
 
                                 Nothing ->
                                     h1 [] [ text ("Event not found: " ++ id) ]
 
                         EditEvent id ->
+                            Html.map EventFormMsg (EventForm.view model.eventForm)
+
+                        CreateEvent ->
                             Html.map EventFormMsg (EventForm.view model.eventForm)
 
                         Callback ->

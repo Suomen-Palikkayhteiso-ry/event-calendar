@@ -38,4 +38,13 @@ in
   # Point Playwright to the Nix-provided browser bundle so Vitest doesn't try to download one.
   env.PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD = "1";
   env.PLAYWRIGHT_BROWSERS_PATH = "${playwrightBrowsersCompat}";
+
+  scripts = {
+    elm-build.exec = "elm make src/Main.elm --output=src/main.js";
+    elm-check.exec = "elm-format src/ --validate && elm-review && elm-test";
+  };
+
+  processes = {
+    reactor.exec = "elm reactor";
+  };
 }

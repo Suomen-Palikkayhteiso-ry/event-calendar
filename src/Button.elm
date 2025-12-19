@@ -54,6 +54,7 @@ view config =
         disabledClass =
             if config.disabled then
                 "disabled"
+
             else
                 ""
 

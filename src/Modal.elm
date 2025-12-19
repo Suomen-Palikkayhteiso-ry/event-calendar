@@ -1,7 +1,7 @@
-module Modal exposing (..)module Modal exposing (..)
+module Modal exposing (..)
 
-import Html exposing (Html, div, button, text, h2)
-import Html.Attributes exposing (class, attribute, tabindex)
+import Html exposing (Html, button, div, h2, text)
+import Html.Attributes exposing (attribute, class, tabindex)
 import Html.Events exposing (onClick)
 
 
@@ -44,5 +44,6 @@ view config =
                         [ div [ class "modal-body" ] config.children ]
                 )
             ]
+
     else
         text ""

@@ -1,4 +1,4 @@
-module DateTimePicker exposing (..)module DateTimePicker exposing (..)
+module DateTimePicker exposing (..)
 
 import Html exposing (Attribute, Html, div, input, label)
 import Html.Attributes exposing (class, disabled, id, type_, value)

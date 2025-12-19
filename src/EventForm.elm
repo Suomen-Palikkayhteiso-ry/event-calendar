@@ -1,9 +1,9 @@
 module EventForm exposing (..)
 
 import DateTimePicker
-import Html exposing (Html, div, input, textarea, label, button, text, br, ul, li)
-import Html.Attributes exposing (type_, value, checked, placeholder, id, for, disabled, name)
-import Html.Events exposing (onInput, onCheck, onClick)
+import Html exposing (Html, br, button, div, input, label, li, text, textarea, ul)
+import Html.Attributes exposing (checked, disabled, for, id, name, placeholder, type_, value)
+import Html.Events exposing (onCheck, onClick, onInput)
 import Types exposing (Event, EventState(..), Point)
 
 
@@ -220,6 +220,7 @@ fromEvent event =
     , point = event.point
     , errors = []
     , mode = Edit event.id
+    , loading = False
     }
 
 
@@ -285,8 +286,17 @@ view model =
             ]
         , if not (List.isEmpty model.errors) then
             ul [] (List.map (\error -> li [] [ text error ]) model.errors)
+
           else
             text ""
-        , button [ onClick Submit, disabled (not (List.isEmpty model.errors) || model.loading) ] [ text (if model.loading then "Submitting..." else "Submit") ]
+        , button [ onClick Submit, disabled (not (List.isEmpty model.errors) || model.loading) ]
+            [ text
+                (if model.loading then
+                    "Submitting..."
+
+                 else
+                    "Submit"
+                )
+            ]
         , button [ onClick Validate ] [ text "Validate" ]
         ]

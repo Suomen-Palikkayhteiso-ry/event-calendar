@@ -94,32 +94,40 @@ The application requires the following environment variables:
 
 ```
 src/
-├── lib/           # Shared utilities and components
-│   ├── auth.ts    # Authentication logic
-│   ├── pocketbase.ts # PocketBase client
-│   ├── types.ts   # TypeScript interfaces
-│   └── ...
-├── routes/        # SvelteKit routes
-│   ├── +page.svelte     # Main calendar page
-│   ├── events/          # Event management
-│   └── ...
-└── app.css        # Global styles and Tailwind theme
+├── Main.elm       # Application Entry Point
+├── Types.elm      # Core Data Types
+├── Ports.elm      # JS Interop Definitions
+├── Calendar.elm   # Calendar Feature Module
+├── Map.elm        # Map Feature Module
+├── ...            # Other Elm Modules
+├── index.js       # JS Entry Point & Port Implementation
+└── style.css      # Global Styles
 
-scripts/           # Static generation scripts
+scripts/           # Static generation scripts (Node.js/Elm)
 agents/            # Documentation and ADRs
+docs/              # Project documentation
 ```
 
 ## Code Style Guidelines
 
-- **Indentation**: Tabs
-- **Quotes**: Single quotes
-- **Trailing Commas**: No trailing commas
-- **Print Width**: 100 characters
-- **Formatting**: Automated with Prettier
+- **Language**: Elm (Strict functional typing)
+- **Indentation**: 4 Spaces (Strictly enforced by `elm-format`)
+- **Quotes**: Double quotes (`"`)
+- **Formatting**: Automated with `elm-format` (Elm) and Prettier (JS/CSS)
 
 ## Testing
 
-### Unit Tests
+### Elm Unit Tests
+
+```bash
+# Run tests
+devenv script elm-test (or `make elm-test`)
+
+# Run with watch mode (requires elm-test-rs or similar, otherwise use loop)
+devenv script elm-check
+```
+
+### Legacy/E2E Tests
 
 ```bash
 pnpm test           # Run once and exit

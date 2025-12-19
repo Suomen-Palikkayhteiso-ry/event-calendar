@@ -2,12 +2,12 @@
 
 ## High-Level Architecture
 
-The event calendar application follows a hybrid architecture combining dynamic web application features with static site generation for content syndication.
+The event calendar application follows a client-side functional architecture (Elm) served via a static host or hybrid backend, integrated with PocketBase for data and authentication.
 
 ```
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   SvelteKit     │    │   PocketBase    │    │  Static Files   │
-│   Frontend      │◄──►│   Backend       │───►│  (Feeds, ICS)   │
+│   Elm Frontend  │    │   PocketBase    │    │  Static Files   │
+│   (Client)      │◄──►│   Backend       │───►│  (Feeds, ICS)   │
 │                 │    │                 │    │                 │
 │ • Calendar UI   │    │ • Event Data    │    │ • RSS/Atom      │
 │ • Event Mgmt    │    │ • Auth          │    │ • JSON/GeoJSON  │
@@ -17,23 +17,37 @@ The event calendar application follows a hybrid architecture combining dynamic w
 
 ## Component Architecture
 
-### Frontend (SvelteKit)
+### Frontend (Elm)
 
-- **Routes**: File-based routing with SvelteKit
-  - `/` - Main calendar view
-  - `/events` - Event management (authenticated)
-  - `/events/[id]` - Individual event pages
+- **Architecture**: The Elm Architecture (Model-View-Update)
+- **Routing**: `Url.Parser` based routing in `Main.elm`
+  - `/` - Home (Calendar)
+  - `/map` - Map View
+  - `/events/:id` - Event Detail
+  - `/events/:id/edit` - Edit Event
 
-- **Components**:
-  - Calendar component (@event-calendar/core)
-  - Map component (Leaflet)
-  - Form components (Flowbite Svelte)
-  - Toast notifications (@zerodevx/svelte-toast)
+- **Modules (src/)**:
+  - `Main.elm`: Application entry point and wiring
+  - `Calendar.elm`: Calendar grid logic and view
+  - `Map.elm`: Leaflet integration (via Ports/Custom Elements)
+  - `EventForm.elm`: Create/Edit event logic
+  - `PocketBase.elm`: API interaction module (Ports/Http)
+  - `Events.elm`: Event data structures and collection management
 
-- **State Management**:
-  - Svelte stores for user authentication
-  - Reactive statements for UI state
-  - Local component state
+### Interop (Ports)
+
+The application uses specific ports to communicate with JavaScript for features not available in pure Elm.
+
+**Authentication (`src/Ports.elm` ↔ `src/index.js`)**
+*   `storeAuth : Auth -> Cmd msg`: Sends authentication data (token + user) to JS for localStorage persistence.
+*   `removeAuth : () -> Cmd msg`: Signals JS to clear auth data from localStorage.
+*   `authStored : (Auth -> msg) -> Sub msg`: Subscription receiving auth data restored from localStorage on app init.
+*   `authRemoved : (() -> msg) -> Sub msg`: Subscription confirming auth data removal.
+
+**Leaflet Map (`src/Ports.elm` ↔ `src/index.js`)**
+*   `initMap : MapConfig -> Cmd msg`: Initializes the Leaflet map with center, zoom, and optional marker.
+*   `updateMap : MapConfig -> Cmd msg`: Updates the map view or marker position programmatically.
+*   `mapMarkerMoved : ((Float, Float) -> msg) -> Sub msg`: Subscription receiving new coordinates when the user drags the marker.
 
 ### Backend (PocketBase)
 
@@ -45,56 +59,35 @@ The event calendar application follows a hybrid architecture combining dynamic w
   - OAuth2/OIDC integration
   - Admin authentication for content management
 
-- **File Storage**:
-  - Event images
-  - Automatic optimization
+### Legacy SvelteKit (Migration Phase)
+
+During migration, the SvelteKit scaffolding remains to serve the application or provide reference implementation. `src/routes` contains legacy Svelte components.
 
 ### Static Generation
 
-Custom Node.js scripts generate multiple output formats:
+Custom Node.js scripts generate multiple output formats (independent of frontend framework):
 
 - **HTML**: Embeddable calendar pages
 - **RSS/Atom**: Syndication feeds
 - **JSON**: Structured data access
 - **GeoJSON**: Geographic event data
 - **ICS**: Calendar import files
-- **Individual Event Pages**: SEO-friendly event details
 
-## Data Flow
+## Data Flow (TEA)
 
-1. **Event Creation**:
-   - User authenticates via OAuth2
-   - Form data submitted to PocketBase
-   - Geocoding performed for location data
-   - Event stored with metadata
-
-2. **Calendar Display**:
-   - Events fetched from PocketBase API
-   - Calendar component renders events
-   - Interactive navigation and filtering
-
-3. **Static Generation**:
-   - Script fetches all published events
-   - Generates multiple output formats
-   - Files written to static directory
+1. **Msg (Message)**: User interaction or external event (HTTP, Port) triggers a `Msg`.
+2. **Update**: The `update` function takes the `Msg` and current `Model`, returning a new `Model` and `Cmd` (side effects).
+3. **View**: The `view` function renders the new `Model` to HTML.
+4. **Runtime**: The Elm runtime manages the DOM updates and side effect execution.
 
 ## Security Architecture
 
-- **Authentication**: OAuth2/OIDC delegation
+- **Authentication**: OAuth2/OIDC delegation (Token stored via Ports)
 - **Authorization**: PocketBase collection rules
-- **Data Validation**: TypeScript interfaces and PocketBase schemas
-- **API Security**: PocketBase's built-in security features
-
-## Performance Considerations
-
-- **Static Generation**: Pre-computed feeds reduce server load
-- **Lazy Loading**: Calendar events loaded on demand
-- **Asset Optimization**: Vite handles bundling and minification
-- **Caching**: Static files served with appropriate headers
+- **Type Safety**: Elm ensures no runtime null/undefined errors in frontend logic
 
 ## Deployment Architecture
 
-- **Static Hosting**: Generated files served from static host
+- **Artifacts**: Compiled `elm.js` (or `main.js`) + `index.html` + Static Assets
+- **Hosting**: Static hosting compatible
 - **PocketBase**: Self-hosted backend service
-- **CI/CD**: Automated build and deployment pipeline
-- **Monitoring**: Basic error logging and performance monitoring
