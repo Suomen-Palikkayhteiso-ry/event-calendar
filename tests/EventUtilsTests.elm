@@ -1,7 +1,7 @@
 module EventUtilsTests exposing (..)
 
 {-| Tests for EventUtils
-Reference: agents/stories/view-calendar.md, agents/stories/create-event.md
+Reference: agents/stories/view-calendar.md, agents/stories/create-event.md, agents/stories/edit-event.md, agents/stories/view-event-details.md
 ADRs: ADR-0012
 -}
 

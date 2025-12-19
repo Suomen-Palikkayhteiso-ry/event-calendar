@@ -25,3 +25,10 @@ Feature: Calendar Navigation and Event Viewing
   Scenario: Handle date selection
     Given I am on the home page
     Then I should be able to select dates on the calendar
+
+  Scenario: View event details
+    Given I am on the home page
+    And there is an event displayed on the calendar
+    When I click on the event
+    Then I should be navigated to the event detail page
+    And I should see the event title, description, and dates

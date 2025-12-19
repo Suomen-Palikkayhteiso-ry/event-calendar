@@ -1,7 +1,7 @@
 module DateUtilsTests exposing (..)
 
 {-| Tests for DateUtils
-Reference: agents/stories/view-calendar.md
+Reference: agents/stories/view-calendar.md, agents/stories/view-event-details.md
 ADRs: ADR-0012, ADR-0005
 -}
 

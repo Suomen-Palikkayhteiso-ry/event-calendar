@@ -17,12 +17,32 @@ This document maps test cases to their corresponding user stories.
 
 ## tests/features/event-editing.feature
 
-- `Scenario: Edit existing event` -> edit-event.md
-- `Scenario: Delete event` -> delete-event.md
+- `Scenario: Edit existing event` -> edit-event.md, view-event-list.md
+- `Scenario: Delete event` -> delete-event.md, view-event-list.md
 
-## tests/screenshots.spec.ts
+## tests/features/map.feature
+
+- `Scenario: Display map with events` -> view-events-on-map.md
+- `Scenario: Interact with map markers` -> view-events-on-map.md
+
+## tests/features/event-list.feature
+
+- `Scenario: View event list as authenticated user` -> view-event-list.md
+- `Scenario: Import events from KML` -> import-events.md
 
 - `calendar-overview` -> view-calendar.md
 - `calendar-mobile` -> view-calendar.md
 - `calendar-navigation` -> view-calendar.md
-- `event-detail` -> view-calendar.md
+- `event-detail` -> view-event-details.md
+
+## tests/DateUtilsTests.elm
+
+- Date parsing and formatting tests -> view-calendar.md, view-event-details.md
+
+## tests/EventUtilsTests.elm
+
+- Event data conversion tests -> create-event.md, edit-event.md, view-calendar.md
+
+## tests/KMLUtilsTests.elm
+
+- KML parsing tests -> import-events.md

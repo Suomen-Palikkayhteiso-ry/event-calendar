@@ -1,7 +1,7 @@
 module KMLUtilsTests exposing (..)
 
 {-| Tests for KMLUtils
-Reference: agents/stories/create-event.md (KML Import logic)
+Reference: agents/stories/import-events.md
 ADRs: ADR-0012
 -}
 
