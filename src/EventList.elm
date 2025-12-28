@@ -131,7 +131,7 @@ update msg model =
 view : Model -> List Event -> Html Msg
 view model events =
     div [ class "container mx-auto" ]
-        [ div [ class "flex justify-between items-center mb-4" ]
+        [ div [ class "flex justify-between items-center mb-2" ]
             [ h1 [ class "text-2xl font-bold" ] [ text "Events" ]
             , div [ class "flex gap-2" ]
                 [ button
@@ -151,7 +151,7 @@ view model events =
 
           else
             text ""
-        , div [ class "mb-4 flex gap-4" ]
+        , div [ class "mb-2 flex gap-4" ]
             [ input [ type_ "text", placeholder "Filter by title", value model.titleFilter, onInput SetTitleFilter, class "px-3 py-2 border border-gray-300 rounded-md" ] []
             , input [ type_ "text", placeholder "Filter by date", value model.dateFilter, onInput SetDateFilter, class "px-3 py-2 border border-gray-300 rounded-md" ] []
             , select [ onInput SetStatusFilter, class "px-3 py-2 border border-gray-300 rounded-md" ]
@@ -166,10 +166,10 @@ view model events =
             [ table [ class "min-w-full divide-y divide-gray-200" ]
                 [ thead [ class "bg-white" ]
                     [ tr []
-                        [ th [ class "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer", onClick (SortBy Title) ] [ text "Title" ]
-                        , th [ class "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer", onClick (SortBy Date) ] [ text "Date" ]
-                        , th [ class "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer", onClick (SortBy Status) ] [ text "Status" ]
-                        , th [ class "px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider" ] [ text "Actions" ]
+                        [ th [ class "px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer", onClick (SortBy Title) ] [ text "Title" ]
+                        , th [ class "px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer", onClick (SortBy Date) ] [ text "Date" ]
+                        , th [ class "px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer", onClick (SortBy Status) ] [ text "Status" ]
+                        , th [ class "px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider" ] [ text "Actions" ]
                         ]
                     ]
                 , tbody [ class "bg-white divide-y divide-gray-200" ]
@@ -219,18 +219,18 @@ sortEvents sortBy direction events =
 viewEventRow : Event -> Html Msg
 viewEventRow event =
     tr []
-        [ td [ class "px-6 py-4 whitespace-nowrap" ]
+        [ td [ class "px-4 py-2 whitespace-nowrap" ]
             [ div [ class "text-sm font-medium text-gray-900" ] [ text event.title ]
             , div [ class "text-sm text-gray-500" ] [ text (Maybe.withDefault "" event.location) ]
             ]
-        , td [ class "px-6 py-4 whitespace-nowrap text-sm text-gray-500" ]
+        , td [ class "px-4 py-2 whitespace-nowrap text-sm text-gray-500" ]
             [ text event.startDate ]
-        , td [ class "px-6 py-4 whitespace-nowrap" ]
+        , td [ class "px-4 py-2 whitespace-nowrap" ]
             [ span
                 [ class ("px-2 inline-flex text-xs leading-5 font-semibold rounded-full " ++ statusColor event.state) ]
                 [ text (stateToString event.state) ]
             ]
-        , td [ class "px-6 py-4 whitespace-nowrap text-right text-sm font-medium" ]
+        , td [ class "px-4 py-2 whitespace-nowrap text-right text-sm font-medium" ]
             [ a
                 [ href ("/events/" ++ event.id ++ "/edit")
                 , class "text-indigo-600 hover:text-indigo-900 mr-4"

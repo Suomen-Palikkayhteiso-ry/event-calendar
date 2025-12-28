@@ -539,7 +539,7 @@ view model =
                         text ""
                 ]
             , main_ [ class "flex-1" ]
-                [ div [ class "max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8" ]
+                [ div [ class "max-w-7xl mx-auto py-2 px-4 sm:px-6 lg:px-8" ]
                     [ if model.loading then
                         div [ class "flex justify-center items-center h-64" ]
                             [ div [ class "animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" ] []
@@ -548,13 +548,13 @@ view model =
                       else
                         case model.route of
                             Home ->
-                                div [ class "space-y-6" ]
+                                div [ class "space-y-4" ]
                                     [ div [ class "bg-white shadow rounded-lg" ]
-                                        [ div [ class "px-4 py-3 sm:p-4" ]
-                                            [ h1 [ class "text-2xl font-bold text-gray-900 mb-4" ] [ text (I18n.get "public_calendar") ]
+                                        [ div [ class "px-3 py-2 sm:p-3" ]
+                                            [ h1 [ class "text-2xl font-bold text-gray-900 mb-2" ] [ text (I18n.get "public_calendar") ]
                                             , case model.auth of
                                                 Just _ ->
-                                                    div [ class "mb-6 flex items-center justify-between" ]
+                                                    div [ class "mb-4 flex items-center justify-between" ]
                                                         [ div [ class "flex items-center space-x-4" ]
                                                             [ label [ class "block text-sm font-medium text-gray-700" ] [ text (I18n.get "select_date") ]
                                                             , Input.view
@@ -588,7 +588,7 @@ view model =
                                                         ]
 
                                                 Nothing ->
-                                                    div [ class "mb-6 bg-blue-50 border border-blue-200 rounded-md p-4" ]
+                                                    div [ class "mb-4 bg-blue-50 border border-blue-200 rounded-md p-4" ]
                                                         [ p [ class "text-sm text-blue-800 mb-4" ]
                                                             [ text (I18n.get "non_member_prefix")
                                                             , a [ href "mailto:suomenpalikkayhteisory@outlook.com", class "text-blue-600 hover:text-blue-800 underline" ] [ text (I18n.get "send_event_email") ]
@@ -623,7 +623,7 @@ view model =
                                                                 }
                                                             ]
                                                         ]
-                                            , div [ class "mt-6" ]
+                                            , div [ class "mt-4" ]
                                                 [ Html.map CalendarMsg (Calendar.view model.calendar) ]
                                             ]
                                         ]
@@ -631,7 +631,7 @@ view model =
 
                             EventsRoute ->
                                 div [ class "bg-white shadow rounded-lg" ]
-                                    [ div [ class "px-4 py-3 sm:p-4" ]
+                                    [ div [ class "px-3 py-2 sm:p-3" ]
                                         [ Html.map EventListMsg (EventList.view model.eventList model.events.events) ]
                                     ]
 
@@ -639,13 +639,13 @@ view model =
                                 case List.head (List.filter (\e -> e.id == id) model.events.events) of
                                     Just event ->
                                         div [ class "bg-white shadow rounded-lg" ]
-                                            [ div [ class "px-4 py-3 sm:p-4" ]
+                                            [ div [ class "px-3 py-2 sm:p-3" ]
                                                 [ Html.map EventDetailMsg (EventDetail.view event model.auth) ]
                                             ]
 
                                     Nothing ->
                                         div [ class "bg-white shadow rounded-lg" ]
-                                            [ div [ class "px-4 py-3 sm:p-4" ]
+                                            [ div [ class "px-3 py-2 sm:p-3" ]
                                                 [ h1 [ class "text-2xl font-bold text-gray-900" ] [ text ("Event not found: " ++ id) ]
                                                 , div [ class "mt-4" ]
                                                     [ a [ href "/", class "text-blue-600 hover:text-blue-800" ] [ text "← Go Home" ] ]
@@ -654,19 +654,19 @@ view model =
 
                             EditEvent id ->
                                 div [ class "bg-white shadow rounded-lg" ]
-                                    [ div [ class "px-4 py-3 sm:p-4" ]
+                                    [ div [ class "px-3 py-2 sm:p-3" ]
                                         [ Html.map EventFormMsg (EventForm.view model.eventForm) ]
                                     ]
 
                             CreateEvent ->
                                 div [ class "bg-white shadow rounded-lg" ]
-                                    [ div [ class "px-4 py-3 sm:p-4" ]
+                                    [ div [ class "px-3 py-2 sm:p-3" ]
                                         [ Html.map EventFormMsg (EventForm.view model.eventForm) ]
                                     ]
 
                             Callback ->
                                 div [ class "bg-white shadow rounded-lg" ]
-                                    [ div [ class "px-4 py-3 sm:p-4" ]
+                                    [ div [ class "px-3 py-2 sm:p-3" ]
                                         [ h1 [ class "text-2xl font-bold text-gray-900 mb-4" ] [ text "Authentication Callback" ]
                                         , p [ class "text-gray-600" ] [ text "Processing authentication..." ]
                                         ]
@@ -674,7 +674,7 @@ view model =
 
                             NotFound ->
                                 div [ class "bg-white shadow rounded-lg" ]
-                                    [ div [ class "px-4 py-3 sm:p-4 text-center" ]
+                                    [ div [ class "px-3 py-2 sm:p-3 text-center" ]
                                         [ h1 [ class "text-3xl font-bold text-gray-900 mb-4" ] [ text "404" ]
                                         , p [ class "text-xl text-gray-600 mb-6" ] [ text "Page Not Found" ]
                                         , p [ class "text-gray-500 mb-6" ] [ text "The page you are looking for does not exist." ]
