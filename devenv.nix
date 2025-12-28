@@ -14,6 +14,8 @@ in
   languages.python.uv.enable = true;
   languages.python.venv.enable = true;
 
+  languages.haskell.enable = true;
+
   packages = with pkgs; [
     chromium
     python3
