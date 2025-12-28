@@ -18,7 +18,6 @@ import I18n
 import Input
 import Json.Decode as Decode
 import KMLUtils
-import Map
 import PocketBase
 import Ports
 import Task
@@ -55,7 +54,6 @@ type alias Model =
     , route : Route
     , calendar : Calendar.Model
     , events : Events.Model
-    , map : Map.Model
     , eventForm : EventForm.Model
     , eventList : EventList.Model
     , auth : Maybe Types.Auth
@@ -71,7 +69,7 @@ init flags url key =
         ( eventsModel, eventsCmd ) =
             Events.update (Events.FetchEvents Nothing) Events.init
     in
-    ( Model key url (parseUrl url) Calendar.init eventsModel Map.init EventForm.init EventList.init Nothing Nothing True ""
+    ( Model key url (parseUrl url) Calendar.init eventsModel EventForm.init EventList.init Nothing Nothing True ""
     , Cmd.batch
         [ Cmd.map EventsMsg eventsCmd
         , Task.perform SetCurrentTime Time.now
@@ -86,7 +84,6 @@ init flags url key =
 type Route
     = Home
     | EventsRoute
-    | MapRoute
     | CreateEvent
     | EventDetail String
     | EditEvent String
@@ -98,7 +95,6 @@ routeParser : Parser (Route -> a) a
 routeParser =
     oneOf
         [ Parser.map Home Parser.top
-        , Parser.map MapRoute (s "map")
         , Parser.map CreateEvent (s "events" </> s "create")
         , Parser.map EventDetail (s "events" </> string)
         , Parser.map EditEvent (s "events" </> string </> s "edit")
@@ -182,13 +178,11 @@ type Msg
     | UrlChanged Url.Url
     | CalendarMsg Calendar.Msg
     | EventsMsg Events.Msg
-    | MapMsg Map.Msg
     | EventFormMsg EventForm.Msg
     | EventListMsg EventList.Msg
     | EventDetailMsg EventDetail.Msg
     | AuthStored Types.Auth
     | AuthRemoved
-    | MapMarkerMoved ( Float, Float )
     | Login
     | Logout
     | LoginResult (Result Http.Error Types.Auth)
@@ -244,9 +238,6 @@ update msg model =
                         Nothing ->
                             ( newModel, Cmd.none )
 
-                MapRoute ->
-                    ( newModel, Task.perform identity (Task.succeed (MapMsg Map.InitMap)) )
-
                 _ ->
                     ( newModel, Cmd.none )
 
@@ -278,32 +269,6 @@ update msg model =
 
                         _ ->
                             model.calendar
-
-                updatedMap =
-                    case eventsMsg of
-                        Events.EventsFetched (Ok events) ->
-                            Tuple.first (Map.update (Map.SetEvents events) model.map)
-
-                        Events.EventCreated (Ok event) ->
-                            Tuple.first (Map.update (Map.SetEvents (event :: model.events.events)) model.map)
-
-                        Events.EventUpdated (Ok event) ->
-                            let
-                                updatedEventsList =
-                                    List.map
-                                        (\e ->
-                                            if e.id == event.id then
-                                                event
-
-                                            else
-                                                e
-                                        )
-                                        model.events.events
-                            in
-                            Tuple.first (Map.update (Map.SetEvents updatedEventsList) model.map)
-
-                        _ ->
-                            model.map
 
                 newLoading =
                     case eventsMsg of
@@ -341,17 +306,8 @@ update msg model =
                         _ ->
                             Cmd.none
             in
-            ( { model | events = updatedEvents, calendar = updatedCalendar, map = updatedMap, loading = newLoading, error = newError, eventForm = updatedEventForm }
+            ( { model | events = updatedEvents, calendar = updatedCalendar, loading = newLoading, error = newError, eventForm = updatedEventForm }
             , Cmd.batch [ Cmd.map EventsMsg eventsCmd, redirectCmd ]
-            )
-
-        MapMsg mapMsg ->
-            let
-                ( updatedMap, mapCmd ) =
-                    Map.update mapMsg model.map
-            in
-            ( { model | map = updatedMap }
-            , Cmd.map MapMsg mapCmd
             )
 
         EventFormMsg eventFormMsg ->
@@ -429,15 +385,6 @@ update msg model =
         AuthRemoved ->
             ( { model | auth = Nothing }, Cmd.none )
 
-        MapMarkerMoved pos ->
-            let
-                ( updatedMap, _ ) =
-                    Map.update (Map.MarkerMoved pos) model.map
-            in
-            ( { model | map = updatedMap }
-            , Cmd.none
-            )
-
         Login ->
             ( model, PocketBase.initiateOAuth2Login "oidc" )
 
@@ -509,7 +456,6 @@ subscriptions _ =
                         NoOp
             )
         , Ports.authRemoved (always AuthRemoved)
-        , Ports.mapMarkerMoved MapMarkerMoved
         , Ports.kmlContentParsed KMLParsed
         ]
 
@@ -528,7 +474,6 @@ view model =
                     [ div [ class "flex justify-between items-center h-12" ]
                         [ nav [ class "flex space-x-8" ]
                             [ a [ href "#/", class "text-gray-900 hover:text-blue-600 px-3 py-2 text-sm font-medium" ] [ text (I18n.get "home") ]
-                            , a [ href "#/map", class "text-gray-500 hover:text-blue-600 px-3 py-2 text-sm font-medium" ] [ text (I18n.get "map") ]
                             , if model.auth /= Nothing then
                                 a [ href "#/events", class "text-gray-500 hover:text-blue-600 px-3 py-2 text-sm font-medium" ] [ text (I18n.get "events") ]
 
@@ -682,12 +627,6 @@ view model =
                                                 [ Html.map CalendarMsg (Calendar.view model.calendar) ]
                                             ]
                                         ]
-                                    ]
-
-                            MapRoute ->
-                                div [ class "bg-white shadow rounded-lg" ]
-                                    [ div [ class "px-4 py-3 sm:p-4" ]
-                                        [ Html.map MapMsg (Map.view model.map) ]
                                     ]
 
                             EventsRoute ->

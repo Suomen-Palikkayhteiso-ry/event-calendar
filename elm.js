@@ -5637,15 +5637,13 @@ var $author$project$Main$Model = function (key) {
 		return function (route) {
 			return function (calendar) {
 				return function (events) {
-					return function (map) {
-						return function (eventForm) {
-							return function (eventList) {
-								return function (auth) {
-									return function (error) {
-										return function (loading) {
-											return function (selectedDate) {
-												return {auth: auth, calendar: calendar, error: error, eventForm: eventForm, eventList: eventList, events: events, key: key, loading: loading, map: map, route: route, selectedDate: selectedDate, url: url};
-											};
+					return function (eventForm) {
+						return function (eventList) {
+							return function (auth) {
+								return function (error) {
+									return function (loading) {
+										return function (selectedDate) {
+											return {auth: auth, calendar: calendar, error: error, eventForm: eventForm, eventList: eventList, events: events, key: key, loading: loading, route: route, selectedDate: selectedDate, url: url};
 										};
 									};
 								};
@@ -5677,11 +5675,6 @@ var $author$project$Types$Draft = {$: 'Draft'};
 var $author$project$EventForm$init = {allDay: false, description: '', endDate: '', errors: _List_Nil, image: $elm$core$Maybe$Nothing, imageDescription: '', loading: false, location: '', mode: $author$project$EventForm$Create, point: $elm$core$Maybe$Nothing, startDate: '', state: $author$project$Types$Draft, title: '', url: ''};
 var $author$project$EventList$init = {currentPage: 1, pageSize: 20, showImportModal: false};
 var $author$project$Events$init = {error: $elm$core$Maybe$Nothing, events: _List_Nil, loading: false};
-var $author$project$Map$init = {
-	center: _Utils_Tuple2(60.1699, 24.9384),
-	events: _List_Nil,
-	zoom: 10
-};
 var $elm$core$Platform$Cmd$map = _Platform_map;
 var $elm$time$Time$Name = function (a) {
 	return {$: 'Name', a: a};
@@ -6340,7 +6333,6 @@ var $author$project$Main$EventDetail = function (a) {
 	return {$: 'EventDetail', a: a};
 };
 var $author$project$Main$EventsRoute = {$: 'EventsRoute'};
-var $author$project$Main$MapRoute = {$: 'MapRoute'};
 var $elm$url$Url$Parser$Parser = function (a) {
 	return {$: 'Parser', a: a};
 };
@@ -6485,10 +6477,6 @@ var $author$project$Main$routeParser = $elm$url$Url$Parser$oneOf(
 	_List_fromArray(
 		[
 			A2($elm$url$Url$Parser$map, $author$project$Main$Home, $elm$url$Url$Parser$top),
-			A2(
-			$elm$url$Url$Parser$map,
-			$author$project$Main$MapRoute,
-			$elm$url$Url$Parser$s('map')),
 			A2(
 			$elm$url$Url$Parser$map,
 			$author$project$Main$CreateEvent,
@@ -7367,7 +7355,7 @@ var $author$project$Main$init = F3(
 		var eventsCmd = _v0.b;
 		return _Utils_Tuple2(
 			$author$project$Main$Model(key)(url)(
-				$author$project$Main$parseUrl(url))($author$project$Calendar$init)(eventsModel)($author$project$Map$init)($author$project$EventForm$init)($author$project$EventList$init)($elm$core$Maybe$Nothing)($elm$core$Maybe$Nothing)(true)(''),
+				$author$project$Main$parseUrl(url))($author$project$Calendar$init)(eventsModel)($author$project$EventForm$init)($author$project$EventList$init)($elm$core$Maybe$Nothing)($elm$core$Maybe$Nothing)(true)(''),
 			$elm$core$Platform$Cmd$batch(
 				_List_fromArray(
 					[
@@ -7381,9 +7369,6 @@ var $author$project$Main$AuthStored = function (a) {
 };
 var $author$project$Main$KMLParsed = function (a) {
 	return {$: 'KMLParsed', a: a};
-};
-var $author$project$Main$MapMarkerMoved = function (a) {
-	return {$: 'MapMarkerMoved', a: a};
 };
 var $author$project$Main$NoOp = {$: 'NoOp'};
 var $elm$core$Basics$always = F2(
@@ -7457,21 +7442,6 @@ var $author$project$Ports$authRemoved = _Platform_incomingPort(
 var $author$project$Ports$authStored = _Platform_incomingPort('authStored', $elm$json$Json$Decode$value);
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $author$project$Ports$kmlContentParsed = _Platform_incomingPort('kmlContentParsed', $elm$json$Json$Decode$value);
-var $elm$json$Json$Decode$index = _Json_decodeIndex;
-var $author$project$Ports$mapMarkerMoved = _Platform_incomingPort(
-	'mapMarkerMoved',
-	A2(
-		$elm$json$Json$Decode$andThen,
-		function (_v0) {
-			return A2(
-				$elm$json$Json$Decode$andThen,
-				function (_v1) {
-					return $elm$json$Json$Decode$succeed(
-						_Utils_Tuple2(_v0, _v1));
-				},
-				A2($elm$json$Json$Decode$index, 1, $elm$json$Json$Decode$float));
-		},
-		A2($elm$json$Json$Decode$index, 0, $elm$json$Json$Decode$float)));
 var $author$project$Main$subscriptions = function (_v0) {
 	return $elm$core$Platform$Sub$batch(
 		_List_fromArray(
@@ -7488,7 +7458,6 @@ var $author$project$Main$subscriptions = function (_v0) {
 				}),
 				$author$project$Ports$authRemoved(
 				$elm$core$Basics$always($author$project$Main$AuthRemoved)),
-				$author$project$Ports$mapMarkerMoved($author$project$Main$MapMarkerMoved),
 				$author$project$Ports$kmlContentParsed($author$project$Main$KMLParsed)
 			]));
 };
@@ -7506,26 +7475,16 @@ var $author$project$Events$DeleteEvent = F2(
 var $author$project$Main$EventListMsg = function (a) {
 	return {$: 'EventListMsg', a: a};
 };
-var $author$project$Map$InitMap = {$: 'InitMap'};
 var $author$project$EventForm$LoadEvent = function (a) {
 	return {$: 'LoadEvent', a: a};
 };
 var $author$project$Main$LogoutResult = function (a) {
 	return {$: 'LogoutResult', a: a};
 };
-var $author$project$Main$MapMsg = function (a) {
-	return {$: 'MapMsg', a: a};
-};
-var $author$project$Map$MarkerMoved = function (a) {
-	return {$: 'MarkerMoved', a: a};
-};
 var $author$project$Calendar$SetDate = function (a) {
 	return {$: 'SetDate', a: a};
 };
 var $author$project$Calendar$SetEvents = function (a) {
-	return {$: 'SetEvents', a: a};
-};
-var $author$project$Map$SetEvents = function (a) {
 	return {$: 'SetEvents', a: a};
 };
 var $author$project$EventForm$SetLoading = function (a) {
@@ -8748,193 +8707,6 @@ var $author$project$EventList$update = F2(
 				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 		}
 	});
-var $elm$json$Json$Encode$int = _Json_wrap;
-var $elm$json$Json$Encode$list = F2(
-	function (func, entries) {
-		return _Json_wrap(
-			A3(
-				$elm$core$List$foldl,
-				_Json_addEntry(func),
-				_Json_emptyArray(_Utils_Tuple0),
-				entries));
-	});
-var $author$project$Ports$initMap = _Platform_outgoingPort(
-	'initMap',
-	function ($) {
-		return $elm$json$Json$Encode$object(
-			_List_fromArray(
-				[
-					_Utils_Tuple2(
-					'center',
-					function ($) {
-						var a = $.a;
-						var b = $.b;
-						return A2(
-							$elm$json$Json$Encode$list,
-							$elm$core$Basics$identity,
-							_List_fromArray(
-								[
-									$elm$json$Json$Encode$float(a),
-									$elm$json$Json$Encode$float(b)
-								]));
-					}($.center)),
-					_Utils_Tuple2(
-					'events',
-					$elm$json$Json$Encode$list(
-						function ($) {
-							return $elm$json$Json$Encode$object(
-								_List_fromArray(
-									[
-										_Utils_Tuple2(
-										'id',
-										$elm$json$Json$Encode$string($.id)),
-										_Utils_Tuple2(
-										'point',
-										function ($) {
-											return A3(
-												$elm$core$Maybe$destruct,
-												$elm$json$Json$Encode$null,
-												function ($) {
-													return $elm$json$Json$Encode$object(
-														_List_fromArray(
-															[
-																_Utils_Tuple2(
-																'lat',
-																$elm$json$Json$Encode$float($.lat)),
-																_Utils_Tuple2(
-																'lon',
-																$elm$json$Json$Encode$float($.lon))
-															]));
-												},
-												$);
-										}($.point)),
-										_Utils_Tuple2(
-										'title',
-										$elm$json$Json$Encode$string($.title))
-									]));
-						})($.events)),
-					_Utils_Tuple2(
-					'zoom',
-					$elm$json$Json$Encode$int($.zoom))
-				]));
-	});
-var $author$project$Map$toMapEvent = function (event) {
-	return {
-		id: event.id,
-		point: A2(
-			$elm$core$Maybe$map,
-			function (p) {
-				return {lat: p.lat, lon: p.lon};
-			},
-			event.point),
-		title: event.title
-	};
-};
-var $author$project$Ports$updateMap = _Platform_outgoingPort(
-	'updateMap',
-	function ($) {
-		return $elm$json$Json$Encode$object(
-			_List_fromArray(
-				[
-					_Utils_Tuple2(
-					'center',
-					function ($) {
-						var a = $.a;
-						var b = $.b;
-						return A2(
-							$elm$json$Json$Encode$list,
-							$elm$core$Basics$identity,
-							_List_fromArray(
-								[
-									$elm$json$Json$Encode$float(a),
-									$elm$json$Json$Encode$float(b)
-								]));
-					}($.center)),
-					_Utils_Tuple2(
-					'events',
-					$elm$json$Json$Encode$list(
-						function ($) {
-							return $elm$json$Json$Encode$object(
-								_List_fromArray(
-									[
-										_Utils_Tuple2(
-										'id',
-										$elm$json$Json$Encode$string($.id)),
-										_Utils_Tuple2(
-										'point',
-										function ($) {
-											return A3(
-												$elm$core$Maybe$destruct,
-												$elm$json$Json$Encode$null,
-												function ($) {
-													return $elm$json$Json$Encode$object(
-														_List_fromArray(
-															[
-																_Utils_Tuple2(
-																'lat',
-																$elm$json$Json$Encode$float($.lat)),
-																_Utils_Tuple2(
-																'lon',
-																$elm$json$Json$Encode$float($.lon))
-															]));
-												},
-												$);
-										}($.point)),
-										_Utils_Tuple2(
-										'title',
-										$elm$json$Json$Encode$string($.title))
-									]));
-						})($.events)),
-					_Utils_Tuple2(
-					'zoom',
-					$elm$json$Json$Encode$int($.zoom))
-				]));
-	});
-var $author$project$Map$update = F2(
-	function (msg, model) {
-		switch (msg.$) {
-			case 'InitMap':
-				return _Utils_Tuple2(
-					model,
-					$author$project$Ports$initMap(
-						{
-							center: model.center,
-							events: A2($elm$core$List$map, $author$project$Map$toMapEvent, model.events),
-							zoom: model.zoom
-						}));
-			case 'UpdateMap':
-				var center = msg.a;
-				var zoom = msg.b;
-				var events = msg.c;
-				var newModel = _Utils_update(
-					model,
-					{center: center, events: events, zoom: zoom});
-				return _Utils_Tuple2(
-					newModel,
-					$author$project$Ports$updateMap(
-						{
-							center: center,
-							events: A2($elm$core$List$map, $author$project$Map$toMapEvent, events),
-							zoom: zoom
-						}));
-			case 'SetEvents':
-				var events = msg.a;
-				var newModel = _Utils_update(
-					model,
-					{events: events});
-				return _Utils_Tuple2(
-					newModel,
-					$author$project$Ports$updateMap(
-						{
-							center: model.center,
-							events: A2($elm$core$List$map, $author$project$Map$toMapEvent, events),
-							zoom: model.zoom
-						}));
-			default:
-				var pos = msg.a;
-				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
-		}
-	});
 var $author$project$Main$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
@@ -9005,14 +8777,6 @@ var $author$project$Main$update = F2(
 						} else {
 							return _Utils_Tuple2(newModel, $elm$core$Platform$Cmd$none);
 						}
-					case 'MapRoute':
-						return _Utils_Tuple2(
-							newModel,
-							A2(
-								$elm$core$Task$perform,
-								$elm$core$Basics$identity,
-								$elm$core$Task$succeed(
-									$author$project$Main$MapMsg($author$project$Map$InitMap))));
 					default:
 						return _Utils_Tuple2(newModel, $elm$core$Platform$Cmd$none);
 				}
@@ -9039,53 +8803,6 @@ var $author$project$Main$update = F2(
 					$elm$core$Platform$Cmd$none);
 			case 'EventsMsg':
 				var eventsMsg = msg.a;
-				var updatedMap = function () {
-					_v12$3:
-					while (true) {
-						switch (eventsMsg.$) {
-							case 'EventsFetched':
-								if (eventsMsg.a.$ === 'Ok') {
-									var events = eventsMsg.a.a;
-									return A2(
-										$author$project$Map$update,
-										$author$project$Map$SetEvents(events),
-										model.map).a;
-								} else {
-									break _v12$3;
-								}
-							case 'EventCreated':
-								if (eventsMsg.a.$ === 'Ok') {
-									var event = eventsMsg.a.a;
-									return A2(
-										$author$project$Map$update,
-										$author$project$Map$SetEvents(
-											A2($elm$core$List$cons, event, model.events.events)),
-										model.map).a;
-								} else {
-									break _v12$3;
-								}
-							case 'EventUpdated':
-								if (eventsMsg.a.$ === 'Ok') {
-									var event = eventsMsg.a.a;
-									var updatedEventsList = A2(
-										$elm$core$List$map,
-										function (e) {
-											return _Utils_eq(e.id, event.id) ? event : e;
-										},
-										model.events.events);
-									return A2(
-										$author$project$Map$update,
-										$author$project$Map$SetEvents(updatedEventsList),
-										model.map).a;
-								} else {
-									break _v12$3;
-								}
-							default:
-								break _v12$3;
-						}
-					}
-					return model.map;
-				}();
 				var updatedEventForm = function () {
 					switch (eventsMsg.$) {
 						case 'EventCreated':
@@ -9184,28 +8901,18 @@ var $author$project$Main$update = F2(
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{calendar: updatedCalendar, error: newError, eventForm: updatedEventForm, events: updatedEvents, loading: newLoading, map: updatedMap}),
+						{calendar: updatedCalendar, error: newError, eventForm: updatedEventForm, events: updatedEvents, loading: newLoading}),
 					$elm$core$Platform$Cmd$batch(
 						_List_fromArray(
 							[
 								A2($elm$core$Platform$Cmd$map, $author$project$Main$EventsMsg, eventsCmd),
 								redirectCmd
 							])));
-			case 'MapMsg':
-				var mapMsg = msg.a;
-				var _v13 = A2($author$project$Map$update, mapMsg, model.map);
-				var updatedMap = _v13.a;
-				var mapCmd = _v13.b;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{map: updatedMap}),
-					A2($elm$core$Platform$Cmd$map, $author$project$Main$MapMsg, mapCmd));
 			case 'EventFormMsg':
 				var eventFormMsg = msg.a;
-				var _v14 = A2($author$project$EventForm$update, eventFormMsg, model.eventForm);
-				var updatedEventForm = _v14.a;
-				var action = _v14.b;
+				var _v12 = A2($author$project$EventForm$update, eventFormMsg, model.eventForm);
+				var updatedEventForm = _v12.a;
+				var action = _v12.b;
 				var cmd = function () {
 					if (action.$ === 'Just') {
 						if (action.a.$ === 'CreateEvent') {
@@ -9225,9 +8932,9 @@ var $author$project$Main$update = F2(
 												model.auth),
 											event))));
 						} else {
-							var _v16 = action.a;
-							var id = _v16.a;
-							var event = _v16.b;
+							var _v14 = action.a;
+							var id = _v14.a;
+							var event = _v14.b;
 							return A2(
 								$elm$core$Task$perform,
 								$elm$core$Basics$identity,
@@ -9285,9 +8992,9 @@ var $author$project$Main$update = F2(
 							model,
 							$author$project$Ports$parseKMLContent(content));
 					default:
-						var _v18 = A2($author$project$EventList$update, eventListMsg, model.eventList);
-						var updatedEventList = _v18.a;
-						var cmd = _v18.b;
+						var _v16 = A2($author$project$EventList$update, eventListMsg, model.eventList);
+						var updatedEventList = _v16.a;
+						var cmd = _v16.b;
 						return _Utils_Tuple2(
 							_Utils_update(
 								model,
@@ -9327,12 +9034,12 @@ var $author$project$Main$update = F2(
 				}
 			case 'KMLParsed':
 				var value = msg.a;
-				var _v20 = A2(
+				var _v18 = A2(
 					$elm$json$Json$Decode$decodeValue,
 					$elm$json$Json$Decode$list($author$project$KMLUtils$rawKMLDecoder),
 					value);
-				if (_v20.$ === 'Ok') {
-					var rawList = _v20.a;
+				if (_v18.$ === 'Ok') {
+					var rawList = _v18.a;
 					var events = A2($elm$core$List$filterMap, $author$project$KMLUtils$processRawKML, rawList);
 					var cmds = A2(
 						$elm$core$List$map,
@@ -9374,29 +9081,17 @@ var $author$project$Main$update = F2(
 						model,
 						{auth: $elm$core$Maybe$Nothing}),
 					$elm$core$Platform$Cmd$none);
-			case 'MapMarkerMoved':
-				var pos = msg.a;
-				var _v21 = A2(
-					$author$project$Map$update,
-					$author$project$Map$MarkerMoved(pos),
-					model.map);
-				var updatedMap = _v21.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{map: updatedMap}),
-					$elm$core$Platform$Cmd$none);
 			case 'Login':
 				return _Utils_Tuple2(
 					model,
 					$author$project$PocketBase$initiateOAuth2Login('oidc'));
 			case 'Logout':
-				var _v22 = model.auth;
-				if (_v22.$ === 'Just') {
-					var auth = _v22.a;
-					var _v23 = auth.token;
-					if (_v23.$ === 'Just') {
-						var token = _v23.a;
+				var _v19 = model.auth;
+				if (_v19.$ === 'Just') {
+					var auth = _v19.a;
+					var _v20 = auth.token;
+					if (_v20.$ === 'Just') {
+						var token = _v20.a;
 						return _Utils_Tuple2(
 							model,
 							A2($author$project$PocketBase$logout, token, $author$project$Main$LogoutResult));
@@ -11814,18 +11509,6 @@ var $author$project$Input$view = function (config) {
 				])));
 	return A2($elm$html$Html$input, attributes, _List_Nil);
 };
-var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
-var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
-var $author$project$Map$view = function (model) {
-	return A2(
-		$elm$html$Html$div,
-		_List_fromArray(
-			[
-				$elm$html$Html$Attributes$id('map'),
-				A2($elm$html$Html$Attributes$style, 'height', '400px')
-			]),
-		_List_Nil);
-};
 var $author$project$Main$view = function (model) {
 	return {
 		body: _List_fromArray(
@@ -11881,18 +11564,6 @@ var $author$project$Main$view = function (model) {
 															[
 																$elm$html$Html$text(
 																$author$project$I18n$get('home'))
-															])),
-														A2(
-														$elm$html$Html$a,
-														_List_fromArray(
-															[
-																$elm$html$Html$Attributes$href('#/map'),
-																$elm$html$Html$Attributes$class('text-gray-500 hover:text-blue-600 px-3 py-2 text-sm font-medium')
-															]),
-														_List_fromArray(
-															[
-																$elm$html$Html$text(
-																$author$project$I18n$get('map'))
 															])),
 														(!_Utils_eq(model.auth, $elm$core$Maybe$Nothing)) ? A2(
 														$elm$html$Html$a,
@@ -12270,29 +11941,6 @@ var $author$project$Main$view = function (model) {
 																						$author$project$Calendar$view(model.calendar))
 																					]))
 																			]))
-																	]))
-															]));
-												case 'MapRoute':
-													return A2(
-														$elm$html$Html$div,
-														_List_fromArray(
-															[
-																$elm$html$Html$Attributes$class('bg-white shadow rounded-lg')
-															]),
-														_List_fromArray(
-															[
-																A2(
-																$elm$html$Html$div,
-																_List_fromArray(
-																	[
-																		$elm$html$Html$Attributes$class('px-4 py-3 sm:p-4')
-																	]),
-																_List_fromArray(
-																	[
-																		A2(
-																		$elm$html$Html$map,
-																		$author$project$Main$MapMsg,
-																		$author$project$Map$view(model.map))
 																	]))
 															]));
 												case 'EventsRoute':
