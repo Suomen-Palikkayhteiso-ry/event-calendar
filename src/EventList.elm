@@ -4,7 +4,7 @@ import File exposing (File)
 import File.Select as Select
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Events exposing (onClick)
+import Html.Events exposing (onClick, onInput)
 import Task
 import Types exposing (Event, EventState(..))
 
@@ -17,7 +17,23 @@ type alias Model =
     { currentPage : Int
     , pageSize : Int
     , showImportModal : Bool
+    , sortBy : SortBy
+    , sortDirection : SortDirection
+    , titleFilter : String
+    , dateFilter : String
+    , statusFilter : String
     }
+
+
+type SortBy
+    = Title
+    | Date
+    | Status
+
+
+type SortDirection
+    = Asc
+    | Desc
 
 
 init : Model
@@ -25,6 +41,11 @@ init =
     { currentPage = 1
     , pageSize = 20
     , showImportModal = False
+    , sortBy = Date
+    , sortDirection = Desc
+    , titleFilter = ""
+    , dateFilter = ""
+    , statusFilter = ""
     }
 
 
@@ -41,6 +62,10 @@ type Msg
     | SelectKMLFile
     | FileSelected File
     | FileLoaded String
+    | SortBy SortBy
+    | SetTitleFilter String
+    | SetDateFilter String
+    | SetStatusFilter String
 
 
 
@@ -74,6 +99,30 @@ update msg model =
         FileLoaded _ ->
             ( model, Cmd.none )
 
+        SortBy sortBy ->
+            let
+                newDirection =
+                    if model.sortBy == sortBy then
+                        if model.sortDirection == Asc then
+                            Desc
+
+                        else
+                            Asc
+
+                    else
+                        Asc
+            in
+            ( { model | sortBy = sortBy, sortDirection = newDirection, currentPage = 1 }, Cmd.none )
+
+        SetTitleFilter filter ->
+            ( { model | titleFilter = filter, currentPage = 1 }, Cmd.none )
+
+        SetDateFilter filter ->
+            ( { model | dateFilter = filter, currentPage = 1 }, Cmd.none )
+
+        SetStatusFilter filter ->
+            ( { model | statusFilter = filter, currentPage = 1 }, Cmd.none )
+
 
 
 -- VIEW
@@ -102,22 +151,69 @@ view model events =
 
           else
             text ""
+        , div [ class "mb-4 flex gap-4" ]
+            [ input [ type_ "text", placeholder "Filter by title", value model.titleFilter, onInput SetTitleFilter, class "px-3 py-2 border border-gray-300 rounded-md" ] []
+            , input [ type_ "text", placeholder "Filter by date", value model.dateFilter, onInput SetDateFilter, class "px-3 py-2 border border-gray-300 rounded-md" ] []
+            , select [ onInput SetStatusFilter, class "px-3 py-2 border border-gray-300 rounded-md" ]
+                [ option [ value "" ] [ text "All statuses" ]
+                , option [ value "draft" ] [ text "Draft" ]
+                , option [ value "pending" ] [ text "Pending" ]
+                , option [ value "published" ] [ text "Published" ]
+                , option [ value "deleted" ] [ text "Deleted" ]
+                ]
+            ]
         , div [ class "bg-white shadow-md rounded-lg overflow-hidden" ]
             [ table [ class "min-w-full divide-y divide-gray-200" ]
                 [ thead [ class "bg-gray-50" ]
                     [ tr []
-                        [ th [ class "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" ] [ text "Title" ]
-                        , th [ class "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" ] [ text "Date" ]
-                        , th [ class "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" ] [ text "Status" ]
+                        [ th [ class "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer", onClick (SortBy Title) ] [ text "Title" ]
+                        , th [ class "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer", onClick (SortBy Date) ] [ text "Date" ]
+                        , th [ class "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer", onClick (SortBy Status) ] [ text "Status" ]
                         , th [ class "px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider" ] [ text "Actions" ]
                         ]
                     ]
                 , tbody [ class "bg-white divide-y divide-gray-200" ]
-                    (List.map viewEventRow (paginate model.currentPage model.pageSize events))
+                    (List.map viewEventRow (paginate model.currentPage model.pageSize (filterAndSortEvents model events)))
                 ]
-            , viewPagination model (List.length events)
+            , viewPagination model (List.length (filterAndSortEvents model events))
             ]
         ]
+
+
+filterAndSortEvents : Model -> List Event -> List Event
+filterAndSortEvents model events =
+    events
+        |> List.filter (matchesFilters model)
+        |> sortEvents model.sortBy model.sortDirection
+
+
+matchesFilters : Model -> Event -> Bool
+matchesFilters model event =
+    String.contains (String.toLower model.titleFilter) (String.toLower event.title)
+        && String.contains (String.toLower model.dateFilter) (String.toLower event.startDate)
+        && (model.statusFilter == "" || stateToString event.state == model.statusFilter)
+
+
+sortEvents : SortBy -> SortDirection -> List Event -> List Event
+sortEvents sortBy direction events =
+    let
+        comparator =
+            case sortBy of
+                Title ->
+                    \a b -> compare (String.toLower a.title) (String.toLower b.title)
+
+                Date ->
+                    \a b -> compare a.startDate b.startDate
+
+                Status ->
+                    \a b -> compare (stateToString a.state) (stateToString b.state)
+    in
+    case direction of
+        Asc ->
+            List.sortWith comparator events
+
+        Desc ->
+            List.sortWith (\a b -> comparator b a) events
 
 
 viewEventRow : Event -> Html Msg

@@ -5673,7 +5673,9 @@ var $author$project$Calendar$init = {
 var $author$project$EventForm$Create = {$: 'Create'};
 var $author$project$Types$Draft = {$: 'Draft'};
 var $author$project$EventForm$init = {allDay: false, description: '', endDate: '', errors: _List_Nil, image: $elm$core$Maybe$Nothing, imageDescription: '', loading: false, location: '', mode: $author$project$EventForm$Create, point: $elm$core$Maybe$Nothing, startDate: '', state: $author$project$Types$Draft, title: '', url: ''};
-var $author$project$EventList$init = {currentPage: 1, pageSize: 20, showImportModal: false};
+var $author$project$EventList$Date = {$: 'Date'};
+var $author$project$EventList$Desc = {$: 'Desc'};
+var $author$project$EventList$init = {currentPage: 1, dateFilter: '', pageSize: 20, showImportModal: false, sortBy: $author$project$EventList$Date, sortDirection: $author$project$EventList$Desc, statusFilter: '', titleFilter: ''};
 var $author$project$Events$init = {error: $elm$core$Maybe$Nothing, events: _List_Nil, loading: false};
 var $elm$core$Platform$Cmd$map = _Platform_map;
 var $elm$time$Time$Name = function (a) {
@@ -8649,6 +8651,7 @@ var $author$project$EventForm$update = F2(
 					$elm$core$Maybe$Nothing);
 		}
 	});
+var $author$project$EventList$Asc = {$: 'Asc'};
 var $author$project$EventList$FileLoaded = function (a) {
 	return {$: 'FileLoaded', a: a};
 };
@@ -8703,8 +8706,37 @@ var $author$project$EventList$update = F2(
 						$elm$core$Task$perform,
 						$author$project$EventList$FileLoaded,
 						$elm$file$File$toString(file)));
-			default:
+			case 'FileLoaded':
 				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+			case 'SortBy':
+				var sortBy = msg.a;
+				var newDirection = _Utils_eq(model.sortBy, sortBy) ? (_Utils_eq(model.sortDirection, $author$project$EventList$Asc) ? $author$project$EventList$Desc : $author$project$EventList$Asc) : $author$project$EventList$Asc;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{currentPage: 1, sortBy: sortBy, sortDirection: newDirection}),
+					$elm$core$Platform$Cmd$none);
+			case 'SetTitleFilter':
+				var filter = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{currentPage: 1, titleFilter: filter}),
+					$elm$core$Platform$Cmd$none);
+			case 'SetDateFilter':
+				var filter = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{currentPage: 1, dateFilter: filter}),
+					$elm$core$Platform$Cmd$none);
+			default:
+				var filter = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{currentPage: 1, statusFilter: filter}),
+					$elm$core$Platform$Cmd$none);
 		}
 	});
 var $author$project$Main$update = F2(
@@ -10808,22 +10840,21 @@ var $author$project$EventForm$view = function (model) {
 					]))
 			]));
 };
-var $author$project$EventList$ToggleImportModal = {$: 'ToggleImportModal'};
-var $author$project$EventList$paginate = F3(
-	function (page, size, list) {
-		return A2(
-			$elm$core$List$take,
-			size,
-			A2($elm$core$List$drop, (page - 1) * size, list));
-	});
-var $elm$html$Html$table = _VirtualDom_node('table');
-var $elm$html$Html$tbody = _VirtualDom_node('tbody');
-var $elm$html$Html$th = _VirtualDom_node('th');
-var $elm$html$Html$thead = _VirtualDom_node('thead');
-var $elm$html$Html$tr = _VirtualDom_node('tr');
-var $author$project$EventList$DeleteEvent = function (a) {
-	return {$: 'DeleteEvent', a: a};
+var $author$project$EventList$SetDateFilter = function (a) {
+	return {$: 'SetDateFilter', a: a};
 };
+var $author$project$EventList$SetStatusFilter = function (a) {
+	return {$: 'SetStatusFilter', a: a};
+};
+var $author$project$EventList$SetTitleFilter = function (a) {
+	return {$: 'SetTitleFilter', a: a};
+};
+var $author$project$EventList$SortBy = function (a) {
+	return {$: 'SortBy', a: a};
+};
+var $author$project$EventList$Status = {$: 'Status'};
+var $author$project$EventList$Title = {$: 'Title'};
+var $author$project$EventList$ToggleImportModal = {$: 'ToggleImportModal'};
 var $author$project$EventList$stateToString = function (state) {
 	switch (state.$) {
 		case 'Draft':
@@ -10835,6 +10866,86 @@ var $author$project$EventList$stateToString = function (state) {
 		default:
 			return 'Deleted';
 	}
+};
+var $author$project$EventList$matchesFilters = F2(
+	function (model, event) {
+		return A2(
+			$elm$core$String$contains,
+			$elm$core$String$toLower(model.titleFilter),
+			$elm$core$String$toLower(event.title)) && (A2(
+			$elm$core$String$contains,
+			$elm$core$String$toLower(model.dateFilter),
+			$elm$core$String$toLower(event.startDate)) && ((model.statusFilter === '') || _Utils_eq(
+			$author$project$EventList$stateToString(event.state),
+			model.statusFilter)));
+	});
+var $elm$core$List$sortWith = _List_sortWith;
+var $author$project$EventList$sortEvents = F3(
+	function (sortBy, direction, events) {
+		var comparator = function () {
+			switch (sortBy.$) {
+				case 'Title':
+					return F2(
+						function (a, b) {
+							return A2(
+								$elm$core$Basics$compare,
+								$elm$core$String$toLower(a.title),
+								$elm$core$String$toLower(b.title));
+						});
+				case 'Date':
+					return F2(
+						function (a, b) {
+							return A2($elm$core$Basics$compare, a.startDate, b.startDate);
+						});
+				default:
+					return F2(
+						function (a, b) {
+							return A2(
+								$elm$core$Basics$compare,
+								$author$project$EventList$stateToString(a.state),
+								$author$project$EventList$stateToString(b.state));
+						});
+			}
+		}();
+		if (direction.$ === 'Asc') {
+			return A2($elm$core$List$sortWith, comparator, events);
+		} else {
+			return A2(
+				$elm$core$List$sortWith,
+				F2(
+					function (a, b) {
+						return A2(comparator, b, a);
+					}),
+				events);
+		}
+	});
+var $author$project$EventList$filterAndSortEvents = F2(
+	function (model, events) {
+		return A3(
+			$author$project$EventList$sortEvents,
+			model.sortBy,
+			model.sortDirection,
+			A2(
+				$elm$core$List$filter,
+				$author$project$EventList$matchesFilters(model),
+				events));
+	});
+var $elm$html$Html$option = _VirtualDom_node('option');
+var $author$project$EventList$paginate = F3(
+	function (page, size, list) {
+		return A2(
+			$elm$core$List$take,
+			size,
+			A2($elm$core$List$drop, (page - 1) * size, list));
+	});
+var $elm$html$Html$select = _VirtualDom_node('select');
+var $elm$html$Html$table = _VirtualDom_node('table');
+var $elm$html$Html$tbody = _VirtualDom_node('tbody');
+var $elm$html$Html$th = _VirtualDom_node('th');
+var $elm$html$Html$thead = _VirtualDom_node('thead');
+var $elm$html$Html$tr = _VirtualDom_node('tr');
+var $author$project$EventList$DeleteEvent = function (a) {
+	return {$: 'DeleteEvent', a: a};
 };
 var $author$project$EventList$statusColor = function (state) {
 	switch (state.$) {
@@ -11332,6 +11443,97 @@ var $author$project$EventList$view = F2(
 					$elm$html$Html$div,
 					_List_fromArray(
 						[
+							$elm$html$Html$Attributes$class('mb-4 flex gap-4')
+						]),
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$input,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$type_('text'),
+									$elm$html$Html$Attributes$placeholder('Filter by title'),
+									$elm$html$Html$Attributes$value(model.titleFilter),
+									$elm$html$Html$Events$onInput($author$project$EventList$SetTitleFilter),
+									$elm$html$Html$Attributes$class('px-3 py-2 border border-gray-300 rounded-md')
+								]),
+							_List_Nil),
+							A2(
+							$elm$html$Html$input,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$type_('text'),
+									$elm$html$Html$Attributes$placeholder('Filter by date'),
+									$elm$html$Html$Attributes$value(model.dateFilter),
+									$elm$html$Html$Events$onInput($author$project$EventList$SetDateFilter),
+									$elm$html$Html$Attributes$class('px-3 py-2 border border-gray-300 rounded-md')
+								]),
+							_List_Nil),
+							A2(
+							$elm$html$Html$select,
+							_List_fromArray(
+								[
+									$elm$html$Html$Events$onInput($author$project$EventList$SetStatusFilter),
+									$elm$html$Html$Attributes$class('px-3 py-2 border border-gray-300 rounded-md')
+								]),
+							_List_fromArray(
+								[
+									A2(
+									$elm$html$Html$option,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$value('')
+										]),
+									_List_fromArray(
+										[
+											$elm$html$Html$text('All statuses')
+										])),
+									A2(
+									$elm$html$Html$option,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$value('draft')
+										]),
+									_List_fromArray(
+										[
+											$elm$html$Html$text('Draft')
+										])),
+									A2(
+									$elm$html$Html$option,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$value('pending')
+										]),
+									_List_fromArray(
+										[
+											$elm$html$Html$text('Pending')
+										])),
+									A2(
+									$elm$html$Html$option,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$value('published')
+										]),
+									_List_fromArray(
+										[
+											$elm$html$Html$text('Published')
+										])),
+									A2(
+									$elm$html$Html$option,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$value('deleted')
+										]),
+									_List_fromArray(
+										[
+											$elm$html$Html$text('Deleted')
+										]))
+								]))
+						])),
+					A2(
+					$elm$html$Html$div,
+					_List_fromArray(
+						[
 							$elm$html$Html$Attributes$class('bg-white shadow-md rounded-lg overflow-hidden')
 						]),
 					_List_fromArray(
@@ -11361,7 +11563,9 @@ var $author$project$EventList$view = F2(
 													$elm$html$Html$th,
 													_List_fromArray(
 														[
-															$elm$html$Html$Attributes$class('px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider')
+															$elm$html$Html$Attributes$class('px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer'),
+															$elm$html$Html$Events$onClick(
+															$author$project$EventList$SortBy($author$project$EventList$Title))
 														]),
 													_List_fromArray(
 														[
@@ -11371,7 +11575,9 @@ var $author$project$EventList$view = F2(
 													$elm$html$Html$th,
 													_List_fromArray(
 														[
-															$elm$html$Html$Attributes$class('px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider')
+															$elm$html$Html$Attributes$class('px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer'),
+															$elm$html$Html$Events$onClick(
+															$author$project$EventList$SortBy($author$project$EventList$Date))
 														]),
 													_List_fromArray(
 														[
@@ -11381,7 +11587,9 @@ var $author$project$EventList$view = F2(
 													$elm$html$Html$th,
 													_List_fromArray(
 														[
-															$elm$html$Html$Attributes$class('px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider')
+															$elm$html$Html$Attributes$class('px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer'),
+															$elm$html$Html$Events$onClick(
+															$author$project$EventList$SortBy($author$project$EventList$Status))
 														]),
 													_List_fromArray(
 														[
@@ -11408,12 +11616,17 @@ var $author$project$EventList$view = F2(
 									A2(
 										$elm$core$List$map,
 										$author$project$EventList$viewEventRow,
-										A3($author$project$EventList$paginate, model.currentPage, model.pageSize, events)))
+										A3(
+											$author$project$EventList$paginate,
+											model.currentPage,
+											model.pageSize,
+											A2($author$project$EventList$filterAndSortEvents, model, events))))
 								])),
 							A2(
 							$author$project$EventList$viewPagination,
 							model,
-							$elm$core$List$length(events))
+							$elm$core$List$length(
+								A2($author$project$EventList$filterAndSortEvents, model, events)))
 						]))
 				]));
 	});
