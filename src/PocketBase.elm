@@ -12,7 +12,7 @@ import Types exposing (Auth, Event, User)
 
 baseUrl : String
 baseUrl =
-    "http://localhost:8090"
+    "/api"
 
 
 
