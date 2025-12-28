@@ -1,6 +1,7 @@
 import './style.css';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import PocketBase from 'pocketbase';
 
 console.log('window.Elm:', window.Elm);
 console.log('window.Elm.Main:', window.Elm?.Main);
@@ -9,6 +10,9 @@ if (window.Elm && window.Elm.Main) {
     const app = window.Elm.Main.init({
         node: document.getElementById('app')
     });
+
+    // Initialize PocketBase client
+    const pb = new PocketBase('/api');
 
     // Auth handling
     const STORAGE_KEY = 'pocketbase_auth';
@@ -22,6 +26,49 @@ if (window.Elm && window.Elm.Main) {
     app.ports.removeAuth.subscribe(() => {
         localStorage.removeItem(STORAGE_KEY);
         // app.ports.authRemoved.send(null);
+    });
+
+    // OAuth2 login initiation using PocketBase SDK
+    app.ports.initiateOAuth2Login.subscribe(async (provider) => {
+        try {
+            // Clear any existing auth
+            pb.authStore.clear();
+            
+            // Use PocketBase SDK's OAuth2 method
+            await pb.collection('users').authWithOAuth2({
+                provider: provider,
+                redirectUrl: window.location.origin + '/callback'
+            });
+            
+            // The SDK will handle the redirect automatically
+        } catch (error) {
+            console.error('OAuth2 login error:', error);
+        }
+    });
+
+    // OAuth2 callback handling using PocketBase SDK
+    app.ports.handleOAuth2Callback.subscribe(async ({ code, state }) => {
+        try {
+            // Use PocketBase SDK to complete OAuth2 flow with code and state
+            const authData = await pb.collection('users').authWithOAuth2({
+                provider: 'oidc',
+                code: code,
+                state: state || undefined,
+                redirectUrl: window.location.origin + '/callback'
+            });
+            
+            // Send the auth data to Elm
+            const auth = {
+                record: authData.record,
+                token: authData.token
+            };
+            app.ports.authStored.send(auth);
+            
+            // Redirect to home page
+            window.location.href = '/';
+        } catch (error) {
+            console.error('OAuth2 callback error:', error);
+        }
     });
 
     // Restore auth on load

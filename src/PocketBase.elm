@@ -3,6 +3,7 @@ module PocketBase exposing (..)
 import Http
 import Json.Decode as Decode
 import Json.Encode as Encode
+import Ports
 import Types exposing (Auth, Event, User)
 
 
@@ -32,6 +33,14 @@ login credentials toMsg =
         , body = Http.jsonBody (loginEncoder credentials)
         , expect = Http.expectJson toMsg authResponseDecoder
         }
+
+
+initiateOAuth2Login : String -> Cmd msg
+initiateOAuth2Login provider =
+    -- For OAuth2, we need to redirect the user to the OAuth2 provider
+    -- This is typically done by setting window.location.href
+    -- We'll use a port to handle this on the JavaScript side
+    Ports.initiateOAuth2Login provider
 
 
 loginEncoder : LoginCredentials -> Encode.Value

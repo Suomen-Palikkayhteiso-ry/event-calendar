@@ -59,8 +59,6 @@ type alias Model =
     , eventForm : EventForm.Model
     , eventList : EventList.Model
     , auth : Maybe Types.Auth
-    , loginEmail : String
-    , loginPassword : String
     , error : Maybe String
     , loading : Bool
     , selectedDate : String
@@ -73,7 +71,7 @@ init flags url key =
         ( eventsModel, eventsCmd ) =
             Events.update (Events.FetchEvents Nothing) Events.init
     in
-    ( Model key url (parseUrl url) Calendar.init eventsModel Map.init EventForm.init EventList.init Nothing "" "" Nothing True ""
+    ( Model key url (parseUrl url) Calendar.init eventsModel Map.init EventForm.init EventList.init Nothing Nothing True ""
     , Cmd.map EventsMsg eventsCmd
     )
 
@@ -187,9 +185,6 @@ type Msg
     | Logout
     | LoginResult (Result Http.Error Types.Auth)
     | LogoutResult (Result Http.Error ())
-    | UpdateLoginEmail String
-    | UpdateLoginPassword String
-    | AuthCallbackResult (Result Http.Error Types.Auth)
     | SetDate String
     | RequestDeleteEvent String
     | GoToCreateEvent
@@ -235,7 +230,7 @@ update msg model =
                 Callback ->
                     case parseCallbackParams (Maybe.withDefault "" url.query) of
                         Just ( code, state ) ->
-                            ( newModel, PocketBase.authWithOAuth2Code code state AuthCallbackResult )
+                            ( newModel, Ports.handleOAuth2Callback { code = code, state = state } )
 
                         Nothing ->
                             ( newModel, Cmd.none )
@@ -278,7 +273,15 @@ update msg model =
                         Events.EventUpdated (Ok event) ->
                             let
                                 updatedEventsList =
-                                    List.map (\e -> if e.id == event.id then event else e) model.events.events
+                                    List.map
+                                        (\e ->
+                                            if e.id == event.id then
+                                                event
+
+                                            else
+                                                e
+                                        )
+                                        model.events.events
                             in
                             Tuple.first (Map.update (Map.SetEvents updatedEventsList) model.map)
 
@@ -419,11 +422,7 @@ update msg model =
             )
 
         Login ->
-            let
-                credentials =
-                    { email = model.loginEmail, password = model.loginPassword }
-            in
-            ( { model | loading = True, error = Nothing }, PocketBase.login credentials LoginResult )
+            ( model, PocketBase.initiateOAuth2Login "oidc" )
 
         Logout ->
             case model.auth of
@@ -453,20 +452,6 @@ update msg model =
 
                 Err err ->
                     ( { model | error = Just (httpErrorToString err), loading = False }, Cmd.none )
-
-        AuthCallbackResult result ->
-            case result of
-                Ok auth ->
-                    ( { model | auth = Just auth, error = Nothing, loading = False }, Ports.storeAuth auth )
-
-                Err err ->
-                    ( { model | error = Just (httpErrorToString err), loading = False }, Cmd.none )
-
-        UpdateLoginEmail email ->
-            ( { model | loginEmail = email }, Cmd.none )
-
-        UpdateLoginPassword password ->
-            ( { model | loginPassword = password }, Cmd.none )
 
         SetDate dateStr ->
             let
@@ -553,64 +538,14 @@ view model =
 
                         Nothing ->
                             div []
-                                [ Input.view
-                                    { type_ = "email"
-                                    , value = model.loginEmail
-                                    , placeholder = Just "Email"
-                                    , required = False
-                                    , disabled = False
-                                    , readonly = False
-                                    , ariaLabel = Nothing
-                                    , ariaDescribedBy = Nothing
-                                    , ariaInvalid = False
-                                    , ariaRequired = False
-                                    , id = Nothing
-                                    , name = Nothing
-                                    , pattern = Nothing
-                                    , min = Nothing
-                                    , max = Nothing
-                                    , step = Nothing
-                                    , accept = Nothing
-                                    , autofocus = False
-                                    , class = Nothing
-                                    , onInput = Just UpdateLoginEmail
-                                    , onChange = Nothing
-                                    , onBlur = Nothing
-                                    , onFocus = Nothing
-                                    }
-                                , Input.view
-                                    { type_ = "password"
-                                    , value = model.loginPassword
-                                    , placeholder = Just "Password"
-                                    , required = False
-                                    , disabled = False
-                                    , readonly = False
-                                    , ariaLabel = Nothing
-                                    , ariaDescribedBy = Nothing
-                                    , ariaInvalid = False
-                                    , ariaRequired = False
-                                    , id = Nothing
-                                    , name = Nothing
-                                    , pattern = Nothing
-                                    , min = Nothing
-                                    , max = Nothing
-                                    , step = Nothing
-                                    , accept = Nothing
-                                    , autofocus = False
-                                    , class = Nothing
-                                    , onInput = Just UpdateLoginPassword
-                                    , onChange = Nothing
-                                    , onBlur = Nothing
-                                    , onFocus = Nothing
-                                    }
-                                , Button.view
+                                [ Button.view
                                     { variant = Button.Primary
                                     , size = Button.Md
                                     , disabled = False
                                     , type_ = "button"
                                     , ariaLabel = Nothing
                                     , onClick = Just Login
-                                    , children = [ text "Login" ]
+                                    , children = [ text "Login with OIDC" ]
                                     }
                                 ]
                     ]

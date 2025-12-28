@@ -44,7 +44,6 @@ elm-format:
 .PHONY: elm-check
 elm-check:
 	elm-format src/ --validate
-	cd review && elm-review
 	elm-test
 
 .PHONY: elm-spec

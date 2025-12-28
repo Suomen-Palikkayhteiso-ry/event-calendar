@@ -14,6 +14,12 @@ port storeAuth : Auth -> Cmd msg
 port removeAuth : () -> Cmd msg
 
 
+port initiateOAuth2Login : String -> Cmd msg
+
+
+port handleOAuth2Callback : { code : String, state : Maybe String } -> Cmd msg
+
+
 port initMap : { center : ( Float, Float ), zoom : Int, events : List { id : String, title : String, point : Maybe { lat : Float, lon : Float } } } -> Cmd msg
 
 
