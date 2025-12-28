@@ -164,7 +164,7 @@ view model events =
             ]
         , div [ class "bg-white shadow-md rounded-lg overflow-hidden" ]
             [ table [ class "min-w-full divide-y divide-gray-200" ]
-                [ thead [ class "bg-gray-50" ]
+                [ thead [ class "bg-white" ]
                     [ tr []
                         [ th [ class "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer", onClick (SortBy Title) ] [ text "Title" ]
                         , th [ class "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer", onClick (SortBy Date) ] [ text "Date" ]
@@ -260,13 +260,13 @@ viewPagination model totalItems =
                 [ button
                     [ onClick (SetPage (Basics.max 1 (model.currentPage - 1)))
                     , disabled (model.currentPage == 1)
-                    , class "relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                    , class "relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-100"
                     ]
                     [ text "Previous" ]
                 , button
                     [ onClick (SetPage (Basics.min totalPages (model.currentPage + 1)))
                     , disabled (model.currentPage == totalPages)
-                    , class "ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                    , class "ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-100"
                     ]
                     [ text "Next" ]
                 ]
@@ -284,7 +284,7 @@ viewPagination model totalItems =
                         [ button
                             [ onClick (SetPage (Basics.max 1 (model.currentPage - 1)))
                             , disabled (model.currentPage == 1)
-                            , class "relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                            , class "relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-100"
                             ]
                             [ span [ class "sr-only" ] [ text "Previous" ]
                             , text "<"
@@ -292,7 +292,7 @@ viewPagination model totalItems =
                         , button
                             [ onClick (SetPage (Basics.min totalPages (model.currentPage + 1)))
                             , disabled (model.currentPage == totalPages)
-                            , class "relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                            , class "relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-100"
                             ]
                             [ span [ class "sr-only" ] [ text "Next" ]
                             , text ">"
@@ -327,10 +327,10 @@ viewImportModal =
                             ]
                         ]
                     ]
-                , div [ class "bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse" ]
+                , div [ class "bg-white px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse" ]
                     [ button
                         [ type_ "button"
-                        , class "mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                        , class "mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
                         , onClick ToggleImportModal
                         ]
                         [ text "Cancel" ]

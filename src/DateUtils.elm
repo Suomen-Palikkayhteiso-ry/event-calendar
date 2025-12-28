@@ -91,7 +91,7 @@ daysSinceEpoch year month day =
 
 
 -- days since 1970-01-01
--- Format date in Helsinki timezone (approximate)
+-- Format date in Helsinki timezone
 
 
 formatDateInHelsinki : String -> Bool -> String
@@ -100,18 +100,43 @@ formatDateInHelsinki utcString allDay =
         posix =
             parseUTCDate utcString
 
-        -- Approximate Helsinki time (UTC +2 or +3)
-        helsinkiMillis =
-            Time.posixToMillis posix + 2 * 60 * 60 * 1000
+        -- Helsinki timezone offset: +2 in winter, +3 in summer
+        month =
+            Time.toMonth Time.utc posix
 
-        -- +2 hours
+        offsetHours =
+            case month of
+                Time.Apr ->
+                    3
+
+                Time.May ->
+                    3
+
+                Time.Jun ->
+                    3
+
+                Time.Jul ->
+                    3
+
+                Time.Aug ->
+                    3
+
+                Time.Sep ->
+                    3
+
+                _ ->
+                    2
+
+        helsinkiMillis =
+            Time.posixToMillis posix + offsetHours * 60 * 60 * 1000
+
         helsinkiPosix =
             Time.millisToPosix helsinkiMillis
 
         year =
             Time.toYear Time.utc helsinkiPosix
 
-        month =
+        helsinkiMonth =
             Time.toMonth Time.utc helsinkiPosix
 
         day =
@@ -120,7 +145,7 @@ formatDateInHelsinki utcString allDay =
         dateStr =
             String.fromInt day
                 ++ "."
-                ++ String.fromInt (monthToInt month)
+                ++ String.fromInt (monthToInt helsinkiMonth)
                 ++ "."
                 ++ String.fromInt year
     in

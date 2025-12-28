@@ -219,7 +219,7 @@ type alias Auth =
 authDecoder : Decode.Decoder Auth
 authDecoder =
     Decode.succeed Auth
-        |> DecodeExtra.andMap (DecodeExtra.optionalField "user" (Decode.nullable userDecoder) |> Decode.map (Maybe.withDefault Nothing))
+        |> DecodeExtra.andMap (DecodeExtra.optionalField "record" (Decode.nullable userDecoder) |> Decode.map (Maybe.withDefault Nothing))
         |> DecodeExtra.andMap (DecodeExtra.optionalField "token" (Decode.nullable Decode.string) |> Decode.map (Maybe.withDefault Nothing))
 
 

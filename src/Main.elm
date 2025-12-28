@@ -538,7 +538,7 @@ view model =
                     Nothing ->
                         text ""
                 ]
-            , main_ [ class "flex-1 bg-gray-50" ]
+            , main_ [ class "flex-1" ]
                 [ div [ class "max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8" ]
                     [ if model.loading then
                         div [ class "flex justify-center items-center h-64" ]

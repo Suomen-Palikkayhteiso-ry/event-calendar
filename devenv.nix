@@ -31,6 +31,22 @@ in
       qrcode
       pillow
     ]))
+    (haskellPackages.ghcWithPackages (ps: with ps; [
+      aeson
+      http-client
+      http-client-tls
+      time
+      directory
+      filepath
+      text
+      bytestring
+      containers
+      vector
+      unordered-containers
+      scientific
+      uuid
+      base64-bytestring
+    ]))
   ];
 
   dotenv.disableHint = true;

@@ -7,7 +7,7 @@
 
 /* Calendar Styles */
 .calendar {
-  max-width: 800px;
+  max-width: 1200px;
   margin: 0 auto;
   font-family: var(--font-family-sans);
 }
