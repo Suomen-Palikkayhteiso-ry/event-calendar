@@ -109,12 +109,17 @@ routeParser =
 
 parseUrl : Url.Url -> Route
 parseUrl url =
-    case Parser.parse routeParser url of
-        Just route ->
-            route
+    case url.fragment of
+        Just fragment ->
+            case Parser.parse routeParser { url | path = fragment, fragment = Nothing } of
+                Just route ->
+                    route
+
+                Nothing ->
+                    NotFound
 
         Nothing ->
-            NotFound
+            Home
 
 
 parseCallbackParams : String -> Maybe ( String, Maybe String )
@@ -239,6 +244,9 @@ update msg model =
                         Nothing ->
                             ( newModel, Cmd.none )
 
+                MapRoute ->
+                    ( newModel, Task.perform identity (Task.succeed (MapMsg Map.InitMap)) )
+
                 _ ->
                     ( newModel, Cmd.none )
 
@@ -322,13 +330,13 @@ update msg model =
                 redirectCmd =
                     case eventsMsg of
                         Events.EventDeleted _ (Ok ()) ->
-                            Nav.pushUrl model.key "/"
+                            Nav.pushUrl model.key "#/"
 
                         Events.EventCreated (Ok _) ->
-                            Nav.pushUrl model.key "/"
+                            Nav.pushUrl model.key "#/"
 
                         Events.EventUpdated (Ok _) ->
-                            Nav.pushUrl model.key "/"
+                            Nav.pushUrl model.key "#/"
 
                         _ ->
                             Cmd.none
@@ -374,7 +382,7 @@ update msg model =
                     )
 
                 EventList.EditEvent id ->
-                    ( model, Nav.pushUrl model.key ("/events/" ++ id ++ "/edit") )
+                    ( model, Nav.pushUrl model.key ("#/events/" ++ id ++ "/edit") )
 
                 EventList.FileLoaded content ->
                     ( model, Ports.parseKMLContent content )
@@ -389,7 +397,7 @@ update msg model =
         EventDetailMsg eventDetailMsg ->
             case eventDetailMsg of
                 EventDetail.EditEvent id ->
-                    ( model, Nav.pushUrl model.key ("/events/" ++ id ++ "/edit") )
+                    ( model, Nav.pushUrl model.key ("#/events/" ++ id ++ "/edit") )
 
                 EventDetail.DeleteEvent id ->
                     ( model
@@ -397,7 +405,7 @@ update msg model =
                     )
 
                 EventDetail.Back ->
-                    ( model, Nav.pushUrl model.key "/events" )
+                    ( model, Nav.pushUrl model.key "#/events" )
 
         KMLParsed value ->
             case Decode.decodeValue (Decode.list KMLUtils.rawKMLDecoder) value of
@@ -478,7 +486,7 @@ update msg model =
             )
 
         GoToCreateEvent ->
-            ( model, Nav.pushUrl model.key "/events/create" )
+            ( model, Nav.pushUrl model.key "#/events/create" )
 
         NoOp ->
             ( model, Cmd.none )
@@ -519,10 +527,10 @@ view model =
                 [ div [ class "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" ]
                     [ div [ class "flex justify-between items-center h-12" ]
                         [ nav [ class "flex space-x-8" ]
-                            [ a [ href "/", class "text-gray-900 hover:text-blue-600 px-3 py-2 text-sm font-medium" ] [ text (I18n.get "home") ]
-                            , a [ href "/map", class "text-gray-500 hover:text-blue-600 px-3 py-2 text-sm font-medium" ] [ text (I18n.get "map") ]
+                            [ a [ href "#/", class "text-gray-900 hover:text-blue-600 px-3 py-2 text-sm font-medium" ] [ text (I18n.get "home") ]
+                            , a [ href "#/map", class "text-gray-500 hover:text-blue-600 px-3 py-2 text-sm font-medium" ] [ text (I18n.get "map") ]
                             , if model.auth /= Nothing then
-                                a [ href "/events", class "text-gray-500 hover:text-blue-600 px-3 py-2 text-sm font-medium" ] [ text (I18n.get "events") ]
+                                a [ href "#/events", class "text-gray-500 hover:text-blue-600 px-3 py-2 text-sm font-medium" ] [ text (I18n.get "events") ]
 
                               else
                                 text ""
