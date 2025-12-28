@@ -88,6 +88,9 @@ type alias Translations =
     , hello : String
     , logout : String
     , login : String
+    , home : String
+    , map : String
+    , events : String
     , rss_feed : String
     , html_feed : String
     , ical_feed : String
@@ -207,6 +210,9 @@ fi =
     , hello = "Hei,"
     , logout = "Kirjaudu ulos"
     , login = "Kirjaudu sisään"
+    , home = "Koti"
+    , map = "Kartta"
+    , events = "Tapahtumat"
     , rss_feed = "RSS"
     , html_feed = "HTML | PDF"
     , ical_feed = "iCalendar"
@@ -498,6 +504,15 @@ get key =
 
         "login" ->
             fi.login
+
+        "home" ->
+            fi.home
+
+        "map" ->
+            fi.map
+
+        "events" ->
+            fi.events
 
         "rss_feed" ->
             fi.rss_feed

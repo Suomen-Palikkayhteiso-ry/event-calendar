@@ -4380,6 +4380,52 @@ function _Browser_load(url)
 }
 
 
+
+function _Time_now(millisToPosix)
+{
+	return _Scheduler_binding(function(callback)
+	{
+		callback(_Scheduler_succeed(millisToPosix(Date.now())));
+	});
+}
+
+var _Time_setInterval = F2(function(interval, task)
+{
+	return _Scheduler_binding(function(callback)
+	{
+		var id = setInterval(function() { _Scheduler_rawSpawn(task); }, interval);
+		return function() { clearInterval(id); };
+	});
+});
+
+function _Time_here()
+{
+	return _Scheduler_binding(function(callback)
+	{
+		callback(_Scheduler_succeed(
+			A2($elm$time$Time$customZone, -(new Date().getTimezoneOffset()), _List_Nil)
+		));
+	});
+}
+
+
+function _Time_getZoneName()
+{
+	return _Scheduler_binding(function(callback)
+	{
+		try
+		{
+			var name = $elm$time$Time$Name(Intl.DateTimeFormat().resolvedOptions().timeZone);
+		}
+		catch (e)
+		{
+			var name = $elm$time$Time$Offset(new Date().getTimezoneOffset());
+		}
+		callback(_Scheduler_succeed(name));
+	});
+}
+
+
 function _Url_percentEncode(string)
 {
 	return encodeURIComponent(string);
@@ -5611,6 +5657,10 @@ var $author$project$Main$Model = function (key) {
 		};
 	};
 };
+var $author$project$Main$SetCurrentTime = function (a) {
+	return {$: 'SetCurrentTime', a: a};
+};
+var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$time$Time$Posix = function (a) {
 	return {$: 'Posix', a: a};
 };
@@ -5633,6 +5683,18 @@ var $author$project$Map$init = {
 	zoom: 10
 };
 var $elm$core$Platform$Cmd$map = _Platform_map;
+var $elm$time$Time$Name = function (a) {
+	return {$: 'Name', a: a};
+};
+var $elm$time$Time$Offset = function (a) {
+	return {$: 'Offset', a: a};
+};
+var $elm$time$Time$Zone = F2(
+	function (a, b) {
+		return {$: 'Zone', a: a, b: b};
+	});
+var $elm$time$Time$customZone = $elm$time$Time$Zone;
+var $elm$time$Time$now = _Time_now($elm$time$Time$millisToPosix);
 var $author$project$Main$NotFound = {$: 'NotFound'};
 var $elm$url$Url$Parser$State = F5(
 	function (visited, unvisited, params, frag, value) {
@@ -7145,7 +7207,6 @@ var $author$project$PocketBase$getEvents = F2(
 			});
 	});
 var $elm$core$Basics$neq = _Utils_notEqual;
-var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$PocketBase$updateEvent = F4(
 	function (token, id, event, toMsg) {
@@ -7296,7 +7357,12 @@ var $author$project$Main$init = F3(
 		return _Utils_Tuple2(
 			$author$project$Main$Model(key)(url)(
 				$author$project$Main$parseUrl(url))($author$project$Calendar$init)(eventsModel)($author$project$Map$init)($author$project$EventForm$init)($author$project$EventList$init)($elm$core$Maybe$Nothing)($elm$core$Maybe$Nothing)(true)(''),
-			A2($elm$core$Platform$Cmd$map, $author$project$Main$EventsMsg, eventsCmd));
+			$elm$core$Platform$Cmd$batch(
+				_List_fromArray(
+					[
+						A2($elm$core$Platform$Cmd$map, $author$project$Main$EventsMsg, eventsCmd),
+						A2($elm$core$Task$perform, $author$project$Main$SetCurrentTime, $elm$time$Time$now)
+					])));
 	});
 var $author$project$Main$AuthRemoved = {$: 'AuthRemoved'};
 var $author$project$Main$AuthStored = function (a) {
@@ -7317,9 +7383,9 @@ var $author$project$Types$Auth = F2(
 	function (user, token) {
 		return {token: token, user: user};
 	});
-var $author$project$Types$User = F4(
-	function (id, email, name, avatar) {
-		return {avatar: avatar, email: email, id: id, name: name};
+var $author$project$Types$User = F5(
+	function (id, email, username, name, avatar) {
+		return {avatar: avatar, email: email, id: id, name: name, username: username};
 	});
 var $author$project$Types$userDecoder = A2(
 	$elm_community$json_extra$Json$Decode$Extra$andMap,
@@ -7341,11 +7407,20 @@ var $author$project$Types$userDecoder = A2(
 				$elm$json$Json$Decode$nullable($elm$json$Json$Decode$string))),
 		A2(
 			$elm_community$json_extra$Json$Decode$Extra$andMap,
-			A2($elm$json$Json$Decode$field, 'email', $elm$json$Json$Decode$string),
+			A2(
+				$elm$json$Json$Decode$map,
+				$elm$core$Maybe$withDefault($elm$core$Maybe$Nothing),
+				A2(
+					$elm_community$json_extra$Json$Decode$Extra$optionalField,
+					'username',
+					$elm$json$Json$Decode$nullable($elm$json$Json$Decode$string))),
 			A2(
 				$elm_community$json_extra$Json$Decode$Extra$andMap,
-				A2($elm$json$Json$Decode$field, 'id', $elm$json$Json$Decode$string),
-				$elm$json$Json$Decode$succeed($author$project$Types$User)))));
+				A2($elm$json$Json$Decode$field, 'email', $elm$json$Json$Decode$string),
+				A2(
+					$elm_community$json_extra$Json$Decode$Extra$andMap,
+					A2($elm$json$Json$Decode$field, 'id', $elm$json$Json$Decode$string),
+					$elm$json$Json$Decode$succeed($author$project$Types$User))))));
 var $author$project$Types$authDecoder = A2(
 	$elm_community$json_extra$Json$Decode$Extra$andMap,
 	A2(
@@ -8048,7 +8123,12 @@ var $author$project$Ports$storeAuth = _Platform_outgoingPort(
 											'name',
 											function ($) {
 												return A3($elm$core$Maybe$destruct, $elm$json$Json$Encode$null, $elm$json$Json$Encode$string, $);
-											}($.name))
+											}($.name)),
+											_Utils_Tuple2(
+											'username',
+											function ($) {
+												return A3($elm$core$Maybe$destruct, $elm$json$Json$Encode$null, $elm$json$Json$Encode$string, $);
+											}($.username))
 										]));
 							},
 							$);
@@ -8334,10 +8414,6 @@ var $elm$time$Time$toYear = F2(
 	function (zone, time) {
 		return $elm$time$Time$toCivil(
 			A2($elm$time$Time$toAdjustedMinutes, zone, time)).year;
-	});
-var $elm$time$Time$Zone = F2(
-	function (a, b) {
-		return {$: 'Zone', a: a, b: b};
 	});
 var $elm$time$Time$utc = A2($elm$time$Time$Zone, 0, _List_Nil);
 var $author$project$Calendar$addMonths = F2(
@@ -8929,6 +9005,18 @@ var $author$project$Main$update = F2(
 							calendar: A2($author$project$Calendar$update, calendarMsg, model.calendar)
 						}),
 					$elm$core$Platform$Cmd$none);
+			case 'SetCurrentTime':
+				var time = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							calendar: A2(
+								$author$project$Calendar$update,
+								$author$project$Calendar$SetDate(time),
+								model.calendar)
+						}),
+					$elm$core$Platform$Cmd$none);
 			case 'EventsMsg':
 				var eventsMsg = msg.a;
 				var updatedMap = function () {
@@ -9412,7 +9500,7 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 	});
 var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
 var $elm$html$Html$div = _VirtualDom_node('div');
-var $author$project$I18n$fi = {actions: 'Toiminnot', add_new_event: 'Lisää uusi tapahtuma', all_day: '(Koko päivä)', all_day_event: 'Koko päivän tapahtuma', all_day_event_label: 'Koko päivän tapahtuma', atom_feed: 'ATOM', back: 'takaisin', back_to_calendar: 'Takaisin kalenteriin', back_to_calendar_detail: 'Takaisin kalenteriin', calendar: 'kalenteri', calendar_title: 'Palikkakalenteri', cancel: 'Peruuta', completing_login: 'Viimeistellään kirjautumista...', component_error_description: 'Tässä komponentissa tapahtui virhe.', component_error_title: 'Komponentin virhe', confirm_delete_event: 'Haluatko varmasti poistaa tämän tapahtuman?', create_event: 'Luo tapahtuma', create_new_event: 'Luo uusi tapahtuma', creating: 'Luodaan...', current_image: 'Nykyinen kuva:', dates: 'Päivämäärät', _delete: 'Poista', deleted: 'Poistettu', deleting: 'Poistetaan...', description: 'Kuvaus:', description_label: 'Kuvaus', description_optional: 'Kuvaus (valinnainen)', disable_geocoding: 'Poista geocoding käytöstä', draft: 'Luonnos', edit: 'Muokkaa', edit_event: 'Muokkaa tapahtumaa', enable_geocoding: 'Ota geocoding käyttöön', end: 'Päättyy:', end_date: 'Lopetuspäivä', end_date_after_start_error: 'Lopetuspäivän täytyy olla aloituspäivän jälkeen', error_details: 'Virheen tiedot', error_page_description: 'Tapahtui odottamaton virhe. Yritä myöhemmin uudelleen.', error_page_title: 'Virhe', event_calendar: 'Palikkakalenteri', event_calendar_description: 'Suomen Palikkayhteisö ry:n Palikkakalenteri', event_created_successfully: 'Tapahtuma luotu onnistuneesti.', event_deleted_successfully: 'Tapahtuma poistettu onnistuneesti.', event_title: 'Tapahtuman otsikko', event_updated_successfully: 'Tapahtuma päivitetty onnistuneesti.', events_table: 'Tapahtumat taulukko', existing_events: 'Olemassa olevat tapahtumat', failed_create_event: 'Tapahtuman luonti epäonnistui. Yritä uudelleen.', failed_delete_event: 'Tapahtuman poistaminen epäonnistui. Yritä uudelleen.', failed_fetch_events: 'Tapahtumien lataaminen epäonnistui. Yritä uudelleen.', failed_kml_import: 'KML-tuonnin epäonnistui. Tarkista tiedosto ja yritä uudelleen.', failed_load_event: 'Tapahtuman lataaminen epäonnistui.', failed_update_event: 'Tapahtuman päivitys epäonnistui. Yritä uudelleen.', feeds_description: 'Syötteet integroivat uudet tapahtumat verkkosivuille. Nämäkin sisältävät kalenterilinkit.', geocoding_failed: 'Sijainnin haku epäonnistui. Tarkista osoite tai syötä koordinaatit manuaalisesti.', geojson_feed: 'GeoJSON', hello: 'Hei,', html_description: 'Upota tai tulosta valmis tapahtumalistaus. Sisältää kalenterilinkit yksittäisiin tapahtumiin.', html_feed: 'HTML | PDF', ical_description: 'Kalenterivienti (ICS) tilaa tai integroi koko kalenterin helposti. Klikkaa kalenteri puhelimeesi!', ical_feed: 'iCalendar', image_description_label: 'Kuvan kuvaus', image_description_optional: 'Kuvan kuvaus (valinnainen)', image_help_text: 'Valitse kuva tapahtumalle (valinnainen)', image_label: 'Kuva', invalid_event_id: 'Virheellinen tapahtuman tunniste.', json_feed: 'JSON', latitude: 'Leveysaste', latitude_invalid_error: 'Leveysasteen täytyy olla välillä -90 ja 90', list: 'lista', loading_event: 'Ladataan tapahtumaa...', loading_events: 'Ladataan tapahtumia...', location: 'Paikka:', location_label: 'Paikka', location_optional: 'Paikka (valinnainen)', login: 'Kirjaudu sisään', login_required: 'Sinun täytyy kirjautua sisään hallitaksesi tapahtumia.', logout: 'Kirjaudu ulos', longitude: 'Pituusaste', longitude_invalid_error: 'Pituusasteen täytyy olla välillä -180 ja 180', next_button: 'Seuraava', next_page: 'Seuraava sivu', non_member_prefix: 'Jos et ole Suomen Palikkayhteisö ry:n jäsen, ', of_: '/', organization_alt: 'Suomen Palikkayhteisö ry', page: 'Sivu', page_not_found: 'Sivua ei löytynyt', page_not_found_description: 'Etsimääsi sivua ei löytynyt.', pending: 'Odottaa', prev: 'Edellinen', previous: 'Edellinen', previous_page: 'Edellinen sivu', public_calendar: 'Palikkakalenteri', published: 'Julkaistu', reload_page: 'Lataa sivu uudelleen', rss_feed: 'RSS', save_changes: 'Tallenna muutokset', saving: 'Tallennetaan...', select_date: 'Päivä:', send_event_email: 'lähetä tapahtumasi meille sähköpostilla', something_went_wrong: 'Jotain meni pieleen', start: 'Alkaa:', start_date_required: 'Aloituspäivä *', start_date_required_error: 'Aloituspäivä on pakollinen', status: 'Tila:', title: 'Otsikko', title_required: 'Otsikko *', title_required_error: 'Otsikko on pakollinen', today: 'tänään', total_events: 'tapahtumaa yhteensä', try_again: 'Yritä uudelleen', url_invalid_error: 'URL:n täytyy alkaa http:// tai https://', url_label: 'Kotisivut:', url_optional: 'Kotisivut (valinnainen)', view_on_map: 'Näytä kartalla'};
+var $author$project$I18n$fi = {actions: 'Toiminnot', add_new_event: 'Lisää uusi tapahtuma', all_day: '(Koko päivä)', all_day_event: 'Koko päivän tapahtuma', all_day_event_label: 'Koko päivän tapahtuma', atom_feed: 'ATOM', back: 'takaisin', back_to_calendar: 'Takaisin kalenteriin', back_to_calendar_detail: 'Takaisin kalenteriin', calendar: 'kalenteri', calendar_title: 'Palikkakalenteri', cancel: 'Peruuta', completing_login: 'Viimeistellään kirjautumista...', component_error_description: 'Tässä komponentissa tapahtui virhe.', component_error_title: 'Komponentin virhe', confirm_delete_event: 'Haluatko varmasti poistaa tämän tapahtuman?', create_event: 'Luo tapahtuma', create_new_event: 'Luo uusi tapahtuma', creating: 'Luodaan...', current_image: 'Nykyinen kuva:', dates: 'Päivämäärät', _delete: 'Poista', deleted: 'Poistettu', deleting: 'Poistetaan...', description: 'Kuvaus:', description_label: 'Kuvaus', description_optional: 'Kuvaus (valinnainen)', disable_geocoding: 'Poista geocoding käytöstä', draft: 'Luonnos', edit: 'Muokkaa', edit_event: 'Muokkaa tapahtumaa', enable_geocoding: 'Ota geocoding käyttöön', end: 'Päättyy:', end_date: 'Lopetuspäivä', end_date_after_start_error: 'Lopetuspäivän täytyy olla aloituspäivän jälkeen', error_details: 'Virheen tiedot', error_page_description: 'Tapahtui odottamaton virhe. Yritä myöhemmin uudelleen.', error_page_title: 'Virhe', event_calendar: 'Palikkakalenteri', event_calendar_description: 'Suomen Palikkayhteisö ry:n Palikkakalenteri', event_created_successfully: 'Tapahtuma luotu onnistuneesti.', event_deleted_successfully: 'Tapahtuma poistettu onnistuneesti.', event_title: 'Tapahtuman otsikko', event_updated_successfully: 'Tapahtuma päivitetty onnistuneesti.', events: 'Tapahtumat', events_table: 'Tapahtumat taulukko', existing_events: 'Olemassa olevat tapahtumat', failed_create_event: 'Tapahtuman luonti epäonnistui. Yritä uudelleen.', failed_delete_event: 'Tapahtuman poistaminen epäonnistui. Yritä uudelleen.', failed_fetch_events: 'Tapahtumien lataaminen epäonnistui. Yritä uudelleen.', failed_kml_import: 'KML-tuonnin epäonnistui. Tarkista tiedosto ja yritä uudelleen.', failed_load_event: 'Tapahtuman lataaminen epäonnistui.', failed_update_event: 'Tapahtuman päivitys epäonnistui. Yritä uudelleen.', feeds_description: 'Syötteet integroivat uudet tapahtumat verkkosivuille. Nämäkin sisältävät kalenterilinkit.', geocoding_failed: 'Sijainnin haku epäonnistui. Tarkista osoite tai syötä koordinaatit manuaalisesti.', geojson_feed: 'GeoJSON', hello: 'Hei,', home: 'Koti', html_description: 'Upota tai tulosta valmis tapahtumalistaus. Sisältää kalenterilinkit yksittäisiin tapahtumiin.', html_feed: 'HTML | PDF', ical_description: 'Kalenterivienti (ICS) tilaa tai integroi koko kalenterin helposti. Klikkaa kalenteri puhelimeesi!', ical_feed: 'iCalendar', image_description_label: 'Kuvan kuvaus', image_description_optional: 'Kuvan kuvaus (valinnainen)', image_help_text: 'Valitse kuva tapahtumalle (valinnainen)', image_label: 'Kuva', invalid_event_id: 'Virheellinen tapahtuman tunniste.', json_feed: 'JSON', latitude: 'Leveysaste', latitude_invalid_error: 'Leveysasteen täytyy olla välillä -90 ja 90', list: 'lista', loading_event: 'Ladataan tapahtumaa...', loading_events: 'Ladataan tapahtumia...', location: 'Paikka:', location_label: 'Paikka', location_optional: 'Paikka (valinnainen)', login: 'Kirjaudu sisään', login_required: 'Sinun täytyy kirjautua sisään hallitaksesi tapahtumia.', logout: 'Kirjaudu ulos', longitude: 'Pituusaste', longitude_invalid_error: 'Pituusasteen täytyy olla välillä -180 ja 180', map: 'Kartta', next_button: 'Seuraava', next_page: 'Seuraava sivu', non_member_prefix: 'Jos et ole Suomen Palikkayhteisö ry:n jäsen, ', of_: '/', organization_alt: 'Suomen Palikkayhteisö ry', page: 'Sivu', page_not_found: 'Sivua ei löytynyt', page_not_found_description: 'Etsimääsi sivua ei löytynyt.', pending: 'Odottaa', prev: 'Edellinen', previous: 'Edellinen', previous_page: 'Edellinen sivu', public_calendar: 'Palikkakalenteri', published: 'Julkaistu', reload_page: 'Lataa sivu uudelleen', rss_feed: 'RSS', save_changes: 'Tallenna muutokset', saving: 'Tallennetaan...', select_date: 'Päivä:', send_event_email: 'lähetä tapahtumasi meille sähköpostilla', something_went_wrong: 'Jotain meni pieleen', start: 'Alkaa:', start_date_required: 'Aloituspäivä *', start_date_required_error: 'Aloituspäivä on pakollinen', status: 'Tila:', title: 'Otsikko', title_required: 'Otsikko *', title_required_error: 'Otsikko on pakollinen', today: 'tänään', total_events: 'tapahtumaa yhteensä', try_again: 'Yritä uudelleen', url_invalid_error: 'URL:n täytyy alkaa http:// tai https://', url_label: 'Kotisivut:', url_optional: 'Kotisivut (valinnainen)', view_on_map: 'Näytä kartalla'};
 var $author$project$I18n$get = function (key) {
 	switch (key) {
 		case 'calendar':
@@ -9587,6 +9675,12 @@ var $author$project$I18n$get = function (key) {
 			return $author$project$I18n$fi.logout;
 		case 'login':
 			return $author$project$I18n$fi.login;
+		case 'home':
+			return $author$project$I18n$fi.home;
+		case 'map':
+			return $author$project$I18n$fi.map;
+		case 'events':
+			return $author$project$I18n$fi.events;
 		case 'rss_feed':
 			return $author$project$I18n$fi.rss_feed;
 		case 'html_feed':
@@ -11719,7 +11813,7 @@ var $author$project$Main$view = function (model) {
 										$elm$html$Html$div,
 										_List_fromArray(
 											[
-												$elm$html$Html$Attributes$class('flex justify-between items-center h-16')
+												$elm$html$Html$Attributes$class('flex justify-between items-center h-12')
 											]),
 										_List_fromArray(
 											[
@@ -11740,7 +11834,8 @@ var $author$project$Main$view = function (model) {
 															]),
 														_List_fromArray(
 															[
-																$elm$html$Html$text('Home')
+																$elm$html$Html$text(
+																$author$project$I18n$get('home'))
 															])),
 														A2(
 														$elm$html$Html$a,
@@ -11751,7 +11846,8 @@ var $author$project$Main$view = function (model) {
 															]),
 														_List_fromArray(
 															[
-																$elm$html$Html$text('Map')
+																$elm$html$Html$text(
+																$author$project$I18n$get('map'))
 															])),
 														(!_Utils_eq(model.auth, $elm$core$Maybe$Nothing)) ? A2(
 														$elm$html$Html$a,
@@ -11762,7 +11858,8 @@ var $author$project$Main$view = function (model) {
 															]),
 														_List_fromArray(
 															[
-																$elm$html$Html$text('Events')
+																$elm$html$Html$text(
+																$author$project$I18n$get('events'))
 															])) : $elm$html$Html$text('')
 													])),
 												A2(
@@ -11794,22 +11891,29 @@ var $author$project$Main$view = function (model) {
 																		_List_fromArray(
 																			[
 																				$elm$html$Html$text(
-																				'Logged in as: ' + A2(
-																					$elm$core$Maybe$withDefault,
-																					'Unknown',
-																					A2(
-																						$elm$core$Maybe$map,
-																						function ($) {
-																							return $.email;
-																						},
-																						auth.user)))
+																				'Logged in as: ' + function () {
+																					var _v1 = auth.user;
+																					if (_v1.$ === 'Just') {
+																						var user = _v1.a;
+																						var _v2 = user.username;
+																						if (_v2.$ === 'Just') {
+																							var username = _v2.a;
+																							return username;
+																						} else {
+																							return user.email;
+																						}
+																					} else {
+																						return 'Unknown';
+																					}
+																				}())
 																			])),
 																		$author$project$Button$view(
 																		{
 																			ariaLabel: $elm$core$Maybe$Nothing,
 																			children: _List_fromArray(
 																				[
-																					$elm$html$Html$text('Logout')
+																					$elm$html$Html$text(
+																					$author$project$I18n$get('logout'))
 																				]),
 																			disabled: false,
 																			onClick: $elm$core$Maybe$Just($author$project$Main$Logout),
@@ -11824,7 +11928,8 @@ var $author$project$Main$view = function (model) {
 																	ariaLabel: $elm$core$Maybe$Nothing,
 																	children: _List_fromArray(
 																		[
-																			$elm$html$Html$text('Login with OIDC')
+																			$elm$html$Html$text(
+																			$author$project$I18n$get('login'))
 																		]),
 																	disabled: false,
 																	onClick: $elm$core$Maybe$Just($author$project$Main$Login),
@@ -11838,9 +11943,9 @@ var $author$project$Main$view = function (model) {
 											]))
 									])),
 								function () {
-								var _v1 = model.error;
-								if (_v1.$ === 'Just') {
-									var err = _v1.a;
+								var _v3 = model.error;
+								if (_v3.$ === 'Just') {
+									var err = _v3.a;
 									return A2(
 										$elm$html$Html$div,
 										_List_fromArray(
@@ -11918,8 +12023,8 @@ var $author$project$Main$view = function (model) {
 														_List_Nil)
 													]));
 										} else {
-											var _v2 = model.route;
-											switch (_v2.$) {
+											var _v4 = model.route;
+											switch (_v4.$) {
 												case 'Home':
 													return A2(
 														$elm$html$Html$div,
@@ -11957,8 +12062,8 @@ var $author$project$Main$view = function (model) {
 																						$author$project$I18n$get('public_calendar'))
 																					])),
 																				function () {
-																				var _v3 = model.auth;
-																				if (_v3.$ === 'Just') {
+																				var _v5 = model.auth;
+																				if (_v5.$ === 'Just') {
 																					return A2(
 																						$elm$html$Html$div,
 																						_List_fromArray(
@@ -11983,7 +12088,8 @@ var $author$project$Main$view = function (model) {
 																											]),
 																										_List_fromArray(
 																											[
-																												$elm$html$Html$text('Select Date:')
+																												$elm$html$Html$text(
+																												$author$project$I18n$get('select_date'))
 																											])),
 																										$author$project$Input$view(
 																										{
@@ -12022,7 +12128,8 @@ var $author$project$Main$view = function (model) {
 																									]),
 																								_List_fromArray(
 																									[
-																										$elm$html$Html$text('+ Add Event')
+																										$elm$html$Html$text(
+																										'+ ' + $author$project$I18n$get('add_new_event'))
 																									]))
 																							]));
 																				} else {
@@ -12042,7 +12149,8 @@ var $author$project$Main$view = function (model) {
 																									]),
 																								_List_fromArray(
 																									[
-																										$elm$html$Html$text('Non-members can send events to '),
+																										$elm$html$Html$text(
+																										$author$project$I18n$get('non_member_prefix')),
 																										A2(
 																										$elm$html$Html$a,
 																										_List_fromArray(
@@ -12052,7 +12160,8 @@ var $author$project$Main$view = function (model) {
 																											]),
 																										_List_fromArray(
 																											[
-																												$elm$html$Html$text('email')
+																												$elm$html$Html$text(
+																												$author$project$I18n$get('send_event_email'))
 																											])),
 																										$elm$html$Html$text('.')
 																									])),
@@ -12069,7 +12178,8 @@ var $author$project$Main$view = function (model) {
 																											]),
 																										_List_fromArray(
 																											[
-																												$elm$html$Html$text('Select Date:')
+																												$elm$html$Html$text(
+																												$author$project$I18n$get('select_date'))
 																											])),
 																										$author$project$Input$view(
 																										{
@@ -12164,16 +12274,16 @@ var $author$project$Main$view = function (model) {
 																	]))
 															]));
 												case 'EventDetail':
-													var id = _v2.a;
-													var _v4 = $elm$core$List$head(
+													var id = _v4.a;
+													var _v6 = $elm$core$List$head(
 														A2(
 															$elm$core$List$filter,
 															function (e) {
 																return _Utils_eq(e.id, id);
 															},
 															model.events.events));
-													if (_v4.$ === 'Just') {
-														var event = _v4.a;
+													if (_v6.$ === 'Just') {
+														var event = _v6.a;
 														return A2(
 															$elm$html$Html$div,
 															_List_fromArray(
@@ -12247,7 +12357,7 @@ var $author$project$Main$view = function (model) {
 																]));
 													}
 												case 'EditEvent':
-													var id = _v2.a;
+													var id = _v4.a;
 													return A2(
 														$elm$html$Html$div,
 														_List_fromArray(

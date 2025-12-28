@@ -9,6 +9,8 @@ from pathlib import Path
 from icalendar import Calendar, Event as ICalEvent
 from generate_utils import *
 
+BASE_URL = 'https://kalenteri.suomenpalikkayhteiso.fi'
+
 def generate_ics_calendar(events):
     """Generate combined ICS calendar file"""
     calendar = Calendar()

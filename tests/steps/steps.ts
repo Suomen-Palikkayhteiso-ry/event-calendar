@@ -123,9 +123,13 @@ Then('the calendar should load without errors', async ({ page }) => {
 });
 
 Then('events should be displayed if available', async ({ page }) => {
-	// This is a bit vague; assuming events are in the calendar
-	// For now, just ensure no errors
-	await expect(page.locator('text=Error')).not.toBeVisible();
+	// Check if there are any event elements in the calendar
+	const eventElements = page.locator('.calendar-day-events .calendar-event');
+	// If events exist, they should be visible
+	if (await eventElements.count() > 0) {
+		await expect(eventElements.first()).toBeVisible();
+	}
+	// If no events, that's also fine (test passes)
 });
 
 Then('I should be able to select dates on the calendar', async ({ page }) => {

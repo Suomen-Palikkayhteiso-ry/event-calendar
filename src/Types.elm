@@ -184,6 +184,7 @@ pointEncoder point =
 type alias User =
     { id : String
     , email : String
+    , username : Maybe String
     , name : Maybe String
     , avatar : Maybe String
     }
@@ -194,6 +195,7 @@ userDecoder =
     Decode.succeed User
         |> DecodeExtra.andMap (Decode.field "id" Decode.string)
         |> DecodeExtra.andMap (Decode.field "email" Decode.string)
+        |> DecodeExtra.andMap (DecodeExtra.optionalField "username" (Decode.nullable Decode.string) |> Decode.map (Maybe.withDefault Nothing))
         |> DecodeExtra.andMap (DecodeExtra.optionalField "name" (Decode.nullable Decode.string) |> Decode.map (Maybe.withDefault Nothing))
         |> DecodeExtra.andMap (DecodeExtra.optionalField "avatar" (Decode.nullable Decode.string) |> Decode.map (Maybe.withDefault Nothing))
 

@@ -72,7 +72,10 @@ init flags url key =
             Events.update (Events.FetchEvents Nothing) Events.init
     in
     ( Model key url (parseUrl url) Calendar.init eventsModel Map.init EventForm.init EventList.init Nothing Nothing True ""
-    , Cmd.map EventsMsg eventsCmd
+    , Cmd.batch
+        [ Cmd.map EventsMsg eventsCmd
+        , Task.perform SetCurrentTime Time.now
+        ]
     )
 
 
@@ -186,6 +189,7 @@ type Msg
     | LoginResult (Result Http.Error Types.Auth)
     | LogoutResult (Result Http.Error ())
     | SetDate String
+    | SetCurrentTime Time.Posix
     | RequestDeleteEvent String
     | GoToCreateEvent
     | KMLParsed Decode.Value
@@ -240,6 +244,11 @@ update msg model =
 
         CalendarMsg calendarMsg ->
             ( { model | calendar = Calendar.update calendarMsg model.calendar }
+            , Cmd.none
+            )
+
+        SetCurrentTime time ->
+            ( { model | calendar = Calendar.update (Calendar.SetDate time) model.calendar }
             , Cmd.none
             )
 
@@ -508,12 +517,12 @@ view model =
         [ div [ class "min-h-screen flex flex-col" ]
             [ header [ class "bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50" ]
                 [ div [ class "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" ]
-                    [ div [ class "flex justify-between items-center h-16" ]
+                    [ div [ class "flex justify-between items-center h-12" ]
                         [ nav [ class "flex space-x-8" ]
-                            [ a [ href "/", class "text-gray-900 hover:text-blue-600 px-3 py-2 text-sm font-medium" ] [ text "Home" ]
-                            , a [ href "/map", class "text-gray-500 hover:text-blue-600 px-3 py-2 text-sm font-medium" ] [ text "Map" ]
+                            [ a [ href "/", class "text-gray-900 hover:text-blue-600 px-3 py-2 text-sm font-medium" ] [ text (I18n.get "home") ]
+                            , a [ href "/map", class "text-gray-500 hover:text-blue-600 px-3 py-2 text-sm font-medium" ] [ text (I18n.get "map") ]
                             , if model.auth /= Nothing then
-                                a [ href "/events", class "text-gray-500 hover:text-blue-600 px-3 py-2 text-sm font-medium" ] [ text "Events" ]
+                                a [ href "/events", class "text-gray-500 hover:text-blue-600 px-3 py-2 text-sm font-medium" ] [ text (I18n.get "events") ]
 
                               else
                                 text ""
@@ -522,7 +531,23 @@ view model =
                             [ case model.auth of
                                 Just auth ->
                                     div [ class "flex items-center space-x-4" ]
-                                        [ span [ class "text-sm text-gray-700" ] [ text ("Logged in as: " ++ Maybe.withDefault "Unknown" (Maybe.map .email auth.user)) ]
+                                        [ span [ class "text-sm text-gray-700" ]
+                                            [ text
+                                                ("Logged in as: "
+                                                    ++ (case auth.user of
+                                                            Just user ->
+                                                                case user.username of
+                                                                    Just username ->
+                                                                        username
+
+                                                                    Nothing ->
+                                                                        user.email
+
+                                                            Nothing ->
+                                                                "Unknown"
+                                                       )
+                                                )
+                                            ]
                                         , Button.view
                                             { variant = Button.Secondary
                                             , size = Button.Sm
@@ -530,7 +555,7 @@ view model =
                                             , type_ = "button"
                                             , ariaLabel = Nothing
                                             , onClick = Just Logout
-                                            , children = [ text "Logout" ]
+                                            , children = [ text (I18n.get "logout") ]
                                             }
                                         ]
 
@@ -542,7 +567,7 @@ view model =
                                         , type_ = "button"
                                         , ariaLabel = Nothing
                                         , onClick = Just Login
-                                        , children = [ text "Login with OIDC" ]
+                                        , children = [ text (I18n.get "login") ]
                                         }
                             ]
                         ]
@@ -578,7 +603,7 @@ view model =
                                                 Just _ ->
                                                     div [ class "mb-6 flex items-center justify-between" ]
                                                         [ div [ class "flex items-center space-x-4" ]
-                                                            [ label [ class "block text-sm font-medium text-gray-700" ] [ text "Select Date:" ]
+                                                            [ label [ class "block text-sm font-medium text-gray-700" ] [ text (I18n.get "select_date") ]
                                                             , Input.view
                                                                 { type_ = "date"
                                                                 , value = model.selectedDate
@@ -606,18 +631,18 @@ view model =
                                                                 }
                                                             ]
                                                         , button [ class "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500", onClick GoToCreateEvent, title "Add new event" ]
-                                                            [ text "+ Add Event" ]
+                                                            [ text ("+ " ++ I18n.get "add_new_event") ]
                                                         ]
 
                                                 Nothing ->
                                                     div [ class "mb-6 bg-blue-50 border border-blue-200 rounded-md p-4" ]
                                                         [ p [ class "text-sm text-blue-800 mb-4" ]
-                                                            [ text "Non-members can send events to "
-                                                            , a [ href "mailto:suomenpalikkayhteisory@outlook.com", class "text-blue-600 hover:text-blue-800 underline" ] [ text "email" ]
+                                                            [ text (I18n.get "non_member_prefix")
+                                                            , a [ href "mailto:suomenpalikkayhteisory@outlook.com", class "text-blue-600 hover:text-blue-800 underline" ] [ text (I18n.get "send_event_email") ]
                                                             , text "."
                                                             ]
                                                         , div []
-                                                            [ label [ class "block text-sm font-medium text-gray-700 mb-2" ] [ text "Select Date:" ]
+                                                            [ label [ class "block text-sm font-medium text-gray-700 mb-2" ] [ text (I18n.get "select_date") ]
                                                             , Input.view
                                                                 { type_ = "date"
                                                                 , value = model.selectedDate

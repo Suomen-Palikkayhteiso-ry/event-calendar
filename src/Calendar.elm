@@ -1,5 +1,6 @@
 module Calendar exposing (..)
 
+import DateUtils
 import Html exposing (Html, button, div, h2, text)
 import Html.Attributes exposing (class)
 import Html.Events exposing (onClick)
@@ -340,8 +341,47 @@ getCalendarDays model =
 
         endOfWeekDate =
             endOfWeek lastOfMonth model.firstDay
+
+        days =
+            generateDays startOfWeekDate endOfWeekDate month
     in
-    generateDays startOfWeekDate endOfWeekDate month
+    List.map (assignEventsToDay model.events) days
+
+
+assignEventsToDay : List Event -> CalendarDay -> CalendarDay
+assignEventsToDay events day =
+    let
+        dayEvents =
+            List.filter (eventOnDay day.date) events
+    in
+    { day | events = dayEvents }
+
+
+eventOnDay : Time.Posix -> Event -> Bool
+eventOnDay dayPosix event =
+    let
+        eventStart =
+            DateUtils.parseUTCDate event.startDate
+
+        eventDay =
+            Time.toDay Time.utc eventStart
+
+        eventMonth =
+            Time.toMonth Time.utc eventStart
+
+        eventYear =
+            Time.toYear Time.utc eventStart
+
+        dayDay =
+            Time.toDay Time.utc dayPosix
+
+        dayMonth =
+            Time.toMonth Time.utc dayPosix
+
+        dayYear =
+            Time.toYear Time.utc dayPosix
+    in
+    eventDay == dayDay && eventMonth == dayMonth && eventYear == dayYear
 
 
 firstOfMonthPosix : Int -> Time.Month -> Time.Posix
@@ -462,8 +502,6 @@ generateDaysHelper currentMillis endMillis currentMonth acc =
 
             day =
                 { date = posix, isCurrentMonth = isCurrent, events = [] }
-
-            -- events to be filtered later
         in
         generateDaysHelper (currentMillis + 24 * 60 * 60 * 1000) endMillis currentMonth (day :: acc)
 

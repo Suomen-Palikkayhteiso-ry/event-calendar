@@ -123,6 +123,15 @@ def write_static_file(relative_path, content):
         # Assume bytes
         static_path.write_bytes(content)
 
+    # Also write to build/ directory if it exists
+    build_path = Path('build') / relative_path
+    if build_path.parent.exists():
+        build_path.parent.mkdir(parents=True, exist_ok=True)
+        if isinstance(content, str):
+            build_path.write_text(content, encoding='utf-8')
+        else:
+            build_path.write_bytes(content)
+
     # Also write to build directory if it exists
     if Path('build').exists():
         build_path = Path('build') / relative_path

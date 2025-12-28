@@ -77,9 +77,10 @@ authResponseDecoder =
 
 userDecoder : Decode.Decoder User
 userDecoder =
-    Decode.map4 User
+    Decode.map5 User
         (Decode.field "id" Decode.string)
         (Decode.field "email" Decode.string)
+        (Decode.field "username" (Decode.nullable Decode.string))
         (Decode.field "name" (Decode.nullable Decode.string))
         (Decode.field "avatar" (Decode.nullable Decode.string))
 
