@@ -28,6 +28,10 @@ in
 
   languages.elm.enable = true;
 
+  languages.python.enable = true;
+  languages.python.uv.enable = true;
+  languages.python.venv.enable = true;
+
   packages = with pkgs; [
     chromium
     playwright-driver
@@ -39,6 +43,13 @@ in
     elmPackages.elm-format
     elmPackages.elm-test
     elmPackages.elm-language-server
+    (python3.withPackages (ps: with ps; [
+      requests
+      feedgen
+      icalendar
+      qrcode
+      pillow
+    ]))
   ];
 
   dotenv.disableHint = true;

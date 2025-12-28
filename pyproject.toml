@@ -1,0 +1,15 @@
+[project]
+name = "event-calendar-static-generator"
+version = "0.1.0"
+description = "Static site generator for event calendar"
+dependencies = [
+    "requests>=2.31.0",
+    "feedgen>=0.9.0",
+    "icalendar>=5.0.0",
+    "qrcode>=7.0.0",
+    "Pillow>=10.0.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
