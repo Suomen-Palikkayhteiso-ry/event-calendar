@@ -31,12 +31,16 @@ init =
 type Msg
     = FetchEvents (Maybe String)
     | EventsFetched (Result Http.Error (List Event))
+    | FetchEvent (Maybe String) String
+    | EventFetched (Result Http.Error Event)
     | CreateEvent (Maybe String) Event
     | EventCreated (Result Http.Error Event)
     | UpdateEvent (Maybe String) String Event
     | EventUpdated (Result Http.Error Event)
     | DeleteEvent (Maybe String) String
     | EventDeleted String (Result Http.Error ())
+    | MarkDeleted (Maybe String) String
+    | EventMarkedDeleted (Result Http.Error Event)
 
 
 
@@ -122,5 +126,60 @@ update msg model =
 
                 Err _ ->
                     ( { model | error = Just "Failed to delete event" }
+                    , Cmd.none
+                    )
+
+        FetchEvent token id ->
+            ( model
+            , PocketBase.getEvent token id EventFetched
+            )
+
+        EventFetched result ->
+            case result of
+                Ok event ->
+                    ( model
+                    , Cmd.none
+                      -- Will be followed by update
+                    )
+
+                Err _ ->
+                    ( { model | error = Just "Failed to fetch event" }
+                    , Cmd.none
+                    )
+
+        MarkDeleted token id ->
+            ( model
+            , PocketBase.getEvent token
+                id
+                (\result ->
+                    case result of
+                        Ok event ->
+                            UpdateEvent token id { event | state = Types.Deleted }
+
+                        Err err ->
+                            EventMarkedDeleted (Err err)
+                )
+            )
+
+        EventMarkedDeleted result ->
+            case result of
+                Ok event ->
+                    ( { model
+                        | events =
+                            List.map
+                                (\e ->
+                                    if e.id == event.id then
+                                        event
+
+                                    else
+                                        e
+                                )
+                                model.events
+                      }
+                    , Cmd.none
+                    )
+
+                Err _ ->
+                    ( { model | error = Just "Failed to mark event as deleted" }
                     , Cmd.none
                     )

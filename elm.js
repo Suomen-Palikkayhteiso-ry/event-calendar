@@ -6532,6 +6532,7 @@ var $author$project$Main$parseUrl = function (url) {
 		return $author$project$Main$Home;
 	}
 };
+var $author$project$Types$Deleted = {$: 'Deleted'};
 var $author$project$Events$EventCreated = function (a) {
 	return {$: 'EventCreated', a: a};
 };
@@ -6539,12 +6540,22 @@ var $author$project$Events$EventDeleted = F2(
 	function (a, b) {
 		return {$: 'EventDeleted', a: a, b: b};
 	});
+var $author$project$Events$EventFetched = function (a) {
+	return {$: 'EventFetched', a: a};
+};
+var $author$project$Events$EventMarkedDeleted = function (a) {
+	return {$: 'EventMarkedDeleted', a: a};
+};
 var $author$project$Events$EventUpdated = function (a) {
 	return {$: 'EventUpdated', a: a};
 };
 var $author$project$Events$EventsFetched = function (a) {
 	return {$: 'EventsFetched', a: a};
 };
+var $author$project$Events$UpdateEvent = F3(
+	function (a, b, c) {
+		return {$: 'UpdateEvent', a: a, b: b, c: c};
+	});
 var $elm$http$Http$Header = F2(
 	function (a, b) {
 		return {$: 'Header', a: a, b: b};
@@ -6593,7 +6604,6 @@ var $author$project$Types$Event = function (id) {
 };
 var $elm_community$json_extra$Json$Decode$Extra$andMap = $elm$json$Json$Decode$map2($elm$core$Basics$apR);
 var $elm$json$Json$Decode$bool = _Json_decodeBool;
-var $author$project$Types$Deleted = {$: 'Deleted'};
 var $author$project$Types$Pending = {$: 'Pending'};
 var $author$project$Types$Published = {$: 'Published'};
 var $elm$json$Json$Decode$andThen = _Json_andThen;
@@ -7189,6 +7199,19 @@ var $elm$core$List$filter = F2(
 			_List_Nil,
 			list);
 	});
+var $author$project$PocketBase$getEvent = F3(
+	function (token, id, toMsg) {
+		return $elm$http$Http$request(
+			{
+				body: $elm$http$Http$emptyBody,
+				expect: A2($elm$http$Http$expectJson, toMsg, $author$project$Types$eventDecoder),
+				headers: $author$project$PocketBase$authHeader(token),
+				method: 'GET',
+				timeout: $elm$core$Maybe$Nothing,
+				tracker: $elm$core$Maybe$Nothing,
+				url: $author$project$PocketBase$baseUrl + ('/collections/events/records/' + id)
+			});
+	});
 var $elm$json$Json$Decode$list = _Json_decodeList;
 var $author$project$PocketBase$eventsResponseDecoder = A2(
 	$elm$json$Json$Decode$field,
@@ -7320,7 +7343,7 @@ var $author$project$Events$update = F2(
 						token,
 						id,
 						$author$project$Events$EventDeleted(id)));
-			default:
+			case 'EventDeleted':
 				var id = msg.a;
 				var result = msg.b;
 				if (result.$ === 'Ok') {
@@ -7342,6 +7365,76 @@ var $author$project$Events$update = F2(
 							model,
 							{
 								error: $elm$core$Maybe$Just('Failed to delete event')
+							}),
+						$elm$core$Platform$Cmd$none);
+				}
+			case 'FetchEvent':
+				var token = msg.a;
+				var id = msg.b;
+				return _Utils_Tuple2(
+					model,
+					A3($author$project$PocketBase$getEvent, token, id, $author$project$Events$EventFetched));
+			case 'EventFetched':
+				var result = msg.a;
+				if (result.$ === 'Ok') {
+					var event = result.a;
+					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+				} else {
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								error: $elm$core$Maybe$Just('Failed to fetch event')
+							}),
+						$elm$core$Platform$Cmd$none);
+				}
+			case 'MarkDeleted':
+				var token = msg.a;
+				var id = msg.b;
+				return _Utils_Tuple2(
+					model,
+					A3(
+						$author$project$PocketBase$getEvent,
+						token,
+						id,
+						function (result) {
+							if (result.$ === 'Ok') {
+								var event = result.a;
+								return A3(
+									$author$project$Events$UpdateEvent,
+									token,
+									id,
+									_Utils_update(
+										event,
+										{state: $author$project$Types$Deleted}));
+							} else {
+								var err = result.a;
+								return $author$project$Events$EventMarkedDeleted(
+									$elm$core$Result$Err(err));
+							}
+						}));
+			default:
+				var result = msg.a;
+				if (result.$ === 'Ok') {
+					var event = result.a;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								events: A2(
+									$elm$core$List$map,
+									function (e) {
+										return _Utils_eq(e.id, event.id) ? event : e;
+									},
+									model.events)
+							}),
+						$elm$core$Platform$Cmd$none);
+				} else {
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								error: $elm$core$Maybe$Just('Failed to mark event as deleted')
 							}),
 						$elm$core$Platform$Cmd$none);
 				}
@@ -7483,6 +7576,10 @@ var $author$project$EventForm$LoadEvent = function (a) {
 var $author$project$Main$LogoutResult = function (a) {
 	return {$: 'LogoutResult', a: a};
 };
+var $author$project$Events$MarkDeleted = F2(
+	function (a, b) {
+		return {$: 'MarkDeleted', a: a, b: b};
+	});
 var $author$project$Calendar$SetDate = function (a) {
 	return {$: 'SetDate', a: a};
 };
@@ -7495,10 +7592,6 @@ var $author$project$EventForm$SetLoading = function (a) {
 var $author$project$Calendar$UpdateEvent = function (a) {
 	return {$: 'UpdateEvent', a: a};
 };
-var $author$project$Events$UpdateEvent = F3(
-	function (a, b, c) {
-		return {$: 'UpdateEvent', a: a, b: b, c: c};
-	});
 var $elm$core$Maybe$andThen = F2(
 	function (callback, maybeValue) {
 		if (maybeValue.$ === 'Just') {
@@ -9202,7 +9295,7 @@ var $author$project$Main$update = F2(
 						$elm$core$Task$succeed(
 							$author$project$Main$EventsMsg(
 								A2(
-									$author$project$Events$DeleteEvent,
+									$author$project$Events$MarkDeleted,
 									A2(
 										$elm$core$Maybe$andThen,
 										function ($) {

@@ -429,7 +429,7 @@ update msg model =
 
         RequestDeleteEvent id ->
             ( model
-            , Task.perform identity (Task.succeed (EventsMsg (Events.DeleteEvent (model.auth |> Maybe.andThen .token) id)))
+            , Task.perform identity (Task.succeed (EventsMsg (Events.MarkDeleted (model.auth |> Maybe.andThen .token) id)))
             )
 
         GoToCreateEvent ->

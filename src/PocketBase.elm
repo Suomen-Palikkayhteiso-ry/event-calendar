@@ -115,6 +115,19 @@ getEvents token toMsg =
         }
 
 
+getEvent : Maybe String -> String -> (Result Http.Error Event -> msg) -> Cmd msg
+getEvent token id toMsg =
+    Http.request
+        { method = "GET"
+        , headers = authHeader token
+        , url = baseUrl ++ "/collections/events/records/" ++ id
+        , body = Http.emptyBody
+        , expect = Http.expectJson toMsg Types.eventDecoder
+        , timeout = Nothing
+        , tracker = Nothing
+        }
+
+
 eventsResponseDecoder : Decode.Decoder (List Event)
 eventsResponseDecoder =
     Decode.field "items" (Decode.list Types.eventDecoder)
