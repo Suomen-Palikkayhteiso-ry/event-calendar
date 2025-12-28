@@ -81,8 +81,8 @@ update msg model =
 
 view : Model -> List Event -> Html Msg
 view model events =
-    div [ class "container mx-auto p-4" ]
-        [ div [ class "flex justify-between items-center mb-6" ]
+    div [ class "container mx-auto" ]
+        [ div [ class "flex justify-between items-center mb-4" ]
             [ h1 [ class "text-2xl font-bold" ] [ text "Events" ]
             , div [ class "flex gap-2" ]
                 [ button

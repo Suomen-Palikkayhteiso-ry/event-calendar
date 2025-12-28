@@ -5695,6 +5695,7 @@ var $elm$time$Time$Zone = F2(
 	});
 var $elm$time$Time$customZone = $elm$time$Time$Zone;
 var $elm$time$Time$now = _Time_now($elm$time$Time$millisToPosix);
+var $author$project$Main$Home = {$: 'Home'};
 var $author$project$Main$NotFound = {$: 'NotFound'};
 var $elm$url$Url$Parser$State = F5(
 	function (visited, unvisited, params, frag, value) {
@@ -6339,7 +6340,6 @@ var $author$project$Main$EventDetail = function (a) {
 	return {$: 'EventDetail', a: a};
 };
 var $author$project$Main$EventsRoute = {$: 'EventsRoute'};
-var $author$project$Main$Home = {$: 'Home'};
 var $author$project$Main$MapRoute = {$: 'MapRoute'};
 var $elm$url$Url$Parser$Parser = function (a) {
 	return {$: 'Parser', a: a};
@@ -6523,12 +6523,23 @@ var $author$project$Main$routeParser = $elm$url$Url$Parser$oneOf(
 			$elm$url$Url$Parser$s('callback'))
 		]));
 var $author$project$Main$parseUrl = function (url) {
-	var _v0 = A2($elm$url$Url$Parser$parse, $author$project$Main$routeParser, url);
+	var _v0 = url.fragment;
 	if (_v0.$ === 'Just') {
-		var route = _v0.a;
-		return route;
+		var fragment = _v0.a;
+		var _v1 = A2(
+			$elm$url$Url$Parser$parse,
+			$author$project$Main$routeParser,
+			_Utils_update(
+				url,
+				{fragment: $elm$core$Maybe$Nothing, path: fragment}));
+		if (_v1.$ === 'Just') {
+			var route = _v1.a;
+			return route;
+		} else {
+			return $author$project$Main$NotFound;
+		}
 	} else {
-		return $author$project$Main$NotFound;
+		return $author$project$Main$Home;
 	}
 };
 var $author$project$Events$EventCreated = function (a) {
@@ -7495,6 +7506,7 @@ var $author$project$Events$DeleteEvent = F2(
 var $author$project$Main$EventListMsg = function (a) {
 	return {$: 'EventListMsg', a: a};
 };
+var $author$project$Map$InitMap = {$: 'InitMap'};
 var $author$project$EventForm$LoadEvent = function (a) {
 	return {$: 'LoadEvent', a: a};
 };
@@ -8993,6 +9005,14 @@ var $author$project$Main$update = F2(
 						} else {
 							return _Utils_Tuple2(newModel, $elm$core$Platform$Cmd$none);
 						}
+					case 'MapRoute':
+						return _Utils_Tuple2(
+							newModel,
+							A2(
+								$elm$core$Task$perform,
+								$elm$core$Basics$identity,
+								$elm$core$Task$succeed(
+									$author$project$Main$MapMsg($author$project$Map$InitMap))));
 					default:
 						return _Utils_Tuple2(newModel, $elm$core$Platform$Cmd$none);
 				}
@@ -9128,19 +9148,19 @@ var $author$project$Main$update = F2(
 						switch (eventsMsg.$) {
 							case 'EventDeleted':
 								if (eventsMsg.b.$ === 'Ok') {
-									return A2($elm$browser$Browser$Navigation$pushUrl, model.key, '/');
+									return A2($elm$browser$Browser$Navigation$pushUrl, model.key, '#/');
 								} else {
 									break _v9$3;
 								}
 							case 'EventCreated':
 								if (eventsMsg.a.$ === 'Ok') {
-									return A2($elm$browser$Browser$Navigation$pushUrl, model.key, '/');
+									return A2($elm$browser$Browser$Navigation$pushUrl, model.key, '#/');
 								} else {
 									break _v9$3;
 								}
 							case 'EventUpdated':
 								if (eventsMsg.a.$ === 'Ok') {
-									return A2($elm$browser$Browser$Navigation$pushUrl, model.key, '/');
+									return A2($elm$browser$Browser$Navigation$pushUrl, model.key, '#/');
 								} else {
 									break _v9$3;
 								}
@@ -9258,7 +9278,7 @@ var $author$project$Main$update = F2(
 						var id = eventListMsg.a;
 						return _Utils_Tuple2(
 							model,
-							A2($elm$browser$Browser$Navigation$pushUrl, model.key, '/events/' + (id + '/edit')));
+							A2($elm$browser$Browser$Navigation$pushUrl, model.key, '#/events/' + (id + '/edit')));
 					case 'FileLoaded':
 						var content = eventListMsg.a;
 						return _Utils_Tuple2(
@@ -9281,7 +9301,7 @@ var $author$project$Main$update = F2(
 						var id = eventDetailMsg.a;
 						return _Utils_Tuple2(
 							model,
-							A2($elm$browser$Browser$Navigation$pushUrl, model.key, '/events/' + (id + '/edit')));
+							A2($elm$browser$Browser$Navigation$pushUrl, model.key, '#/events/' + (id + '/edit')));
 					case 'DeleteEvent':
 						var id = eventDetailMsg.a;
 						return _Utils_Tuple2(
@@ -9303,7 +9323,7 @@ var $author$project$Main$update = F2(
 					default:
 						return _Utils_Tuple2(
 							model,
-							A2($elm$browser$Browser$Navigation$pushUrl, model.key, '/events'));
+							A2($elm$browser$Browser$Navigation$pushUrl, model.key, '#/events'));
 				}
 			case 'KMLParsed':
 				var value = msg.a;
@@ -9466,7 +9486,7 @@ var $author$project$Main$update = F2(
 			case 'GoToCreateEvent':
 				return _Utils_Tuple2(
 					model,
-					A2($elm$browser$Browser$Navigation$pushUrl, model.key, '/events/create'));
+					A2($elm$browser$Browser$Navigation$pushUrl, model.key, '#/events/create'));
 			default:
 				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 		}
@@ -9854,6 +9874,27 @@ var $author$project$Button$view = function (config) {
 };
 var $author$project$Calendar$Next = {$: 'Next'};
 var $author$project$Calendar$Previous = {$: 'Previous'};
+var $author$project$Calendar$eventOnDay = F2(
+	function (dayPosix, event) {
+		var eventStart = $author$project$DateUtils$parseUTCDate(event.startDate);
+		var eventYear = A2($elm$time$Time$toYear, $elm$time$Time$utc, eventStart);
+		var eventMonth = A2($elm$time$Time$toMonth, $elm$time$Time$utc, eventStart);
+		var eventDay = A2($elm$time$Time$toDay, $elm$time$Time$utc, eventStart);
+		var dayYear = A2($elm$time$Time$toYear, $elm$time$Time$utc, dayPosix);
+		var dayMonth = A2($elm$time$Time$toMonth, $elm$time$Time$utc, dayPosix);
+		var dayDay = A2($elm$time$Time$toDay, $elm$time$Time$utc, dayPosix);
+		return _Utils_eq(eventDay, dayDay) && (_Utils_eq(eventMonth, dayMonth) && _Utils_eq(eventYear, dayYear));
+	});
+var $author$project$Calendar$assignEventsToDay = F2(
+	function (events, day) {
+		var dayEvents = A2(
+			$elm$core$List$filter,
+			$author$project$Calendar$eventOnDay(day.date),
+			events);
+		return _Utils_update(
+			day,
+			{events: dayEvents});
+	});
 var $elm$core$Basics$round = _Basics_round;
 var $author$project$Calendar$addDays = F2(
 	function (days, posix) {
@@ -9977,7 +10018,11 @@ var $author$project$Calendar$getCalendarDays = function (model) {
 	var firstOfMonth = A2($author$project$Calendar$firstOfMonthPosix, year, month);
 	var startOfWeekDate = A2($author$project$Calendar$startOfWeek, firstOfMonth, model.firstDay);
 	var endOfWeekDate = A2($author$project$Calendar$endOfWeek, lastOfMonth, model.firstDay);
-	return A3($author$project$Calendar$generateDays, startOfWeekDate, endOfWeekDate, month);
+	var days = A3($author$project$Calendar$generateDays, startOfWeekDate, endOfWeekDate, month);
+	return A2(
+		$elm$core$List$map,
+		$author$project$Calendar$assignEventsToDay(model.events),
+		days);
 };
 var $elm$core$List$drop = F2(
 	function (n, list) {
@@ -11533,7 +11578,7 @@ var $author$project$EventList$view = F2(
 			$elm$html$Html$div,
 			_List_fromArray(
 				[
-					$elm$html$Html$Attributes$class('container mx-auto p-4')
+					$elm$html$Html$Attributes$class('container mx-auto')
 				]),
 			_List_fromArray(
 				[
@@ -11541,7 +11586,7 @@ var $author$project$EventList$view = F2(
 					$elm$html$Html$div,
 					_List_fromArray(
 						[
-							$elm$html$Html$Attributes$class('flex justify-between items-center mb-6')
+							$elm$html$Html$Attributes$class('flex justify-between items-center mb-4')
 						]),
 					_List_fromArray(
 						[
@@ -11829,7 +11874,7 @@ var $author$project$Main$view = function (model) {
 														$elm$html$Html$a,
 														_List_fromArray(
 															[
-																$elm$html$Html$Attributes$href('/'),
+																$elm$html$Html$Attributes$href('#/'),
 																$elm$html$Html$Attributes$class('text-gray-900 hover:text-blue-600 px-3 py-2 text-sm font-medium')
 															]),
 														_List_fromArray(
@@ -11841,7 +11886,7 @@ var $author$project$Main$view = function (model) {
 														$elm$html$Html$a,
 														_List_fromArray(
 															[
-																$elm$html$Html$Attributes$href('/map'),
+																$elm$html$Html$Attributes$href('#/map'),
 																$elm$html$Html$Attributes$class('text-gray-500 hover:text-blue-600 px-3 py-2 text-sm font-medium')
 															]),
 														_List_fromArray(
@@ -11853,7 +11898,7 @@ var $author$project$Main$view = function (model) {
 														$elm$html$Html$a,
 														_List_fromArray(
 															[
-																$elm$html$Html$Attributes$href('/events'),
+																$elm$html$Html$Attributes$href('#/events'),
 																$elm$html$Html$Attributes$class('text-gray-500 hover:text-blue-600 px-3 py-2 text-sm font-medium')
 															]),
 														_List_fromArray(
@@ -12000,7 +12045,7 @@ var $author$project$Main$view = function (model) {
 								$elm$html$Html$div,
 								_List_fromArray(
 									[
-										$elm$html$Html$Attributes$class('max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8')
+										$elm$html$Html$Attributes$class('max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8')
 									]),
 								_List_fromArray(
 									[
@@ -12046,7 +12091,7 @@ var $author$project$Main$view = function (model) {
 																		$elm$html$Html$div,
 																		_List_fromArray(
 																			[
-																				$elm$html$Html$Attributes$class('px-4 py-5 sm:p-6')
+																				$elm$html$Html$Attributes$class('px-4 py-3 sm:p-4')
 																			]),
 																		_List_fromArray(
 																			[
@@ -12240,7 +12285,7 @@ var $author$project$Main$view = function (model) {
 																$elm$html$Html$div,
 																_List_fromArray(
 																	[
-																		$elm$html$Html$Attributes$class('px-4 py-5 sm:p-6')
+																		$elm$html$Html$Attributes$class('px-4 py-3 sm:p-4')
 																	]),
 																_List_fromArray(
 																	[
@@ -12263,7 +12308,7 @@ var $author$project$Main$view = function (model) {
 																$elm$html$Html$div,
 																_List_fromArray(
 																	[
-																		$elm$html$Html$Attributes$class('px-4 py-5 sm:p-6')
+																		$elm$html$Html$Attributes$class('px-4 py-3 sm:p-4')
 																	]),
 																_List_fromArray(
 																	[
@@ -12296,7 +12341,7 @@ var $author$project$Main$view = function (model) {
 																	$elm$html$Html$div,
 																	_List_fromArray(
 																		[
-																			$elm$html$Html$Attributes$class('px-4 py-5 sm:p-6')
+																			$elm$html$Html$Attributes$class('px-4 py-3 sm:p-4')
 																		]),
 																	_List_fromArray(
 																		[
@@ -12319,7 +12364,7 @@ var $author$project$Main$view = function (model) {
 																	$elm$html$Html$div,
 																	_List_fromArray(
 																		[
-																			$elm$html$Html$Attributes$class('px-4 py-5 sm:p-6')
+																			$elm$html$Html$Attributes$class('px-4 py-3 sm:p-4')
 																		]),
 																	_List_fromArray(
 																		[
@@ -12370,7 +12415,7 @@ var $author$project$Main$view = function (model) {
 																$elm$html$Html$div,
 																_List_fromArray(
 																	[
-																		$elm$html$Html$Attributes$class('px-4 py-5 sm:p-6')
+																		$elm$html$Html$Attributes$class('px-4 py-3 sm:p-4')
 																	]),
 																_List_fromArray(
 																	[
@@ -12393,7 +12438,7 @@ var $author$project$Main$view = function (model) {
 																$elm$html$Html$div,
 																_List_fromArray(
 																	[
-																		$elm$html$Html$Attributes$class('px-4 py-5 sm:p-6')
+																		$elm$html$Html$Attributes$class('px-4 py-3 sm:p-4')
 																	]),
 																_List_fromArray(
 																	[
@@ -12416,7 +12461,7 @@ var $author$project$Main$view = function (model) {
 																$elm$html$Html$div,
 																_List_fromArray(
 																	[
-																		$elm$html$Html$Attributes$class('px-4 py-5 sm:p-6')
+																		$elm$html$Html$Attributes$class('px-4 py-3 sm:p-4')
 																	]),
 																_List_fromArray(
 																	[
@@ -12455,7 +12500,7 @@ var $author$project$Main$view = function (model) {
 																$elm$html$Html$div,
 																_List_fromArray(
 																	[
-																		$elm$html$Html$Attributes$class('px-4 py-5 sm:p-6 text-center')
+																		$elm$html$Html$Attributes$class('px-4 py-3 sm:p-4 text-center')
 																	]),
 																_List_fromArray(
 																	[
