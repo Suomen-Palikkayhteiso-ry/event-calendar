@@ -14,10 +14,10 @@ port storeAuth : Auth -> Cmd msg
 port removeAuth : () -> Cmd msg
 
 
-port initMap : { center : ( Float, Float ), zoom : Int, marker : Maybe ( Float, Float ) } -> Cmd msg
+port initMap : { center : ( Float, Float ), zoom : Int, events : List { id : String, title : String, point : Maybe { lat : Float, lon : Float } } } -> Cmd msg
 
 
-port updateMap : { center : ( Float, Float ), zoom : Int, marker : Maybe ( Float, Float ) } -> Cmd msg
+port updateMap : { center : ( Float, Float ), zoom : Int, events : List { id : String, title : String, point : Maybe { lat : Float, lon : Float } } } -> Cmd msg
 
 
 port parseKMLContent : String -> Cmd msg

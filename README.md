@@ -84,7 +84,23 @@ This will create a `build` directory with the static files that can be deployed 
 - **Testing:**
 
   ```sh
-  pnpm test:run
+  # Elm unit tests
+  pnpm elm-test
+  
+  # Elm behavior specs (jsdom, fastest)
+  pnpm test:spec
+  
+  # Elm specs with real browser (debugging)
+  pnpm test:spec:headed
+  
+  # Playwright E2E tests
+  pnpm test:e2e
+  
+  # BDD feature tests
+  pnpm test:bdd
+  
+  # All tests
+  pnpm test
   ```
 
 - **Test coverage:**
@@ -92,3 +108,5 @@ This will create a `build` directory with the static files that can be deployed 
   ```sh
   pnpm test:coverage
   ```
+
+For more details on elm-spec testing, see [agents/elm-spec-setup.md](agents/elm-spec-setup.md).

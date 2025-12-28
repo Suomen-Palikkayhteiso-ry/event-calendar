@@ -16,6 +16,11 @@ As an authenticated member, I want to create new events so that I can add them t
 - Validation errors are displayed for required fields and invalid coordinates
 - Created events appear in the calendar
 
+## Related
+
+- **Tests**: `tests/features/event-creation.feature`
+- **ADRs**: ADR-0004 (Authentication), ADR-0006 (Mapping/Geocoding), ADR-0007 (Calendar)
+
 ## Scenarios
 
 - Non-auth user tries to access /events -> redirected to /

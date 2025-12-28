@@ -28,7 +28,7 @@ type alias LoginCredentials =
 login : LoginCredentials -> (Result Http.Error Auth -> msg) -> Cmd msg
 login credentials toMsg =
     Http.post
-        { url = baseUrl ++ "/api/collections/users/auth-with-password"
+        { url = baseUrl ++ "/collections/users/auth-with-password"
         , body = Http.jsonBody (loginEncoder credentials)
         , expect = Http.expectJson toMsg authResponseDecoder
         }
@@ -45,7 +45,7 @@ loginEncoder credentials =
 authWithOAuth2Code : String -> Maybe String -> (Result Http.Error Auth -> msg) -> Cmd msg
 authWithOAuth2Code code state toMsg =
     Http.post
-        { url = baseUrl ++ "/api/oauth2-redirect"
+        { url = baseUrl ++ "/oauth2-redirect"
         , body = Http.jsonBody (oauth2Encoder code state)
         , expect = Http.expectJson toMsg authResponseDecoder
         }
@@ -80,7 +80,7 @@ logout token toMsg =
     Http.request
         { method = "POST"
         , headers = [ Http.header "Authorization" ("Bearer " ++ token) ]
-        , url = baseUrl ++ "/api/collections/users/auth-refresh"
+        , url = baseUrl ++ "/collections/users/auth-refresh"
         , body = Http.emptyBody
         , expect = Http.expectWhatever toMsg
         , timeout = Nothing
@@ -97,7 +97,7 @@ getEvents token toMsg =
     Http.request
         { method = "GET"
         , headers = authHeader token
-        , url = baseUrl ++ "/api/collections/events/records"
+        , url = baseUrl ++ "/collections/events/records"
         , body = Http.emptyBody
         , expect = Http.expectJson toMsg eventsResponseDecoder
         , timeout = Nothing
@@ -115,7 +115,7 @@ createEvent token event toMsg =
     Http.request
         { method = "POST"
         , headers = authHeader token
-        , url = baseUrl ++ "/api/collections/events/records"
+        , url = baseUrl ++ "/collections/events/records"
         , body = Http.jsonBody (Types.eventEncoder event)
         , expect = Http.expectJson toMsg Types.eventDecoder
         , timeout = Nothing
@@ -128,7 +128,7 @@ updateEvent token id event toMsg =
     Http.request
         { method = "PATCH"
         , headers = authHeader token
-        , url = baseUrl ++ "/api/collections/events/records/" ++ id
+        , url = baseUrl ++ "/collections/events/records/" ++ id
         , body = Http.jsonBody (Types.eventEncoder event)
         , expect = Http.expectJson toMsg Types.eventDecoder
         , timeout = Nothing
@@ -141,7 +141,7 @@ deleteEvent token id toMsg =
     Http.request
         { method = "DELETE"
         , headers = authHeader token
-        , url = baseUrl ++ "/api/collections/events/records/" ++ id
+        , url = baseUrl ++ "/collections/events/records/" ++ id
         , body = Http.emptyBody
         , expect = Http.expectWhatever toMsg
         , timeout = Nothing

@@ -19,6 +19,11 @@
 		"test:bdd": "node test-bdd.js",
 		"test:e2e": "playwright test",
 		"test:e2e:ui": "playwright test --ui",
+		"test:spec": "npx elm-spec --specRoot=./elm-spec-core --specs='../tests/**/*Spec.elm'",
+		"test:spec:chromium": "npx elm-spec --specRoot=./elm-spec-core --specs='../tests/**/*Spec.elm' --browser=chromium",
+		"test:spec:headed": "npx elm-spec --specRoot=./elm-spec-core --specs='../tests/**/*Spec.elm' --browser=chromium --visible",
+		"test:spec:firefox": "npx elm-spec --specRoot=./elm-spec-core --specs='../tests/**/*Spec.elm' --browser=firefox",
+		"test:spec:webkit": "npx elm-spec --specRoot=./elm-spec-core --specs='../tests/**/*Spec.elm' --browser=webkit",
 		"elm-test": "elm-test"
 	},
 	"devDependencies": {
@@ -36,6 +41,7 @@
 		"@types/node": "^20",
 		"@vitest/coverage-v8": "^4.0.14",
 		"@vitest/ui": "^4.0.14",
+		"elm-spec-runner": "^2.5.1",
 		"elm-test": "0.19.1-revision17",
 		"eslint": "^9.38.0",
 		"eslint-config-prettier": "^10.1.8",

@@ -27,11 +27,11 @@ start:
 
 .PHONY: watch
 watch:
-	elm reactor
+	pnpm dev
 
 .PHONY: elm-build
 elm-build:
-	elm make src/Main.elm --output=/dev/null
+	elm make src/Main.elm --output=elm.js
 
 .PHONY: elm-test
 elm-test:
@@ -44,8 +44,16 @@ elm-format:
 .PHONY: elm-check
 elm-check:
 	elm-format src/ --validate
-	elm-review
+	cd review && elm-review
 	elm-test
+
+.PHONY: elm-spec
+elm-spec: node_modules
+	pnpm test:spec
+
+.PHONY: elm-spec-headed
+elm-spec-headed: node_modules
+	pnpm test:spec:headed
 
 .PHONY: test
 test: elm-test

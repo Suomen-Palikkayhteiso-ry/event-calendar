@@ -3,6 +3,7 @@ module Map exposing (..)
 import Html exposing (div)
 import Html.Attributes exposing (id)
 import Ports
+import Types exposing (Event)
 
 
 
@@ -12,7 +13,7 @@ import Ports
 type alias Model =
     { center : ( Float, Float )
     , zoom : Int
-    , marker : Maybe ( Float, Float )
+    , events : List Event
     }
 
 
@@ -20,7 +21,7 @@ init : Model
 init =
     { center = ( 60.1699, 24.9384 ) -- Helsinki
     , zoom = 10
-    , marker = Nothing
+    , events = []
     }
 
 
@@ -30,7 +31,8 @@ init =
 
 type Msg
     = InitMap
-    | UpdateMap ( Float, Float ) Int (Maybe ( Float, Float ))
+    | UpdateMap ( Float, Float ) Int (List Event)
+    | SetEvents (List Event)
     | MarkerMoved ( Float, Float )
 
 
@@ -38,21 +40,36 @@ type Msg
 -- Update
 
 
+toMapEvent : Event -> { id : String, title : String, point : Maybe { lat : Float, lon : Float } }
+toMapEvent event =
+    { id = event.id
+    , title = event.title
+    , point = Maybe.map (\p -> { lat = p.lat, lon = p.lon }) event.point
+    }
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         InitMap ->
-            ( model, Ports.initMap { center = model.center, zoom = model.zoom, marker = model.marker } )
+            ( model, Ports.initMap { center = model.center, zoom = model.zoom, events = List.map toMapEvent model.events } )
 
-        UpdateMap center zoom marker ->
+        UpdateMap center zoom events ->
             let
                 newModel =
-                    { model | center = center, zoom = zoom, marker = marker }
+                    { model | center = center, zoom = zoom, events = events }
             in
-            ( newModel, Ports.updateMap { center = center, zoom = zoom, marker = marker } )
+            ( newModel, Ports.updateMap { center = center, zoom = zoom, events = List.map toMapEvent events } )
+
+        SetEvents events ->
+            let
+                newModel =
+                    { model | events = events }
+            in
+            ( newModel, Ports.updateMap { center = model.center, zoom = model.zoom, events = List.map toMapEvent events } )
 
         MarkerMoved pos ->
-            ( { model | marker = Just pos }, Cmd.none )
+            ( model, Cmd.none )
 
 
 

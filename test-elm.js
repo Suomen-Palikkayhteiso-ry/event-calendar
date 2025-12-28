@@ -5633,7 +5633,7 @@ var $author$project$EventList$init = {currentPage: 1, pageSize: 20, showImportMo
 var $author$project$Events$init = {error: $elm$core$Maybe$Nothing, events: _List_Nil, loading: false};
 var $author$project$Map$init = {
 	center: _Utils_Tuple2(60.1699, 24.9384),
-	events: _List_Nil,
+	marker: $elm$core$Maybe$Nothing,
 	zoom: 10
 };
 var $elm$core$Platform$Cmd$map = _Platform_map;
@@ -6502,7 +6502,7 @@ var $author$project$PocketBase$authHeader = function (token) {
 		return _List_Nil;
 	}
 };
-var $author$project$PocketBase$baseUrl = '/api';
+var $author$project$PocketBase$baseUrl = 'http://localhost:8090';
 var $author$project$Types$Event = function (id) {
 	return function (title) {
 		return function (description) {
@@ -7085,7 +7085,7 @@ var $author$project$PocketBase$createEvent = F3(
 				method: 'POST',
 				timeout: $elm$core$Maybe$Nothing,
 				tracker: $elm$core$Maybe$Nothing,
-				url: $author$project$PocketBase$baseUrl + '/collections/events/records'
+				url: $author$project$PocketBase$baseUrl + '/api/collections/events/records'
 			});
 	});
 var $elm$http$Http$emptyBody = _Http_emptyBody;
@@ -7116,7 +7116,7 @@ var $author$project$PocketBase$deleteEvent = F3(
 				method: 'DELETE',
 				timeout: $elm$core$Maybe$Nothing,
 				tracker: $elm$core$Maybe$Nothing,
-				url: $author$project$PocketBase$baseUrl + ('/collections/events/records/' + id)
+				url: $author$project$PocketBase$baseUrl + ('/api/collections/events/records/' + id)
 			});
 	});
 var $elm$core$List$filter = F2(
@@ -7145,7 +7145,7 @@ var $author$project$PocketBase$getEvents = F2(
 				method: 'GET',
 				timeout: $elm$core$Maybe$Nothing,
 				tracker: $elm$core$Maybe$Nothing,
-				url: $author$project$PocketBase$baseUrl + '/collections/events/records'
+				url: $author$project$PocketBase$baseUrl + '/api/collections/events/records'
 			});
 	});
 var $elm$core$Basics$neq = _Utils_notEqual;
@@ -7162,7 +7162,7 @@ var $author$project$PocketBase$updateEvent = F4(
 				method: 'PATCH',
 				timeout: $elm$core$Maybe$Nothing,
 				tracker: $elm$core$Maybe$Nothing,
-				url: $author$project$PocketBase$baseUrl + ('/collections/events/records/' + id)
+				url: $author$project$PocketBase$baseUrl + ('/api/collections/events/records/' + id)
 			});
 	});
 var $author$project$Events$update = F2(
@@ -7312,67 +7312,83 @@ var $author$project$Main$KMLParsed = function (a) {
 var $author$project$Main$MapMarkerMoved = function (a) {
 	return {$: 'MapMarkerMoved', a: a};
 };
-var $author$project$Main$NoOp = {$: 'NoOp'};
 var $elm$core$Basics$always = F2(
 	function (a, _v0) {
 		return a;
 	});
-var $author$project$Types$Auth = F2(
-	function (user, token) {
-		return {token: token, user: user};
-	});
-var $author$project$Types$User = F4(
-	function (id, email, name, avatar) {
-		return {avatar: avatar, email: email, id: id, name: name};
-	});
-var $author$project$Types$userDecoder = A2(
-	$elm_community$json_extra$Json$Decode$Extra$andMap,
-	A2(
-		$elm$json$Json$Decode$map,
-		$elm$core$Maybe$withDefault($elm$core$Maybe$Nothing),
-		A2(
-			$elm_community$json_extra$Json$Decode$Extra$optionalField,
-			'avatar',
-			$elm$json$Json$Decode$nullable($elm$json$Json$Decode$string))),
-	A2(
-		$elm_community$json_extra$Json$Decode$Extra$andMap,
-		A2(
-			$elm$json$Json$Decode$map,
-			$elm$core$Maybe$withDefault($elm$core$Maybe$Nothing),
-			A2(
-				$elm_community$json_extra$Json$Decode$Extra$optionalField,
-				'name',
-				$elm$json$Json$Decode$nullable($elm$json$Json$Decode$string))),
-		A2(
-			$elm_community$json_extra$Json$Decode$Extra$andMap,
-			A2($elm$json$Json$Decode$field, 'email', $elm$json$Json$Decode$string),
-			A2(
-				$elm_community$json_extra$Json$Decode$Extra$andMap,
-				A2($elm$json$Json$Decode$field, 'id', $elm$json$Json$Decode$string),
-				$elm$json$Json$Decode$succeed($author$project$Types$User)))));
-var $author$project$Types$authDecoder = A2(
-	$elm_community$json_extra$Json$Decode$Extra$andMap,
-	A2(
-		$elm$json$Json$Decode$map,
-		$elm$core$Maybe$withDefault($elm$core$Maybe$Nothing),
-		A2(
-			$elm_community$json_extra$Json$Decode$Extra$optionalField,
-			'token',
-			$elm$json$Json$Decode$nullable($elm$json$Json$Decode$string))),
-	A2(
-		$elm_community$json_extra$Json$Decode$Extra$andMap,
-		A2(
-			$elm$json$Json$Decode$map,
-			$elm$core$Maybe$withDefault($elm$core$Maybe$Nothing),
-			A2(
-				$elm_community$json_extra$Json$Decode$Extra$optionalField,
-				'user',
-				$elm$json$Json$Decode$nullable($author$project$Types$userDecoder))),
-		$elm$json$Json$Decode$succeed($author$project$Types$Auth)));
 var $author$project$Ports$authRemoved = _Platform_incomingPort(
 	'authRemoved',
 	$elm$json$Json$Decode$null(_Utils_Tuple0));
-var $author$project$Ports$authStored = _Platform_incomingPort('authStored', $elm$json$Json$Decode$value);
+var $author$project$Ports$authStored = _Platform_incomingPort(
+	'authStored',
+	A2(
+		$elm$json$Json$Decode$andThen,
+		function (user) {
+			return A2(
+				$elm$json$Json$Decode$andThen,
+				function (token) {
+					return $elm$json$Json$Decode$succeed(
+						{token: token, user: user});
+				},
+				A2(
+					$elm$json$Json$Decode$field,
+					'token',
+					$elm$json$Json$Decode$oneOf(
+						_List_fromArray(
+							[
+								$elm$json$Json$Decode$null($elm$core$Maybe$Nothing),
+								A2($elm$json$Json$Decode$map, $elm$core$Maybe$Just, $elm$json$Json$Decode$string)
+							]))));
+		},
+		A2(
+			$elm$json$Json$Decode$field,
+			'user',
+			$elm$json$Json$Decode$oneOf(
+				_List_fromArray(
+					[
+						$elm$json$Json$Decode$null($elm$core$Maybe$Nothing),
+						A2(
+						$elm$json$Json$Decode$map,
+						$elm$core$Maybe$Just,
+						A2(
+							$elm$json$Json$Decode$andThen,
+							function (name) {
+								return A2(
+									$elm$json$Json$Decode$andThen,
+									function (id) {
+										return A2(
+											$elm$json$Json$Decode$andThen,
+											function (email) {
+												return A2(
+													$elm$json$Json$Decode$andThen,
+													function (avatar) {
+														return $elm$json$Json$Decode$succeed(
+															{avatar: avatar, email: email, id: id, name: name});
+													},
+													A2(
+														$elm$json$Json$Decode$field,
+														'avatar',
+														$elm$json$Json$Decode$oneOf(
+															_List_fromArray(
+																[
+																	$elm$json$Json$Decode$null($elm$core$Maybe$Nothing),
+																	A2($elm$json$Json$Decode$map, $elm$core$Maybe$Just, $elm$json$Json$Decode$string)
+																]))));
+											},
+											A2($elm$json$Json$Decode$field, 'email', $elm$json$Json$Decode$string));
+									},
+									A2($elm$json$Json$Decode$field, 'id', $elm$json$Json$Decode$string));
+							},
+							A2(
+								$elm$json$Json$Decode$field,
+								'name',
+								$elm$json$Json$Decode$oneOf(
+									_List_fromArray(
+										[
+											$elm$json$Json$Decode$null($elm$core$Maybe$Nothing),
+											A2($elm$json$Json$Decode$map, $elm$core$Maybe$Just, $elm$json$Json$Decode$string)
+										])))))
+					])))));
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $author$project$Ports$kmlContentParsed = _Platform_incomingPort('kmlContentParsed', $elm$json$Json$Decode$value);
 var $elm$json$Json$Decode$index = _Json_decodeIndex;
@@ -7394,16 +7410,7 @@ var $author$project$Main$subscriptions = function (_v0) {
 	return $elm$core$Platform$Sub$batch(
 		_List_fromArray(
 			[
-				$author$project$Ports$authStored(
-				function (value) {
-					var _v1 = A2($elm$json$Json$Decode$decodeValue, $author$project$Types$authDecoder, value);
-					if (_v1.$ === 'Ok') {
-						var auth = _v1.a;
-						return $author$project$Main$AuthStored(auth);
-					} else {
-						return $author$project$Main$NoOp;
-					}
-				}),
+				$author$project$Ports$authStored($author$project$Main$AuthStored),
 				$author$project$Ports$authRemoved(
 				$elm$core$Basics$always($author$project$Main$AuthRemoved)),
 				$author$project$Ports$mapMarkerMoved($author$project$Main$MapMarkerMoved),
@@ -7448,9 +7455,6 @@ var $author$project$Calendar$SetDate = function (a) {
 var $author$project$Calendar$SetEvents = function (a) {
 	return {$: 'SetEvents', a: a};
 };
-var $author$project$Map$SetEvents = function (a) {
-	return {$: 'SetEvents', a: a};
-};
 var $author$project$EventForm$SetLoading = function (a) {
 	return {$: 'SetLoading', a: a};
 };
@@ -7469,6 +7473,14 @@ var $elm$core$Maybe$andThen = F2(
 		} else {
 			return $elm$core$Maybe$Nothing;
 		}
+	});
+var $author$project$Types$Auth = F2(
+	function (user, token) {
+		return {token: token, user: user};
+	});
+var $author$project$Types$User = F4(
+	function (id, email, name, avatar) {
+		return {avatar: avatar, email: email, id: id, name: name};
 	});
 var $elm$json$Json$Decode$map4 = _Json_map4;
 var $author$project$PocketBase$userDecoder = A5(
@@ -7520,7 +7532,7 @@ var $author$project$PocketBase$authWithOAuth2Code = F3(
 				body: $elm$http$Http$jsonBody(
 					A2($author$project$PocketBase$oauth2Encoder, code, state)),
 				expect: A2($elm$http$Http$expectJson, toMsg, $author$project$PocketBase$authResponseDecoder),
-				url: $author$project$PocketBase$baseUrl + '/oauth2-redirect'
+				url: $author$project$PocketBase$baseUrl + '/api/oauth2-redirect'
 			});
 	});
 var $elm$core$List$head = function (list) {
@@ -7569,7 +7581,7 @@ var $author$project$PocketBase$login = F2(
 				body: $elm$http$Http$jsonBody(
 					$author$project$PocketBase$loginEncoder(credentials)),
 				expect: A2($elm$http$Http$expectJson, toMsg, $author$project$PocketBase$authResponseDecoder),
-				url: $author$project$PocketBase$baseUrl + '/collections/users/auth-with-password'
+				url: $author$project$PocketBase$baseUrl + '/api/collections/users/auth-with-password'
 			});
 	});
 var $author$project$PocketBase$logout = F2(
@@ -7585,7 +7597,7 @@ var $author$project$PocketBase$logout = F2(
 				method: 'POST',
 				timeout: $elm$core$Maybe$Nothing,
 				tracker: $elm$core$Maybe$Nothing,
-				url: $author$project$PocketBase$baseUrl + '/collections/users/auth-refresh'
+				url: $author$project$PocketBase$baseUrl + '/api/collections/users/auth-refresh'
 			});
 	});
 var $elm$core$Maybe$map = F2(
@@ -8755,57 +8767,30 @@ var $author$project$Ports$initMap = _Platform_outgoingPort(
 								]));
 					}($.center)),
 					_Utils_Tuple2(
-					'events',
-					$elm$json$Json$Encode$list(
-						function ($) {
-							return $elm$json$Json$Encode$object(
-								_List_fromArray(
-									[
-										_Utils_Tuple2(
-										'id',
-										$elm$json$Json$Encode$string($.id)),
-										_Utils_Tuple2(
-										'point',
-										function ($) {
-											return A3(
-												$elm$core$Maybe$destruct,
-												$elm$json$Json$Encode$null,
-												function ($) {
-													return $elm$json$Json$Encode$object(
-														_List_fromArray(
-															[
-																_Utils_Tuple2(
-																'lat',
-																$elm$json$Json$Encode$float($.lat)),
-																_Utils_Tuple2(
-																'lon',
-																$elm$json$Json$Encode$float($.lon))
-															]));
-												},
-												$);
-										}($.point)),
-										_Utils_Tuple2(
-										'title',
-										$elm$json$Json$Encode$string($.title))
-									]));
-						})($.events)),
+					'marker',
+					function ($) {
+						return A3(
+							$elm$core$Maybe$destruct,
+							$elm$json$Json$Encode$null,
+							function ($) {
+								var a = $.a;
+								var b = $.b;
+								return A2(
+									$elm$json$Json$Encode$list,
+									$elm$core$Basics$identity,
+									_List_fromArray(
+										[
+											$elm$json$Json$Encode$float(a),
+											$elm$json$Json$Encode$float(b)
+										]));
+							},
+							$);
+					}($.marker)),
 					_Utils_Tuple2(
 					'zoom',
 					$elm$json$Json$Encode$int($.zoom))
 				]));
 	});
-var $author$project$Map$toMapEvent = function (event) {
-	return {
-		id: event.id,
-		point: A2(
-			$elm$core$Maybe$map,
-			function (p) {
-				return {lat: p.lat, lon: p.lon};
-			},
-			event.point),
-		title: event.title
-	};
-};
 var $author$project$Ports$updateMap = _Platform_outgoingPort(
 	'updateMap',
 	function ($) {
@@ -8827,40 +8812,25 @@ var $author$project$Ports$updateMap = _Platform_outgoingPort(
 								]));
 					}($.center)),
 					_Utils_Tuple2(
-					'events',
-					$elm$json$Json$Encode$list(
-						function ($) {
-							return $elm$json$Json$Encode$object(
-								_List_fromArray(
-									[
-										_Utils_Tuple2(
-										'id',
-										$elm$json$Json$Encode$string($.id)),
-										_Utils_Tuple2(
-										'point',
-										function ($) {
-											return A3(
-												$elm$core$Maybe$destruct,
-												$elm$json$Json$Encode$null,
-												function ($) {
-													return $elm$json$Json$Encode$object(
-														_List_fromArray(
-															[
-																_Utils_Tuple2(
-																'lat',
-																$elm$json$Json$Encode$float($.lat)),
-																_Utils_Tuple2(
-																'lon',
-																$elm$json$Json$Encode$float($.lon))
-															]));
-												},
-												$);
-										}($.point)),
-										_Utils_Tuple2(
-										'title',
-										$elm$json$Json$Encode$string($.title))
-									]));
-						})($.events)),
+					'marker',
+					function ($) {
+						return A3(
+							$elm$core$Maybe$destruct,
+							$elm$json$Json$Encode$null,
+							function ($) {
+								var a = $.a;
+								var b = $.b;
+								return A2(
+									$elm$json$Json$Encode$list,
+									$elm$core$Basics$identity,
+									_List_fromArray(
+										[
+											$elm$json$Json$Encode$float(a),
+											$elm$json$Json$Encode$float(b)
+										]));
+							},
+							$);
+					}($.marker)),
 					_Utils_Tuple2(
 					'zoom',
 					$elm$json$Json$Encode$int($.zoom))
@@ -8873,42 +8843,27 @@ var $author$project$Map$update = F2(
 				return _Utils_Tuple2(
 					model,
 					$author$project$Ports$initMap(
-						{
-							center: model.center,
-							events: A2($elm$core$List$map, $author$project$Map$toMapEvent, model.events),
-							zoom: model.zoom
-						}));
+						{center: model.center, marker: model.marker, zoom: model.zoom}));
 			case 'UpdateMap':
 				var center = msg.a;
 				var zoom = msg.b;
-				var events = msg.c;
+				var marker = msg.c;
 				var newModel = _Utils_update(
 					model,
-					{center: center, events: events, zoom: zoom});
+					{center: center, marker: marker, zoom: zoom});
 				return _Utils_Tuple2(
 					newModel,
 					$author$project$Ports$updateMap(
-						{
-							center: center,
-							events: A2($elm$core$List$map, $author$project$Map$toMapEvent, events),
-							zoom: zoom
-						}));
-			case 'SetEvents':
-				var events = msg.a;
-				var newModel = _Utils_update(
-					model,
-					{events: events});
-				return _Utils_Tuple2(
-					newModel,
-					$author$project$Ports$updateMap(
-						{
-							center: model.center,
-							events: A2($elm$core$List$map, $author$project$Map$toMapEvent, events),
-							zoom: model.zoom
-						}));
+						{center: center, marker: marker, zoom: zoom}));
 			default:
 				var pos = msg.a;
-				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							marker: $elm$core$Maybe$Just(pos)
+						}),
+					$elm$core$Platform$Cmd$none);
 		}
 	});
 var $author$project$Main$update = F2(
@@ -8994,53 +8949,6 @@ var $author$project$Main$update = F2(
 					$elm$core$Platform$Cmd$none);
 			case 'EventsMsg':
 				var eventsMsg = msg.a;
-				var updatedMap = function () {
-					_v12$3:
-					while (true) {
-						switch (eventsMsg.$) {
-							case 'EventsFetched':
-								if (eventsMsg.a.$ === 'Ok') {
-									var events = eventsMsg.a.a;
-									return A2(
-										$author$project$Map$update,
-										$author$project$Map$SetEvents(events),
-										model.map).a;
-								} else {
-									break _v12$3;
-								}
-							case 'EventCreated':
-								if (eventsMsg.a.$ === 'Ok') {
-									var event = eventsMsg.a.a;
-									return A2(
-										$author$project$Map$update,
-										$author$project$Map$SetEvents(
-											A2($elm$core$List$cons, event, model.events.events)),
-										model.map).a;
-								} else {
-									break _v12$3;
-								}
-							case 'EventUpdated':
-								if (eventsMsg.a.$ === 'Ok') {
-									var event = eventsMsg.a.a;
-									var updatedEventsList = A2(
-										$elm$core$List$map,
-										function (e) {
-											return _Utils_eq(e.id, event.id) ? event : e;
-										},
-										model.events.events);
-									return A2(
-										$author$project$Map$update,
-										$author$project$Map$SetEvents(updatedEventsList),
-										model.map).a;
-								} else {
-									break _v12$3;
-								}
-							default:
-								break _v12$3;
-						}
-					}
-					return model.map;
-				}();
 				var updatedEventForm = function () {
 					switch (eventsMsg.$) {
 						case 'EventCreated':
@@ -9139,7 +9047,7 @@ var $author$project$Main$update = F2(
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{calendar: updatedCalendar, error: newError, eventForm: updatedEventForm, events: updatedEvents, loading: newLoading, map: updatedMap}),
+						{calendar: updatedCalendar, error: newError, eventForm: updatedEventForm, events: updatedEvents, loading: newLoading}),
 					$elm$core$Platform$Cmd$batch(
 						_List_fromArray(
 							[
@@ -9148,9 +9056,9 @@ var $author$project$Main$update = F2(
 							])));
 			case 'MapMsg':
 				var mapMsg = msg.a;
-				var _v13 = A2($author$project$Map$update, mapMsg, model.map);
-				var updatedMap = _v13.a;
-				var mapCmd = _v13.b;
+				var _v12 = A2($author$project$Map$update, mapMsg, model.map);
+				var updatedMap = _v12.a;
+				var mapCmd = _v12.b;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
@@ -9158,9 +9066,9 @@ var $author$project$Main$update = F2(
 					A2($elm$core$Platform$Cmd$map, $author$project$Main$MapMsg, mapCmd));
 			case 'EventFormMsg':
 				var eventFormMsg = msg.a;
-				var _v14 = A2($author$project$EventForm$update, eventFormMsg, model.eventForm);
-				var updatedEventForm = _v14.a;
-				var action = _v14.b;
+				var _v13 = A2($author$project$EventForm$update, eventFormMsg, model.eventForm);
+				var updatedEventForm = _v13.a;
+				var action = _v13.b;
 				var cmd = function () {
 					if (action.$ === 'Just') {
 						if (action.a.$ === 'CreateEvent') {
@@ -9180,9 +9088,9 @@ var $author$project$Main$update = F2(
 												model.auth),
 											event))));
 						} else {
-							var _v16 = action.a;
-							var id = _v16.a;
-							var event = _v16.b;
+							var _v15 = action.a;
+							var id = _v15.a;
+							var event = _v15.b;
 							return A2(
 								$elm$core$Task$perform,
 								$elm$core$Basics$identity,
@@ -9240,9 +9148,9 @@ var $author$project$Main$update = F2(
 							model,
 							$author$project$Ports$parseKMLContent(content));
 					default:
-						var _v18 = A2($author$project$EventList$update, eventListMsg, model.eventList);
-						var updatedEventList = _v18.a;
-						var cmd = _v18.b;
+						var _v17 = A2($author$project$EventList$update, eventListMsg, model.eventList);
+						var updatedEventList = _v17.a;
+						var cmd = _v17.b;
 						return _Utils_Tuple2(
 							_Utils_update(
 								model,
@@ -9282,12 +9190,12 @@ var $author$project$Main$update = F2(
 				}
 			case 'KMLParsed':
 				var value = msg.a;
-				var _v20 = A2(
+				var _v19 = A2(
 					$elm$json$Json$Decode$decodeValue,
 					$elm$json$Json$Decode$list($author$project$KMLUtils$rawKMLDecoder),
 					value);
-				if (_v20.$ === 'Ok') {
-					var rawList = _v20.a;
+				if (_v19.$ === 'Ok') {
+					var rawList = _v19.a;
 					var events = A2($elm$core$List$filterMap, $author$project$KMLUtils$processRawKML, rawList);
 					var cmds = A2(
 						$elm$core$List$map,
@@ -9331,11 +9239,11 @@ var $author$project$Main$update = F2(
 					$elm$core$Platform$Cmd$none);
 			case 'MapMarkerMoved':
 				var pos = msg.a;
-				var _v21 = A2(
+				var _v20 = A2(
 					$author$project$Map$update,
 					$author$project$Map$MarkerMoved(pos),
 					model.map);
-				var updatedMap = _v21.a;
+				var updatedMap = _v20.a;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
@@ -9349,12 +9257,12 @@ var $author$project$Main$update = F2(
 						{error: $elm$core$Maybe$Nothing, loading: true}),
 					A2($author$project$PocketBase$login, credentials, $author$project$Main$LoginResult));
 			case 'Logout':
-				var _v22 = model.auth;
-				if (_v22.$ === 'Just') {
-					var auth = _v22.a;
-					var _v23 = auth.token;
-					if (_v23.$ === 'Just') {
-						var token = _v23.a;
+				var _v21 = model.auth;
+				if (_v21.$ === 'Just') {
+					var auth = _v21.a;
+					var _v22 = auth.token;
+					if (_v22.$ === 'Just') {
+						var token = _v22.a;
 						return _Utils_Tuple2(
 							model,
 							A2($author$project$PocketBase$logout, token, $author$project$Main$LogoutResult));
@@ -9480,12 +9388,10 @@ var $author$project$Main$update = F2(
 										},
 										model.auth),
 									id)))));
-			case 'GoToCreateEvent':
+			default:
 				return _Utils_Tuple2(
 					model,
 					A2($elm$browser$Browser$Navigation$pushUrl, model.key, '/events/create'));
-			default:
-				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 		}
 	});
 var $author$project$Main$CalendarMsg = function (a) {
@@ -9523,241 +9429,6 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 	});
 var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
 var $elm$html$Html$div = _VirtualDom_node('div');
-var $author$project$I18n$fi = {actions: 'Toiminnot', add_new_event: 'Lisää uusi tapahtuma', all_day: '(Koko päivä)', all_day_event: 'Koko päivän tapahtuma', all_day_event_label: 'Koko päivän tapahtuma', atom_feed: 'ATOM', back: 'takaisin', back_to_calendar: 'Takaisin kalenteriin', back_to_calendar_detail: 'Takaisin kalenteriin', calendar: 'kalenteri', calendar_title: 'Palikkakalenteri', cancel: 'Peruuta', completing_login: 'Viimeistellään kirjautumista...', component_error_description: 'Tässä komponentissa tapahtui virhe.', component_error_title: 'Komponentin virhe', confirm_delete_event: 'Haluatko varmasti poistaa tämän tapahtuman?', create_event: 'Luo tapahtuma', create_new_event: 'Luo uusi tapahtuma', creating: 'Luodaan...', current_image: 'Nykyinen kuva:', dates: 'Päivämäärät', _delete: 'Poista', deleted: 'Poistettu', deleting: 'Poistetaan...', description: 'Kuvaus:', description_label: 'Kuvaus', description_optional: 'Kuvaus (valinnainen)', disable_geocoding: 'Poista geocoding käytöstä', draft: 'Luonnos', edit: 'Muokkaa', edit_event: 'Muokkaa tapahtumaa', enable_geocoding: 'Ota geocoding käyttöön', end: 'Päättyy:', end_date: 'Lopetuspäivä', end_date_after_start_error: 'Lopetuspäivän täytyy olla aloituspäivän jälkeen', error_details: 'Virheen tiedot', error_page_description: 'Tapahtui odottamaton virhe. Yritä myöhemmin uudelleen.', error_page_title: 'Virhe', event_calendar: 'Palikkakalenteri', event_calendar_description: 'Suomen Palikkayhteisö ry:n Palikkakalenteri', event_created_successfully: 'Tapahtuma luotu onnistuneesti.', event_deleted_successfully: 'Tapahtuma poistettu onnistuneesti.', event_title: 'Tapahtuman otsikko', event_updated_successfully: 'Tapahtuma päivitetty onnistuneesti.', events_table: 'Tapahtumat taulukko', existing_events: 'Olemassa olevat tapahtumat', failed_create_event: 'Tapahtuman luonti epäonnistui. Yritä uudelleen.', failed_delete_event: 'Tapahtuman poistaminen epäonnistui. Yritä uudelleen.', failed_fetch_events: 'Tapahtumien lataaminen epäonnistui. Yritä uudelleen.', failed_kml_import: 'KML-tuonnin epäonnistui. Tarkista tiedosto ja yritä uudelleen.', failed_load_event: 'Tapahtuman lataaminen epäonnistui.', failed_update_event: 'Tapahtuman päivitys epäonnistui. Yritä uudelleen.', feeds_description: 'Syötteet integroivat uudet tapahtumat verkkosivuille. Nämäkin sisältävät kalenterilinkit.', geocoding_failed: 'Sijainnin haku epäonnistui. Tarkista osoite tai syötä koordinaatit manuaalisesti.', geojson_feed: 'GeoJSON', hello: 'Hei,', html_description: 'Upota tai tulosta valmis tapahtumalistaus. Sisältää kalenterilinkit yksittäisiin tapahtumiin.', html_feed: 'HTML | PDF', ical_description: 'Kalenterivienti (ICS) tilaa tai integroi koko kalenterin helposti. Klikkaa kalenteri puhelimeesi!', ical_feed: 'iCalendar', image_description_label: 'Kuvan kuvaus', image_description_optional: 'Kuvan kuvaus (valinnainen)', image_help_text: 'Valitse kuva tapahtumalle (valinnainen)', image_label: 'Kuva', invalid_event_id: 'Virheellinen tapahtuman tunniste.', json_feed: 'JSON', latitude: 'Leveysaste', latitude_invalid_error: 'Leveysasteen täytyy olla välillä -90 ja 90', list: 'lista', loading_event: 'Ladataan tapahtumaa...', loading_events: 'Ladataan tapahtumia...', location: 'Paikka:', location_label: 'Paikka', location_optional: 'Paikka (valinnainen)', login: 'Kirjaudu sisään', login_required: 'Sinun täytyy kirjautua sisään hallitaksesi tapahtumia.', logout: 'Kirjaudu ulos', longitude: 'Pituusaste', longitude_invalid_error: 'Pituusasteen täytyy olla välillä -180 ja 180', next_button: 'Seuraava', next_page: 'Seuraava sivu', non_member_prefix: 'Jos et ole Suomen Palikkayhteisö ry:n jäsen, ', of_: '/', organization_alt: 'Suomen Palikkayhteisö ry', page: 'Sivu', page_not_found: 'Sivua ei löytynyt', page_not_found_description: 'Etsimääsi sivua ei löytynyt.', pending: 'Odottaa', prev: 'Edellinen', previous: 'Edellinen', previous_page: 'Edellinen sivu', public_calendar: 'Palikkakalenteri', published: 'Julkaistu', reload_page: 'Lataa sivu uudelleen', rss_feed: 'RSS', save_changes: 'Tallenna muutokset', saving: 'Tallennetaan...', select_date: 'Päivä:', send_event_email: 'lähetä tapahtumasi meille sähköpostilla', something_went_wrong: 'Jotain meni pieleen', start: 'Alkaa:', start_date_required: 'Aloituspäivä *', start_date_required_error: 'Aloituspäivä on pakollinen', status: 'Tila:', title: 'Otsikko', title_required: 'Otsikko *', title_required_error: 'Otsikko on pakollinen', today: 'tänään', total_events: 'tapahtumaa yhteensä', try_again: 'Yritä uudelleen', url_invalid_error: 'URL:n täytyy alkaa http:// tai https://', url_label: 'Kotisivut:', url_optional: 'Kotisivut (valinnainen)', view_on_map: 'Näytä kartalla'};
-var $author$project$I18n$get = function (key) {
-	switch (key) {
-		case 'calendar':
-			return $author$project$I18n$fi.calendar;
-		case 'list':
-			return $author$project$I18n$fi.list;
-		case 'today':
-			return $author$project$I18n$fi.today;
-		case 'prev':
-			return $author$project$I18n$fi.prev;
-		case 'next_button':
-			return $author$project$I18n$fi.next_button;
-		case 'back':
-			return $author$project$I18n$fi.back;
-		case 'public_calendar':
-			return $author$project$I18n$fi.public_calendar;
-		case 'select_date':
-			return $author$project$I18n$fi.select_date;
-		case 'back_to_calendar':
-			return $author$project$I18n$fi.back_to_calendar;
-		case 'location':
-			return $author$project$I18n$fi.location;
-		case 'start':
-			return $author$project$I18n$fi.start;
-		case 'end':
-			return $author$project$I18n$fi.end;
-		case 'all_day_event':
-			return $author$project$I18n$fi.all_day_event;
-		case 'description':
-			return $author$project$I18n$fi.description;
-		case 'event_calendar':
-			return $author$project$I18n$fi.event_calendar;
-		case 'event_calendar_description':
-			return $author$project$I18n$fi.event_calendar_description;
-		case 'add_new_event':
-			return $author$project$I18n$fi.add_new_event;
-		case 'login_required':
-			return $author$project$I18n$fi.login_required;
-		case 'create_new_event':
-			return $author$project$I18n$fi.create_new_event;
-		case 'title_required':
-			return $author$project$I18n$fi.title_required;
-		case 'title':
-			return $author$project$I18n$fi.title;
-		case 'event_title':
-			return $author$project$I18n$fi.event_title;
-		case 'location_label':
-			return $author$project$I18n$fi.location_label;
-		case 'location_optional':
-			return $author$project$I18n$fi.location_optional;
-		case 'latitude':
-			return $author$project$I18n$fi.latitude;
-		case 'longitude':
-			return $author$project$I18n$fi.longitude;
-		case 'geocoding_failed':
-			return $author$project$I18n$fi.geocoding_failed;
-		case 'disable_geocoding':
-			return $author$project$I18n$fi.disable_geocoding;
-		case 'enable_geocoding':
-			return $author$project$I18n$fi.enable_geocoding;
-		case 'description_label':
-			return $author$project$I18n$fi.description_label;
-		case 'description_optional':
-			return $author$project$I18n$fi.description_optional;
-		case 'dates':
-			return $author$project$I18n$fi.dates;
-		case 'actions':
-			return $author$project$I18n$fi.actions;
-		case 'url_label':
-			return $author$project$I18n$fi.url_label;
-		case 'url_optional':
-			return $author$project$I18n$fi.url_optional;
-		case 'image_label':
-			return $author$project$I18n$fi.image_label;
-		case 'image_description_label':
-			return $author$project$I18n$fi.image_description_label;
-		case 'image_description_optional':
-			return $author$project$I18n$fi.image_description_optional;
-		case 'image_help_text':
-			return $author$project$I18n$fi.image_help_text;
-		case 'view_on_map':
-			return $author$project$I18n$fi.view_on_map;
-		case 'edit_event':
-			return $author$project$I18n$fi.edit_event;
-		case 'previous_page':
-			return $author$project$I18n$fi.previous_page;
-		case 'next_page':
-			return $author$project$I18n$fi.next_page;
-		case 'events_table':
-			return $author$project$I18n$fi.events_table;
-		case 'start_date_required':
-			return $author$project$I18n$fi.start_date_required;
-		case 'end_date':
-			return $author$project$I18n$fi.end_date;
-		case 'all_day_event_label':
-			return $author$project$I18n$fi.all_day_event_label;
-		case 'creating':
-			return $author$project$I18n$fi.creating;
-		case 'create_event':
-			return $author$project$I18n$fi.create_event;
-		case 'cancel':
-			return $author$project$I18n$fi.cancel;
-		case 'existing_events':
-			return $author$project$I18n$fi.existing_events;
-		case 'edit':
-			return $author$project$I18n$fi.edit;
-		case 'all_day':
-			return $author$project$I18n$fi.all_day;
-		case 'status':
-			return $author$project$I18n$fi.status;
-		case 'previous':
-			return $author$project$I18n$fi.previous;
-		case 'page':
-			return $author$project$I18n$fi.page;
-		case 'of':
-			return $author$project$I18n$fi.of_;
-		case 'total_events':
-			return $author$project$I18n$fi.total_events;
-		case 'failed_create_event':
-			return $author$project$I18n$fi.failed_create_event;
-		case 'event_created_successfully':
-			return $author$project$I18n$fi.event_created_successfully;
-		case 'failed_fetch_events':
-			return $author$project$I18n$fi.failed_fetch_events;
-		case 'failed_kml_import':
-			return $author$project$I18n$fi.failed_kml_import;
-		case 'failed_load_event':
-			return $author$project$I18n$fi.failed_load_event;
-		case 'invalid_event_id':
-			return $author$project$I18n$fi.invalid_event_id;
-		case 'deleting':
-			return $author$project$I18n$fi.deleting;
-		case 'delete':
-			return $author$project$I18n$fi._delete;
-		case 'back_to_calendar_detail':
-			return $author$project$I18n$fi.back_to_calendar_detail;
-		case 'loading_event':
-			return $author$project$I18n$fi.loading_event;
-		case 'loading_events':
-			return $author$project$I18n$fi.loading_events;
-		case 'failed_delete_event':
-			return $author$project$I18n$fi.failed_delete_event;
-		case 'event_deleted_successfully':
-			return $author$project$I18n$fi.event_deleted_successfully;
-		case 'confirm_delete_event':
-			return $author$project$I18n$fi.confirm_delete_event;
-		case 'current_image':
-			return $author$project$I18n$fi.current_image;
-		case 'saving':
-			return $author$project$I18n$fi.saving;
-		case 'save_changes':
-			return $author$project$I18n$fi.save_changes;
-		case 'failed_update_event':
-			return $author$project$I18n$fi.failed_update_event;
-		case 'event_updated_successfully':
-			return $author$project$I18n$fi.event_updated_successfully;
-		case 'draft':
-			return $author$project$I18n$fi.draft;
-		case 'pending':
-			return $author$project$I18n$fi.pending;
-		case 'published':
-			return $author$project$I18n$fi.published;
-		case 'deleted':
-			return $author$project$I18n$fi.deleted;
-		case 'organization_alt':
-			return $author$project$I18n$fi.organization_alt;
-		case 'calendar_title':
-			return $author$project$I18n$fi.calendar_title;
-		case 'hello':
-			return $author$project$I18n$fi.hello;
-		case 'logout':
-			return $author$project$I18n$fi.logout;
-		case 'login':
-			return $author$project$I18n$fi.login;
-		case 'rss_feed':
-			return $author$project$I18n$fi.rss_feed;
-		case 'html_feed':
-			return $author$project$I18n$fi.html_feed;
-		case 'ical_feed':
-			return $author$project$I18n$fi.ical_feed;
-		case 'atom_feed':
-			return $author$project$I18n$fi.atom_feed;
-		case 'json_feed':
-			return $author$project$I18n$fi.json_feed;
-		case 'geojson_feed':
-			return $author$project$I18n$fi.geojson_feed;
-		case 'ical_description':
-			return $author$project$I18n$fi.ical_description;
-		case 'html_description':
-			return $author$project$I18n$fi.html_description;
-		case 'feeds_description':
-			return $author$project$I18n$fi.feeds_description;
-		case 'completing_login':
-			return $author$project$I18n$fi.completing_login;
-		case 'non_member_prefix':
-			return $author$project$I18n$fi.non_member_prefix;
-		case 'send_event_email':
-			return $author$project$I18n$fi.send_event_email;
-		case 'error_page_title':
-			return $author$project$I18n$fi.error_page_title;
-		case 'something_went_wrong':
-			return $author$project$I18n$fi.something_went_wrong;
-		case 'page_not_found':
-			return $author$project$I18n$fi.page_not_found;
-		case 'page_not_found_description':
-			return $author$project$I18n$fi.page_not_found_description;
-		case 'error_page_description':
-			return $author$project$I18n$fi.error_page_description;
-		case 'error_details':
-			return $author$project$I18n$fi.error_details;
-		case 'reload_page':
-			return $author$project$I18n$fi.reload_page;
-		case 'component_error_title':
-			return $author$project$I18n$fi.component_error_title;
-		case 'component_error_description':
-			return $author$project$I18n$fi.component_error_description;
-		case 'try_again':
-			return $author$project$I18n$fi.try_again;
-		case 'title_required_error':
-			return $author$project$I18n$fi.title_required_error;
-		case 'start_date_required_error':
-			return $author$project$I18n$fi.start_date_required_error;
-		case 'end_date_after_start_error':
-			return $author$project$I18n$fi.end_date_after_start_error;
-		case 'url_invalid_error':
-			return $author$project$I18n$fi.url_invalid_error;
-		case 'latitude_invalid_error':
-			return $author$project$I18n$fi.latitude_invalid_error;
-		case 'longitude_invalid_error':
-			return $author$project$I18n$fi.longitude_invalid_error;
-		default:
-			return key;
-	}
-};
 var $elm$html$Html$h1 = _VirtualDom_node('h1');
 var $elm$html$Html$header = _VirtualDom_node('header');
 var $elm$html$Html$Attributes$href = function (url) {
@@ -10159,29 +9830,29 @@ var $elm$html$Html$h2 = _VirtualDom_node('h2');
 var $author$project$Calendar$monthToString = function (month) {
 	switch (month.$) {
 		case 'Jan':
-			return 'Tammikuu';
+			return 'January';
 		case 'Feb':
-			return 'Helmikuu';
+			return 'February';
 		case 'Mar':
-			return 'Maaliskuu';
+			return 'March';
 		case 'Apr':
-			return 'Huhtikuu';
+			return 'April';
 		case 'May':
-			return 'Toukokuu';
+			return 'May';
 		case 'Jun':
-			return 'Kesäkuu';
+			return 'June';
 		case 'Jul':
-			return 'Heinäkuu';
+			return 'July';
 		case 'Aug':
-			return 'Elokuu';
+			return 'August';
 		case 'Sep':
-			return 'Syyskuu';
+			return 'September';
 		case 'Oct':
-			return 'Lokakuu';
+			return 'October';
 		case 'Nov':
-			return 'Marraskuu';
+			return 'November';
 		default:
-			return 'Joulukuu';
+			return 'December';
 	}
 };
 var $author$project$Calendar$monthYearString = function (posix) {
@@ -10243,6 +9914,8 @@ var $author$project$Calendar$viewWeek = function (days) {
 };
 var $author$project$Calendar$intToWeekday = function (_int) {
 	switch (_int) {
+		case 0:
+			return $elm$time$Time$Sun;
 		case 1:
 			return $elm$time$Time$Mon;
 		case 2:
@@ -10255,8 +9928,6 @@ var $author$project$Calendar$intToWeekday = function (_int) {
 			return $elm$time$Time$Fri;
 		case 6:
 			return $elm$time$Time$Sat;
-		case 7:
-			return $elm$time$Time$Sun;
 		default:
 			return $elm$time$Time$Mon;
 	}
@@ -10264,19 +9935,19 @@ var $author$project$Calendar$intToWeekday = function (_int) {
 var $author$project$Calendar$weekdayToString = function (weekday) {
 	switch (weekday.$) {
 		case 'Mon':
-			return 'Ma';
+			return 'Mon';
 		case 'Tue':
-			return 'Ti';
+			return 'Tue';
 		case 'Wed':
-			return 'Ke';
+			return 'Wed';
 		case 'Thu':
-			return 'To';
+			return 'Thu';
 		case 'Fri':
-			return 'Pe';
+			return 'Fri';
 		case 'Sat':
-			return 'La';
+			return 'Sat';
 		default:
-			return 'Su';
+			return 'Sun';
 	}
 };
 var $author$project$Calendar$weekdayHeader = function (weekdayInt) {
@@ -10361,7 +10032,7 @@ var $author$project$Calendar$view = function (model) {
 								A2(
 									$elm$core$List$map,
 									$author$project$Calendar$weekdayHeader,
-									A2($elm$core$List$range, 1, 7)))
+									A2($elm$core$List$range, 0, 6)))
 							]),
 							A2($elm$core$List$map, $author$project$Calendar$viewWeek, weeks)
 						])))
@@ -12016,14 +11687,6 @@ var $author$project$Main$view = function (model) {
 												_List_Nil,
 												_List_fromArray(
 													[
-														A2(
-														$elm$html$Html$h1,
-														_List_Nil,
-														_List_fromArray(
-															[
-																$elm$html$Html$text(
-																$author$project$I18n$get('public_calendar'))
-															])),
 														function () {
 														var _v3 = model.auth;
 														if (_v3.$ === 'Just') {
@@ -12247,7 +11910,7 @@ var $author$project$Main$view = function (model) {
 							]))
 					]))
 			]),
-		title: $author$project$I18n$get('event_calendar')
+		title: 'Event Calendar'
 	};
 };
 var $author$project$Main$main = $elm$browser$Browser$application(

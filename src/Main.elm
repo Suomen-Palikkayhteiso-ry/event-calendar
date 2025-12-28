@@ -14,6 +14,7 @@ import Html exposing (Html, a, button, div, h1, header, img, main_, nav, p, stro
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Http
+import I18n
 import Input
 import Json.Decode as Decode
 import KMLUtils
@@ -266,6 +267,24 @@ update msg model =
                         _ ->
                             model.calendar
 
+                updatedMap =
+                    case eventsMsg of
+                        Events.EventsFetched (Ok events) ->
+                            Tuple.first (Map.update (Map.SetEvents events) model.map)
+
+                        Events.EventCreated (Ok event) ->
+                            Tuple.first (Map.update (Map.SetEvents (event :: model.events.events)) model.map)
+
+                        Events.EventUpdated (Ok event) ->
+                            let
+                                updatedEventsList =
+                                    List.map (\e -> if e.id == event.id then event else e) model.events.events
+                            in
+                            Tuple.first (Map.update (Map.SetEvents updatedEventsList) model.map)
+
+                        _ ->
+                            model.map
+
                 newLoading =
                     case eventsMsg of
                         Events.EventsFetched _ ->
@@ -302,7 +321,7 @@ update msg model =
                         _ ->
                             Cmd.none
             in
-            ( { model | events = updatedEvents, calendar = updatedCalendar, loading = newLoading, error = newError, eventForm = updatedEventForm }
+            ( { model | events = updatedEvents, calendar = updatedCalendar, map = updatedMap, loading = newLoading, error = newError, eventForm = updatedEventForm }
             , Cmd.batch [ Cmd.map EventsMsg eventsCmd, redirectCmd ]
             )
 
@@ -499,7 +518,7 @@ subscriptions _ =
 
 view : Model -> Browser.Document Msg
 view model =
-    { title = "Event Calendar"
+    { title = I18n.get "event_calendar"
     , body =
         [ div []
             [ header []
@@ -610,7 +629,8 @@ view model =
                     case model.route of
                         Home ->
                             div []
-                                [ case model.auth of
+                                [ h1 [] [ text (I18n.get "public_calendar") ]
+                                , case model.auth of
                                     Just _ ->
                                         div [ class "mb-4 flex items-end gap-4" ]
                                             [ div [ class "flex-1" ]

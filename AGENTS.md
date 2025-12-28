@@ -16,9 +16,9 @@ This file defines how LLM coding agents should understand, navigate, and safely 
 
 ## Quick Reference
 
-- **Project**: Event calendar application (Mid-migration: SvelteKit to Elm)
-- **Frontend**: Elm (Active Development), SvelteKit (Legacy Reference)
-- **Backend**: PocketBase
+- **Project**: Event calendar application (Elm SPA)
+- **Frontend**: Elm (Active Development)
+- **Backend**: PocketBase (External)
 - **Styling**: Tailwind CSS v4
 - **Package Manager**: pnpm (Node/Build), elm (Application)
 - **Environment**: devenv (Nix)
@@ -38,9 +38,12 @@ This file defines how LLM coding agents should understand, navigate, and safely 
   security.md              # Security considerations
 /tests/                    # Behavioral truth
   /features/               # Playwright BDD scenarios
+  /*Tests.elm              # Elm Unit Tests
 /src/                      # Implementation
   Main.elm                 # Core Elm application
-  /routes/                 # Legacy SvelteKit (reference only)
+  index.js                 # JS Entry point & Ports
+  elm.js                   # Compiled Elm application (artifact)
+/scripts/                  # Node.js Build/Utility scripts
 ```
 
 ## Agent Work Loop
@@ -85,13 +88,14 @@ Stop and escalate when:
 ### Elm (Primary)
 - `devenv script elm-build` (or `make elm-build`) - Compile Elm application
 - `devenv script elm-check` (or `make elm-check`) - Format, Review, and Test Elm code
-- `elm reactor` (or `make watch`) - Start Elm development server (for isolated Elm dev)
+- `make watch` - Start Elm development server with hot-reload (elm-live)
 
-### Legacy / Hybrid
+### Build / Test
 - `pnpm install` - Install Node dependencies
-- `pnpm dev` - Start Vite/SvelteKit development server
-- `pnpm build` - Build hybrid application
+- `pnpm dev` - Start Vite development server
+- `pnpm build` - Build application for production
 - `pnpm test:bdd` - Run BDD tests (Playwright)
+- `pnpm test:e2e` - Run End-to-End tests
 
 ## Code Style
 
@@ -110,7 +114,6 @@ Stop and escalate when:
 - **BDD/E2E**: Use Playwright for user-visible workflows and cross-module behavior.
 - **Test Naming**: Name tests to reflect behavior, not implementation.
 - **Test Headers**: Reference US (User Story) and ADR IDs in test comments.
-- **Legacy Tests**: Svelte component tests are deprecated.
 
 ### BDD Guidelines
 
@@ -185,12 +188,11 @@ Refs: ADR-003
 
 ## Migration Context
 
-This project is in the middle of a migration from SvelteKit to Elm.
+This project has been migrated from SvelteKit to Elm.
 
-- **Source of Truth**: `refactor` branch contains reference SvelteKit implementation.
-- **Current State**: `src/Main.elm` is the core application. Svelte files in `src/routes` are legacy/reference.
-- **Goal**: Replicate all functionality in `Main.elm`.
-- **Do Not**: Modify or rely on Svelte files for new features.
+- **Source of Truth**: `src/Main.elm` is the core application.
+- **Legacy Reference**: The `refactor` branch contains the previous SvelteKit implementation if reference is needed.
+- **Do Not**: Introduce Svelte components or SvelteKit routing logic.
 
 ## Artifact Roles & Cross-Linking
 

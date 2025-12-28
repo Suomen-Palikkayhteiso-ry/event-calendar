@@ -489,7 +489,7 @@ view model =
             ]
         , div [ class "calendar-grid" ]
             (List.concat
-                [ [ div [ class "calendar-week-header" ] (List.map weekdayHeader (List.range 0 6)) ]
+                [ [ div [ class "calendar-week-header" ] (List.map weekdayHeader (List.range 1 7)) ]
                 , List.map viewWeek weeks
                 ]
             )
@@ -512,40 +512,40 @@ monthToString : Time.Month -> String
 monthToString month =
     case month of
         Time.Jan ->
-            "January"
+            "Tammikuu"
 
         Time.Feb ->
-            "February"
+            "Helmikuu"
 
         Time.Mar ->
-            "March"
+            "Maaliskuu"
 
         Time.Apr ->
-            "April"
+            "Huhtikuu"
 
         Time.May ->
-            "May"
+            "Toukokuu"
 
         Time.Jun ->
-            "June"
+            "Kesäkuu"
 
         Time.Jul ->
-            "July"
+            "Heinäkuu"
 
         Time.Aug ->
-            "August"
+            "Elokuu"
 
         Time.Sep ->
-            "September"
+            "Syyskuu"
 
         Time.Oct ->
-            "October"
+            "Lokakuu"
 
         Time.Nov ->
-            "November"
+            "Marraskuu"
 
         Time.Dec ->
-            "December"
+            "Joulukuu"
 
 
 weekdayHeader : Int -> Html.Html Msg
@@ -560,9 +560,6 @@ weekdayHeader weekdayInt =
 intToWeekday : Int -> Time.Weekday
 intToWeekday int =
     case int of
-        0 ->
-            Time.Sun
-
         1 ->
             Time.Mon
 
@@ -581,6 +578,9 @@ intToWeekday int =
         6 ->
             Time.Sat
 
+        7 ->
+            Time.Sun
+
         _ ->
             Time.Mon
 
@@ -589,25 +589,25 @@ weekdayToString : Time.Weekday -> String
 weekdayToString weekday =
     case weekday of
         Time.Mon ->
-            "Mon"
+            "Ma"
 
         Time.Tue ->
-            "Tue"
+            "Ti"
 
         Time.Wed ->
-            "Wed"
+            "Ke"
 
         Time.Thu ->
-            "Thu"
+            "To"
 
         Time.Fri ->
-            "Fri"
+            "Pe"
 
         Time.Sat ->
-            "Sat"
+            "La"
 
         Time.Sun ->
-            "Sun"
+            "Su"
 
 
 viewWeek : List CalendarDay -> Html.Html Msg
