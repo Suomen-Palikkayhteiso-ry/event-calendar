@@ -46,6 +46,7 @@ in
       scientific
       uuid
       base64-bytestring
+      feed
     ]))
   ];
 

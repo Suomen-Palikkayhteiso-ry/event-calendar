@@ -1,4 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE LambdaCase #-}
 
 module GenerateIcsGeojson where
 
@@ -6,6 +7,25 @@ import GenerateUtils
 import qualified Data.Text as T
 import qualified Data.Text.Lazy as TL
 import qualified Data.ByteString.Lazy as BSL
+import Data.Aeson
+import Data.Time
+
+data Feature = Feature
+  { type_ :: T.Text
+  , geometry :: Maybe Value
+  , properties :: Value
+  } deriving (Generic)
+
+instance ToJSON Feature where
+  toJSON = genericToJSON defaultOptions { fieldLabelModifier = \case "type_" -> "type"; x -> x }
+
+data FeatureCollection = FeatureCollection
+  { type_ :: T.Text
+  , features :: [Feature]
+  } deriving (Generic)
+
+instance ToJSON FeatureCollection where
+  toJSON = genericToJSON defaultOptions { fieldLabelModifier = \case "type_" -> "type"; x -> x }
 
 generateIcsCalendar :: [Event] -> IO ()
 generateIcsCalendar events = do
@@ -20,15 +40,10 @@ generateIcsCalendar events = do
 
 generateGeojson :: [Event] -> IO ()
 generateGeojson events = do
-  let json = TL.concat [
-        "{\n",
-        "\"type\": \"FeatureCollection\",\n",
-        "\"features\": [\n",
-        TL.intercalate ",\n" $ map eventToFeature events,
-        "\n]\n",
-        "}"
-        ]
-  writeStaticFile "kalenteri.geo.json" (BSL.fromStrict $ encodeUtf8 $ TL.toStrict json)
+  let features = map eventToFeature events
+  let collection = FeatureCollection { type_ = "FeatureCollection", features = features }
+  let json = encode collection
+  writeStaticFile "kalenteri.geo.json" json
 
 eventToVEvent :: Event -> TL.Text
 eventToVEvent event = TL.concat [
@@ -42,16 +57,14 @@ eventToVEvent event = TL.concat [
   "END:VEVENT\n"
   ]
 
-eventToFeature :: Event -> TL.Text
-eventToFeature event = TL.concat [
-  "{\n",
-  "\"type\": \"Feature\",\n",
-  "\"geometry\": null,\n",
-  "\"properties\": {\n",
-  "\"title\": \"", TL.fromStrict $ title event, "\",\n",
-  "\"description\": ", maybe "null" (\d -> "\"" <> TL.fromStrict d <> "\"") (description event), ",\n",
-  "\"start_date\": \"", TL.fromStrict $ startDate event, "\",\n",
-  "\"end_date\": ", maybe "null" (\e -> "\"" <> TL.fromStrict e <> "\"") (endDate event), "\n",
-  "}\n",
-  "}"
-  ]
+eventToFeature :: Event -> Feature
+eventToFeature event = Feature
+  { type_ = "Feature"
+  , geometry = Nothing
+  , properties = object
+      [ "title" .= title event
+      , "description" .= description event
+      , "start_date" .= startDate event
+      , "end_date" .= endDate event
+      ]
+  }
