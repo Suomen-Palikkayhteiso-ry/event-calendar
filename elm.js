@@ -5595,14 +5595,10 @@ var $author$project$Main$Model = function (key) {
 						return function (eventForm) {
 							return function (eventList) {
 								return function (auth) {
-									return function (loginEmail) {
-										return function (loginPassword) {
-											return function (error) {
-												return function (loading) {
-													return function (selectedDate) {
-														return {auth: auth, calendar: calendar, error: error, eventForm: eventForm, eventList: eventList, events: events, key: key, loading: loading, loginEmail: loginEmail, loginPassword: loginPassword, map: map, route: route, selectedDate: selectedDate, url: url};
-													};
-												};
+									return function (error) {
+										return function (loading) {
+											return function (selectedDate) {
+												return {auth: auth, calendar: calendar, error: error, eventForm: eventForm, eventList: eventList, events: events, key: key, loading: loading, map: map, route: route, selectedDate: selectedDate, url: url};
 											};
 										};
 									};
@@ -6502,7 +6498,7 @@ var $author$project$PocketBase$authHeader = function (token) {
 		return _List_Nil;
 	}
 };
-var $author$project$PocketBase$baseUrl = '/api';
+var $author$project$PocketBase$baseUrl = 'https://data.suomenpalikkayhteiso.fi/api';
 var $author$project$Types$Event = function (id) {
 	return function (title) {
 		return function (description) {
@@ -7299,7 +7295,7 @@ var $author$project$Main$init = F3(
 		var eventsCmd = _v0.b;
 		return _Utils_Tuple2(
 			$author$project$Main$Model(key)(url)(
-				$author$project$Main$parseUrl(url))($author$project$Calendar$init)(eventsModel)($author$project$Map$init)($author$project$EventForm$init)($author$project$EventList$init)($elm$core$Maybe$Nothing)('')('')($elm$core$Maybe$Nothing)(true)(''),
+				$author$project$Main$parseUrl(url))($author$project$Calendar$init)(eventsModel)($author$project$Map$init)($author$project$EventForm$init)($author$project$EventList$init)($elm$core$Maybe$Nothing)($elm$core$Maybe$Nothing)(true)(''),
 			A2($elm$core$Platform$Cmd$map, $author$project$Main$EventsMsg, eventsCmd));
 	});
 var $author$project$Main$AuthRemoved = {$: 'AuthRemoved'};
@@ -7413,9 +7409,6 @@ var $author$project$Main$subscriptions = function (_v0) {
 var $author$project$Calendar$AddEvent = function (a) {
 	return {$: 'AddEvent', a: a};
 };
-var $author$project$Main$AuthCallbackResult = function (a) {
-	return {$: 'AuthCallbackResult', a: a};
-};
 var $author$project$Events$CreateEvent = F2(
 	function (a, b) {
 		return {$: 'CreateEvent', a: a, b: b};
@@ -7429,9 +7422,6 @@ var $author$project$Main$EventListMsg = function (a) {
 };
 var $author$project$EventForm$LoadEvent = function (a) {
 	return {$: 'LoadEvent', a: a};
-};
-var $author$project$Main$LoginResult = function (a) {
-	return {$: 'LoginResult', a: a};
 };
 var $author$project$Main$LogoutResult = function (a) {
 	return {$: 'LogoutResult', a: a};
@@ -7470,58 +7460,30 @@ var $elm$core$Maybe$andThen = F2(
 			return $elm$core$Maybe$Nothing;
 		}
 	});
-var $elm$json$Json$Decode$map4 = _Json_map4;
-var $author$project$PocketBase$userDecoder = A5(
-	$elm$json$Json$Decode$map4,
-	$author$project$Types$User,
-	A2($elm$json$Json$Decode$field, 'id', $elm$json$Json$Decode$string),
-	A2($elm$json$Json$Decode$field, 'email', $elm$json$Json$Decode$string),
-	A2(
-		$elm$json$Json$Decode$field,
-		'name',
-		$elm$json$Json$Decode$nullable($elm$json$Json$Decode$string)),
-	A2(
-		$elm$json$Json$Decode$field,
-		'avatar',
-		$elm$json$Json$Decode$nullable($elm$json$Json$Decode$string)));
-var $author$project$PocketBase$authResponseDecoder = A3(
-	$elm$json$Json$Decode$map2,
-	$author$project$Types$Auth,
-	A2(
-		$elm$json$Json$Decode$field,
-		'record',
-		$elm$json$Json$Decode$nullable($author$project$PocketBase$userDecoder)),
-	A2(
-		$elm$json$Json$Decode$field,
-		'token',
-		$elm$json$Json$Decode$nullable($elm$json$Json$Decode$string)));
-var $author$project$PocketBase$oauth2Encoder = F2(
-	function (code, state) {
+var $elm$core$Maybe$destruct = F3(
+	function (_default, func, maybe) {
+		if (maybe.$ === 'Just') {
+			var a = maybe.a;
+			return func(a);
+		} else {
+			return _default;
+		}
+	});
+var $author$project$Ports$handleOAuth2Callback = _Platform_outgoingPort(
+	'handleOAuth2Callback',
+	function ($) {
 		return $elm$json$Json$Encode$object(
 			_List_fromArray(
 				[
 					_Utils_Tuple2(
 					'code',
-					$elm$json$Json$Encode$string(code)),
+					$elm$json$Json$Encode$string($.code)),
 					_Utils_Tuple2(
 					'state',
-					$elm$json$Json$Encode$string(
-						A2($elm$core$Maybe$withDefault, '', state)))
+					function ($) {
+						return A3($elm$core$Maybe$destruct, $elm$json$Json$Encode$null, $elm$json$Json$Encode$string, $);
+					}($.state))
 				]));
-	});
-var $elm$http$Http$post = function (r) {
-	return $elm$http$Http$request(
-		{body: r.body, expect: r.expect, headers: _List_Nil, method: 'POST', timeout: $elm$core$Maybe$Nothing, tracker: $elm$core$Maybe$Nothing, url: r.url});
-};
-var $author$project$PocketBase$authWithOAuth2Code = F3(
-	function (code, state, toMsg) {
-		return $elm$http$Http$post(
-			{
-				body: $elm$http$Http$jsonBody(
-					A2($author$project$PocketBase$oauth2Encoder, code, state)),
-				expect: A2($elm$http$Http$expectJson, toMsg, $author$project$PocketBase$authResponseDecoder),
-				url: $author$project$PocketBase$baseUrl + '/oauth2-redirect'
-			});
 	});
 var $elm$core$List$head = function (list) {
 	if (list.b) {
@@ -7549,29 +7511,11 @@ var $author$project$Main$httpErrorToString = function (error) {
 			return 'Bad body: ' + body;
 	}
 };
-var $elm$browser$Browser$Navigation$load = _Browser_load;
-var $author$project$PocketBase$loginEncoder = function (credentials) {
-	return $elm$json$Json$Encode$object(
-		_List_fromArray(
-			[
-				_Utils_Tuple2(
-				'identity',
-				$elm$json$Json$Encode$string(credentials.email)),
-				_Utils_Tuple2(
-				'password',
-				$elm$json$Json$Encode$string(credentials.password))
-			]));
+var $author$project$Ports$initiateOAuth2Login = _Platform_outgoingPort('initiateOAuth2Login', $elm$json$Json$Encode$string);
+var $author$project$PocketBase$initiateOAuth2Login = function (provider) {
+	return $author$project$Ports$initiateOAuth2Login(provider);
 };
-var $author$project$PocketBase$login = F2(
-	function (credentials, toMsg) {
-		return $elm$http$Http$post(
-			{
-				body: $elm$http$Http$jsonBody(
-					$author$project$PocketBase$loginEncoder(credentials)),
-				expect: A2($elm$http$Http$expectJson, toMsg, $author$project$PocketBase$authResponseDecoder),
-				url: $author$project$PocketBase$baseUrl + '/collections/users/auth-with-password'
-			});
-	});
+var $elm$browser$Browser$Navigation$load = _Browser_load;
 var $author$project$PocketBase$logout = F2(
 	function (token, toMsg) {
 		return $elm$http$Http$request(
@@ -8055,6 +7999,7 @@ var $author$project$KMLUtils$RawKMLData = F4(
 	function (name, description, lat, lon) {
 		return {description: description, lat: lat, lon: lon, name: name};
 	});
+var $elm$json$Json$Decode$map4 = _Json_map4;
 var $author$project$KMLUtils$rawKMLDecoder = A5(
 	$elm$json$Json$Decode$map4,
 	$author$project$KMLUtils$RawKMLData,
@@ -8066,15 +8011,6 @@ var $author$project$Ports$removeAuth = _Platform_outgoingPort(
 	'removeAuth',
 	function ($) {
 		return $elm$json$Json$Encode$null;
-	});
-var $elm$core$Maybe$destruct = F3(
-	function (_default, func, maybe) {
-		if (maybe.$ === 'Just') {
-			var a = maybe.a;
-			return func(a);
-		} else {
-			return _default;
-		}
 	});
 var $author$project$Ports$storeAuth = _Platform_outgoingPort(
 	'storeAuth',
@@ -8976,7 +8912,8 @@ var $author$project$Main$update = F2(
 							var state = _v6.b;
 							return _Utils_Tuple2(
 								newModel,
-								A3($author$project$PocketBase$authWithOAuth2Code, code, state, $author$project$Main$AuthCallbackResult));
+								$author$project$Ports$handleOAuth2Callback(
+									{code: code, state: state}));
 						} else {
 							return _Utils_Tuple2(newModel, $elm$core$Platform$Cmd$none);
 						}
@@ -9342,12 +9279,9 @@ var $author$project$Main$update = F2(
 						{map: updatedMap}),
 					$elm$core$Platform$Cmd$none);
 			case 'Login':
-				var credentials = {email: model.loginEmail, password: model.loginPassword};
 				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{error: $elm$core$Maybe$Nothing, loading: true}),
-					A2($author$project$PocketBase$login, credentials, $author$project$Main$LoginResult));
+					model,
+					$author$project$PocketBase$initiateOAuth2Login('oidc'));
 			case 'Logout':
 				var _v22 = model.auth;
 				if (_v22.$ === 'Just') {
@@ -9409,45 +9343,6 @@ var $author$project$Main$update = F2(
 							}),
 						$elm$core$Platform$Cmd$none);
 				}
-			case 'AuthCallbackResult':
-				var result = msg.a;
-				if (result.$ === 'Ok') {
-					var auth = result.a;
-					return _Utils_Tuple2(
-						_Utils_update(
-							model,
-							{
-								auth: $elm$core$Maybe$Just(auth),
-								error: $elm$core$Maybe$Nothing,
-								loading: false
-							}),
-						$author$project$Ports$storeAuth(auth));
-				} else {
-					var err = result.a;
-					return _Utils_Tuple2(
-						_Utils_update(
-							model,
-							{
-								error: $elm$core$Maybe$Just(
-									$author$project$Main$httpErrorToString(err)),
-								loading: false
-							}),
-						$elm$core$Platform$Cmd$none);
-				}
-			case 'UpdateLoginEmail':
-				var email = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{loginEmail: email}),
-					$elm$core$Platform$Cmd$none);
-			case 'UpdateLoginPassword':
-				var password = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{loginPassword: password}),
-					$elm$core$Platform$Cmd$none);
 			case 'SetDate':
 				var dateStr = msg.a;
 				var posix = $author$project$DateUtils$parseUTCDate(dateStr + 'T00:00:00Z');
@@ -9505,12 +9400,6 @@ var $author$project$Button$Primary = {$: 'Primary'};
 var $author$project$Button$Secondary = {$: 'Secondary'};
 var $author$project$Main$SetDate = function (a) {
 	return {$: 'SetDate', a: a};
-};
-var $author$project$Main$UpdateLoginEmail = function (a) {
-	return {$: 'UpdateLoginEmail', a: a};
-};
-var $author$project$Main$UpdateLoginPassword = function (a) {
-	return {$: 'UpdateLoginPassword', a: a};
 };
 var $elm$html$Html$a = _VirtualDom_node('a');
 var $elm$html$Html$button = _VirtualDom_node('button');
@@ -11905,64 +11794,12 @@ var $author$project$Main$view = function (model) {
 												_List_Nil,
 												_List_fromArray(
 													[
-														$author$project$Input$view(
-														{
-															accept: $elm$core$Maybe$Nothing,
-															ariaDescribedBy: $elm$core$Maybe$Nothing,
-															ariaInvalid: false,
-															ariaLabel: $elm$core$Maybe$Nothing,
-															ariaRequired: false,
-															autofocus: false,
-															_class: $elm$core$Maybe$Nothing,
-															disabled: false,
-															id: $elm$core$Maybe$Nothing,
-															max: $elm$core$Maybe$Nothing,
-															min: $elm$core$Maybe$Nothing,
-															name: $elm$core$Maybe$Nothing,
-															onBlur: $elm$core$Maybe$Nothing,
-															onChange: $elm$core$Maybe$Nothing,
-															onFocus: $elm$core$Maybe$Nothing,
-															onInput: $elm$core$Maybe$Just($author$project$Main$UpdateLoginEmail),
-															pattern: $elm$core$Maybe$Nothing,
-															placeholder: $elm$core$Maybe$Just('Email'),
-															readonly: false,
-															required: false,
-															step: $elm$core$Maybe$Nothing,
-															type_: 'email',
-															value: model.loginEmail
-														}),
-														$author$project$Input$view(
-														{
-															accept: $elm$core$Maybe$Nothing,
-															ariaDescribedBy: $elm$core$Maybe$Nothing,
-															ariaInvalid: false,
-															ariaLabel: $elm$core$Maybe$Nothing,
-															ariaRequired: false,
-															autofocus: false,
-															_class: $elm$core$Maybe$Nothing,
-															disabled: false,
-															id: $elm$core$Maybe$Nothing,
-															max: $elm$core$Maybe$Nothing,
-															min: $elm$core$Maybe$Nothing,
-															name: $elm$core$Maybe$Nothing,
-															onBlur: $elm$core$Maybe$Nothing,
-															onChange: $elm$core$Maybe$Nothing,
-															onFocus: $elm$core$Maybe$Nothing,
-															onInput: $elm$core$Maybe$Just($author$project$Main$UpdateLoginPassword),
-															pattern: $elm$core$Maybe$Nothing,
-															placeholder: $elm$core$Maybe$Just('Password'),
-															readonly: false,
-															required: false,
-															step: $elm$core$Maybe$Nothing,
-															type_: 'password',
-															value: model.loginPassword
-														}),
 														$author$project$Button$view(
 														{
 															ariaLabel: $elm$core$Maybe$Nothing,
 															children: _List_fromArray(
 																[
-																	$elm$html$Html$text('Login')
+																	$elm$html$Html$text('Login with OIDC')
 																]),
 															disabled: false,
 															onClick: $elm$core$Maybe$Just($author$project$Main$Login),

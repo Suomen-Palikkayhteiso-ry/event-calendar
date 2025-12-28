@@ -6,11 +6,5 @@ export default defineConfig({
 	plugins: [tailwindcss(), elm()],
 	base: '/',
 	server: {
-		proxy: {
-			'/api': {
-				target: 'https://data.suomenpalikkayhteiso.fi',
-				changeOrigin: true
-			}
-		}
 	}
 });

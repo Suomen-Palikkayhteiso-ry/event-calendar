@@ -12,7 +12,7 @@ if (window.Elm && window.Elm.Main) {
     });
 
     // Initialize PocketBase client
-    const pb = new PocketBase('/api');
+    const pb = new PocketBase('https://data.suomenpalikkayhteiso.fi');
 
     // Auth handling
     const STORAGE_KEY = 'pocketbase_auth';

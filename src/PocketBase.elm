@@ -13,7 +13,7 @@ import Types exposing (Auth, Event, User)
 
 baseUrl : String
 baseUrl =
-    "/api"
+    "https://data.suomenpalikkayhteiso.fi/api"
 
 
 
