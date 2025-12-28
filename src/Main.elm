@@ -193,6 +193,7 @@ type Msg
     | RequestDeleteEvent String
     | GoToCreateEvent
     | KMLParsed Decode.Value
+    | NoOp
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -466,6 +467,9 @@ update msg model =
         GoToCreateEvent ->
             ( model, Nav.pushUrl model.key "/events/create" )
 
+        NoOp ->
+            ( model, Cmd.none )
+
 
 
 -- SUBSCRIPTIONS
@@ -474,7 +478,15 @@ update msg model =
 subscriptions : Model -> Sub Msg
 subscriptions _ =
     Sub.batch
-        [ Ports.authStored AuthStored
+        [ Ports.authStored
+            (\value ->
+                case Decode.decodeValue Types.authDecoder value of
+                    Ok auth ->
+                        AuthStored auth
+
+                    Err _ ->
+                        NoOp
+            )
         , Ports.authRemoved (always AuthRemoved)
         , Ports.mapMarkerMoved MapMarkerMoved
         , Ports.kmlContentParsed KMLParsed

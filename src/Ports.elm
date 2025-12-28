@@ -27,7 +27,7 @@ port parseKMLContent : String -> Cmd msg
 -- Incoming ports
 
 
-port authStored : (Auth -> msg) -> Sub msg
+port authStored : (Encode.Value -> msg) -> Sub msg
 
 
 port authRemoved : (() -> msg) -> Sub msg
