@@ -9395,12 +9395,12 @@ var $author$project$Main$EventFormMsg = function (a) {
 var $author$project$Main$GoToCreateEvent = {$: 'GoToCreateEvent'};
 var $author$project$Main$Login = {$: 'Login'};
 var $author$project$Main$Logout = {$: 'Logout'};
-var $author$project$Button$Md = {$: 'Md'};
 var $author$project$Button$Primary = {$: 'Primary'};
 var $author$project$Button$Secondary = {$: 'Secondary'};
 var $author$project$Main$SetDate = function (a) {
 	return {$: 'SetDate', a: a};
 };
+var $author$project$Button$Sm = {$: 'Sm'};
 var $elm$html$Html$a = _VirtualDom_node('a');
 var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$html$Html$Attributes$stringProperty = F2(
@@ -9655,6 +9655,7 @@ var $elm$html$Html$Attributes$href = function (url) {
 		'href',
 		_VirtualDom_noJavaScriptUri(url));
 };
+var $elm$html$Html$label = _VirtualDom_node('label');
 var $elm$html$Html$main_ = _VirtualDom_node('main');
 var $elm$virtual_dom$VirtualDom$map = _VirtualDom_map;
 var $elm$html$Html$map = $elm$virtual_dom$VirtualDom$map;
@@ -9677,8 +9678,7 @@ var $elm$html$Html$Events$onClick = function (msg) {
 		$elm$json$Json$Decode$succeed(msg));
 };
 var $elm$html$Html$p = _VirtualDom_node('p');
-var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
-var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
+var $elm$html$Html$span = _VirtualDom_node('span');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$html$Html$Attributes$title = $elm$html$Html$Attributes$stringProperty('title');
@@ -10559,7 +10559,6 @@ var $elm$html$Html$Attributes$checked = $elm$html$Html$Attributes$boolProperty('
 var $elm$html$Html$Attributes$for = $elm$html$Html$Attributes$stringProperty('htmlFor');
 var $elm$html$Html$Attributes$id = $elm$html$Html$Attributes$stringProperty('id');
 var $elm$html$Html$input = _VirtualDom_node('input');
-var $elm$html$Html$label = _VirtualDom_node('label');
 var $elm$html$Html$li = _VirtualDom_node('li');
 var $elm$html$Html$Attributes$name = $elm$html$Html$Attributes$stringProperty('name');
 var $elm$json$Json$Decode$at = F2(
@@ -10991,7 +10990,6 @@ var $elm$html$Html$tr = _VirtualDom_node('tr');
 var $author$project$EventList$DeleteEvent = function (a) {
 	return {$: 'DeleteEvent', a: a};
 };
-var $elm$html$Html$span = _VirtualDom_node('span');
 var $author$project$EventList$stateToString = function (state) {
 	switch (state.$) {
 		case 'Draft':
@@ -11677,6 +11675,8 @@ var $author$project$Input$view = function (config) {
 				])));
 	return A2($elm$html$Html$input, attributes, _List_Nil);
 };
+var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
+var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
 var $author$project$Map$view = function (model) {
 	return A2(
 		$elm$html$Html$div,
@@ -11693,123 +11693,149 @@ var $author$project$Main$view = function (model) {
 			[
 				A2(
 				$elm$html$Html$div,
-				_List_Nil,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('min-h-screen flex flex-col')
+					]),
 				_List_fromArray(
 					[
 						A2(
 						$elm$html$Html$header,
-						_List_Nil,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50')
+							]),
 						_List_fromArray(
 							[
 								A2(
-								$elm$html$Html$nav,
-								_List_Nil,
-								_List_fromArray(
-									[
-										A2(
-										$elm$html$Html$a,
-										_List_fromArray(
-											[
-												$elm$html$Html$Attributes$href('/')
-											]),
-										_List_fromArray(
-											[
-												$elm$html$Html$text('Home')
-											])),
-										$elm$html$Html$text(' | '),
-										A2(
-										$elm$html$Html$a,
-										_List_fromArray(
-											[
-												$elm$html$Html$Attributes$href('/map')
-											]),
-										_List_fromArray(
-											[
-												$elm$html$Html$text('Map')
-											])),
-										$elm$html$Html$text(' | '),
-										(!_Utils_eq(model.auth, $elm$core$Maybe$Nothing)) ? A2(
-										$elm$html$Html$a,
-										_List_fromArray(
-											[
-												$elm$html$Html$Attributes$href('/events')
-											]),
-										_List_fromArray(
-											[
-												$elm$html$Html$text('Events')
-											])) : $elm$html$Html$text(''),
-										$elm$html$Html$text(' | '),
-										A2(
-										$elm$html$Html$a,
-										_List_fromArray(
-											[
-												$elm$html$Html$Attributes$href('/callback')
-											]),
-										_List_fromArray(
-											[
-												$elm$html$Html$text('Callback')
-											]))
-									])),
-								A2(
 								$elm$html$Html$div,
-								_List_Nil,
 								_List_fromArray(
 									[
-										function () {
-										var _v0 = model.auth;
-										if (_v0.$ === 'Just') {
-											var auth = _v0.a;
-											return A2(
-												$elm$html$Html$div,
-												_List_Nil,
+										$elm$html$Html$Attributes$class('max-w-7xl mx-auto px-4 sm:px-6 lg:px-8')
+									]),
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$div,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('flex justify-between items-center h-16')
+											]),
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$nav,
 												_List_fromArray(
 													[
-														$elm$html$Html$text(
-														'Logged in as: ' + A2(
-															$elm$core$Maybe$withDefault,
-															'Unknown',
-															A2(
-																$elm$core$Maybe$map,
-																function ($) {
-																	return $.email;
-																},
-																auth.user))),
-														$author$project$Button$view(
-														{
-															ariaLabel: $elm$core$Maybe$Nothing,
-															children: _List_fromArray(
-																[
-																	$elm$html$Html$text('Logout')
-																]),
-															disabled: false,
-															onClick: $elm$core$Maybe$Just($author$project$Main$Logout),
-															size: $author$project$Button$Md,
-															type_: 'button',
-															variant: $author$project$Button$Secondary
-														})
-													]));
-										} else {
-											return A2(
-												$elm$html$Html$div,
-												_List_Nil,
+														$elm$html$Html$Attributes$class('flex space-x-8')
+													]),
 												_List_fromArray(
 													[
-														$author$project$Button$view(
-														{
-															ariaLabel: $elm$core$Maybe$Nothing,
-															children: _List_fromArray(
-																[
-																	$elm$html$Html$text('Login with OIDC')
-																]),
-															disabled: false,
-															onClick: $elm$core$Maybe$Just($author$project$Main$Login),
-															size: $author$project$Button$Md,
-															type_: 'button',
-															variant: $author$project$Button$Primary
-														})
-													]));
-										}
-									}()
+														A2(
+														$elm$html$Html$a,
+														_List_fromArray(
+															[
+																$elm$html$Html$Attributes$href('/'),
+																$elm$html$Html$Attributes$class('text-gray-900 hover:text-blue-600 px-3 py-2 text-sm font-medium')
+															]),
+														_List_fromArray(
+															[
+																$elm$html$Html$text('Home')
+															])),
+														A2(
+														$elm$html$Html$a,
+														_List_fromArray(
+															[
+																$elm$html$Html$Attributes$href('/map'),
+																$elm$html$Html$Attributes$class('text-gray-500 hover:text-blue-600 px-3 py-2 text-sm font-medium')
+															]),
+														_List_fromArray(
+															[
+																$elm$html$Html$text('Map')
+															])),
+														(!_Utils_eq(model.auth, $elm$core$Maybe$Nothing)) ? A2(
+														$elm$html$Html$a,
+														_List_fromArray(
+															[
+																$elm$html$Html$Attributes$href('/events'),
+																$elm$html$Html$Attributes$class('text-gray-500 hover:text-blue-600 px-3 py-2 text-sm font-medium')
+															]),
+														_List_fromArray(
+															[
+																$elm$html$Html$text('Events')
+															])) : $elm$html$Html$text('')
+													])),
+												A2(
+												$elm$html$Html$div,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('flex items-center space-x-4')
+													]),
+												_List_fromArray(
+													[
+														function () {
+														var _v0 = model.auth;
+														if (_v0.$ === 'Just') {
+															var auth = _v0.a;
+															return A2(
+																$elm$html$Html$div,
+																_List_fromArray(
+																	[
+																		$elm$html$Html$Attributes$class('flex items-center space-x-4')
+																	]),
+																_List_fromArray(
+																	[
+																		A2(
+																		$elm$html$Html$span,
+																		_List_fromArray(
+																			[
+																				$elm$html$Html$Attributes$class('text-sm text-gray-700')
+																			]),
+																		_List_fromArray(
+																			[
+																				$elm$html$Html$text(
+																				'Logged in as: ' + A2(
+																					$elm$core$Maybe$withDefault,
+																					'Unknown',
+																					A2(
+																						$elm$core$Maybe$map,
+																						function ($) {
+																							return $.email;
+																						},
+																						auth.user)))
+																			])),
+																		$author$project$Button$view(
+																		{
+																			ariaLabel: $elm$core$Maybe$Nothing,
+																			children: _List_fromArray(
+																				[
+																					$elm$html$Html$text('Logout')
+																				]),
+																			disabled: false,
+																			onClick: $elm$core$Maybe$Just($author$project$Main$Logout),
+																			size: $author$project$Button$Sm,
+																			type_: 'button',
+																			variant: $author$project$Button$Secondary
+																		})
+																	]));
+														} else {
+															return $author$project$Button$view(
+																{
+																	ariaLabel: $elm$core$Maybe$Nothing,
+																	children: _List_fromArray(
+																		[
+																			$elm$html$Html$text('Login with OIDC')
+																		]),
+																	disabled: false,
+																	onClick: $elm$core$Maybe$Just($author$project$Main$Login),
+																	size: $author$project$Button$Sm,
+																	type_: 'button',
+																	variant: $author$project$Button$Primary
+																});
+														}
+													}()
+													]))
+											]))
 									])),
 								function () {
 								var _v1 = model.error;
@@ -11819,11 +11845,38 @@ var $author$project$Main$view = function (model) {
 										$elm$html$Html$div,
 										_List_fromArray(
 											[
-												A2($elm$html$Html$Attributes$style, 'color', 'red')
+												$elm$html$Html$Attributes$class('bg-red-50 border-l-4 border-red-400 p-4 max-w-7xl mx-auto')
 											]),
 										_List_fromArray(
 											[
-												$elm$html$Html$text(err)
+												A2(
+												$elm$html$Html$div,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('flex')
+													]),
+												_List_fromArray(
+													[
+														A2(
+														$elm$html$Html$div,
+														_List_fromArray(
+															[
+																$elm$html$Html$Attributes$class('ml-3')
+															]),
+														_List_fromArray(
+															[
+																A2(
+																$elm$html$Html$p,
+																_List_fromArray(
+																	[
+																		$elm$html$Html$Attributes$class('text-sm text-red-700')
+																	]),
+																_List_fromArray(
+																	[
+																		$elm$html$Html$text(err)
+																	]))
+															]))
+													]))
 											]));
 								} else {
 									return $elm$html$Html$text('');
@@ -11832,43 +11885,55 @@ var $author$project$Main$view = function (model) {
 							])),
 						A2(
 						$elm$html$Html$main_,
-						_List_Nil,
 						_List_fromArray(
 							[
-								function () {
-								if (model.loading) {
-									return A2(
-										$elm$html$Html$div,
-										_List_Nil,
-										_List_fromArray(
-											[
-												$elm$html$Html$text('Loading...')
-											]));
-								} else {
-									var _v2 = model.route;
-									switch (_v2.$) {
-										case 'Home':
+								$elm$html$Html$Attributes$class('flex-1 bg-gray-50')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8')
+									]),
+								_List_fromArray(
+									[
+										function () {
+										if (model.loading) {
 											return A2(
 												$elm$html$Html$div,
-												_List_Nil,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('flex justify-center items-center h-64')
+													]),
 												_List_fromArray(
 													[
 														A2(
-														$elm$html$Html$h1,
-														_List_Nil,
+														$elm$html$Html$div,
 														_List_fromArray(
 															[
-																$elm$html$Html$text(
-																$author$project$I18n$get('public_calendar'))
-															])),
-														function () {
-														var _v3 = model.auth;
-														if (_v3.$ === 'Just') {
-															return A2(
+																$elm$html$Html$Attributes$class('animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600')
+															]),
+														_List_Nil)
+													]));
+										} else {
+											var _v2 = model.route;
+											switch (_v2.$) {
+												case 'Home':
+													return A2(
+														$elm$html$Html$div,
+														_List_fromArray(
+															[
+																$elm$html$Html$Attributes$class('space-y-6')
+															]),
+														_List_fromArray(
+															[
+																A2(
 																$elm$html$Html$div,
 																_List_fromArray(
 																	[
-																		$elm$html$Html$Attributes$class('mb-4 flex items-end gap-4')
+																		$elm$html$Html$Attributes$class('bg-white shadow rounded-lg')
 																	]),
 																_List_fromArray(
 																	[
@@ -11876,211 +11941,461 @@ var $author$project$Main$view = function (model) {
 																		$elm$html$Html$div,
 																		_List_fromArray(
 																			[
-																				$elm$html$Html$Attributes$class('flex-1')
+																				$elm$html$Html$Attributes$class('px-4 py-5 sm:p-6')
 																			]),
 																		_List_fromArray(
 																			[
-																				$author$project$Input$view(
-																				{
-																					accept: $elm$core$Maybe$Nothing,
-																					ariaDescribedBy: $elm$core$Maybe$Nothing,
-																					ariaInvalid: false,
-																					ariaLabel: $elm$core$Maybe$Just('Select Date'),
-																					ariaRequired: false,
-																					autofocus: false,
-																					_class: $elm$core$Maybe$Nothing,
-																					disabled: false,
-																					id: $elm$core$Maybe$Just('calendar-date'),
-																					max: $elm$core$Maybe$Nothing,
-																					min: $elm$core$Maybe$Nothing,
-																					name: $elm$core$Maybe$Nothing,
-																					onBlur: $elm$core$Maybe$Nothing,
-																					onChange: $elm$core$Maybe$Nothing,
-																					onFocus: $elm$core$Maybe$Nothing,
-																					onInput: $elm$core$Maybe$Just($author$project$Main$SetDate),
-																					pattern: $elm$core$Maybe$Nothing,
-																					placeholder: $elm$core$Maybe$Nothing,
-																					readonly: false,
-																					required: false,
-																					step: $elm$core$Maybe$Nothing,
-																					type_: 'date',
-																					value: model.selectedDate
-																				})
-																			])),
-																		A2(
-																		$elm$html$Html$button,
-																		_List_fromArray(
-																			[
-																				$elm$html$Html$Attributes$class('btn-icon'),
-																				$elm$html$Html$Events$onClick($author$project$Main$GoToCreateEvent),
-																				$elm$html$Html$Attributes$title('Add new event')
-																			]),
-																		_List_fromArray(
-																			[
-																				$elm$html$Html$text('+')
+																				A2(
+																				$elm$html$Html$h1,
+																				_List_fromArray(
+																					[
+																						$elm$html$Html$Attributes$class('text-2xl font-bold text-gray-900 mb-4')
+																					]),
+																				_List_fromArray(
+																					[
+																						$elm$html$Html$text(
+																						$author$project$I18n$get('public_calendar'))
+																					])),
+																				function () {
+																				var _v3 = model.auth;
+																				if (_v3.$ === 'Just') {
+																					return A2(
+																						$elm$html$Html$div,
+																						_List_fromArray(
+																							[
+																								$elm$html$Html$Attributes$class('mb-6 flex items-center justify-between')
+																							]),
+																						_List_fromArray(
+																							[
+																								A2(
+																								$elm$html$Html$div,
+																								_List_fromArray(
+																									[
+																										$elm$html$Html$Attributes$class('flex items-center space-x-4')
+																									]),
+																								_List_fromArray(
+																									[
+																										A2(
+																										$elm$html$Html$label,
+																										_List_fromArray(
+																											[
+																												$elm$html$Html$Attributes$class('block text-sm font-medium text-gray-700')
+																											]),
+																										_List_fromArray(
+																											[
+																												$elm$html$Html$text('Select Date:')
+																											])),
+																										$author$project$Input$view(
+																										{
+																											accept: $elm$core$Maybe$Nothing,
+																											ariaDescribedBy: $elm$core$Maybe$Nothing,
+																											ariaInvalid: false,
+																											ariaLabel: $elm$core$Maybe$Just('Select Date'),
+																											ariaRequired: false,
+																											autofocus: false,
+																											_class: $elm$core$Maybe$Nothing,
+																											disabled: false,
+																											id: $elm$core$Maybe$Just('calendar-date'),
+																											max: $elm$core$Maybe$Nothing,
+																											min: $elm$core$Maybe$Nothing,
+																											name: $elm$core$Maybe$Nothing,
+																											onBlur: $elm$core$Maybe$Nothing,
+																											onChange: $elm$core$Maybe$Nothing,
+																											onFocus: $elm$core$Maybe$Nothing,
+																											onInput: $elm$core$Maybe$Just($author$project$Main$SetDate),
+																											pattern: $elm$core$Maybe$Nothing,
+																											placeholder: $elm$core$Maybe$Nothing,
+																											readonly: false,
+																											required: false,
+																											step: $elm$core$Maybe$Nothing,
+																											type_: 'date',
+																											value: model.selectedDate
+																										})
+																									])),
+																								A2(
+																								$elm$html$Html$button,
+																								_List_fromArray(
+																									[
+																										$elm$html$Html$Attributes$class('inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'),
+																										$elm$html$Html$Events$onClick($author$project$Main$GoToCreateEvent),
+																										$elm$html$Html$Attributes$title('Add new event')
+																									]),
+																								_List_fromArray(
+																									[
+																										$elm$html$Html$text('+ Add Event')
+																									]))
+																							]));
+																				} else {
+																					return A2(
+																						$elm$html$Html$div,
+																						_List_fromArray(
+																							[
+																								$elm$html$Html$Attributes$class('mb-6 bg-blue-50 border border-blue-200 rounded-md p-4')
+																							]),
+																						_List_fromArray(
+																							[
+																								A2(
+																								$elm$html$Html$p,
+																								_List_fromArray(
+																									[
+																										$elm$html$Html$Attributes$class('text-sm text-blue-800 mb-4')
+																									]),
+																								_List_fromArray(
+																									[
+																										$elm$html$Html$text('Non-members can send events to '),
+																										A2(
+																										$elm$html$Html$a,
+																										_List_fromArray(
+																											[
+																												$elm$html$Html$Attributes$href('mailto:suomenpalikkayhteisory@outlook.com'),
+																												$elm$html$Html$Attributes$class('text-blue-600 hover:text-blue-800 underline')
+																											]),
+																										_List_fromArray(
+																											[
+																												$elm$html$Html$text('email')
+																											])),
+																										$elm$html$Html$text('.')
+																									])),
+																								A2(
+																								$elm$html$Html$div,
+																								_List_Nil,
+																								_List_fromArray(
+																									[
+																										A2(
+																										$elm$html$Html$label,
+																										_List_fromArray(
+																											[
+																												$elm$html$Html$Attributes$class('block text-sm font-medium text-gray-700 mb-2')
+																											]),
+																										_List_fromArray(
+																											[
+																												$elm$html$Html$text('Select Date:')
+																											])),
+																										$author$project$Input$view(
+																										{
+																											accept: $elm$core$Maybe$Nothing,
+																											ariaDescribedBy: $elm$core$Maybe$Nothing,
+																											ariaInvalid: false,
+																											ariaLabel: $elm$core$Maybe$Just('Select Date'),
+																											ariaRequired: false,
+																											autofocus: false,
+																											_class: $elm$core$Maybe$Nothing,
+																											disabled: false,
+																											id: $elm$core$Maybe$Just('calendar-date'),
+																											max: $elm$core$Maybe$Nothing,
+																											min: $elm$core$Maybe$Nothing,
+																											name: $elm$core$Maybe$Nothing,
+																											onBlur: $elm$core$Maybe$Nothing,
+																											onChange: $elm$core$Maybe$Nothing,
+																											onFocus: $elm$core$Maybe$Nothing,
+																											onInput: $elm$core$Maybe$Just($author$project$Main$SetDate),
+																											pattern: $elm$core$Maybe$Nothing,
+																											placeholder: $elm$core$Maybe$Nothing,
+																											readonly: false,
+																											required: false,
+																											step: $elm$core$Maybe$Nothing,
+																											type_: 'date',
+																											value: model.selectedDate
+																										})
+																									]))
+																							]));
+																				}
+																			}(),
+																				A2(
+																				$elm$html$Html$div,
+																				_List_fromArray(
+																					[
+																						$elm$html$Html$Attributes$class('mt-6')
+																					]),
+																				_List_fromArray(
+																					[
+																						A2(
+																						$elm$html$Html$map,
+																						$author$project$Main$CalendarMsg,
+																						$author$project$Calendar$view(model.calendar))
+																					]))
 																			]))
-																	]));
-														} else {
-															return A2(
+																	]))
+															]));
+												case 'MapRoute':
+													return A2(
+														$elm$html$Html$div,
+														_List_fromArray(
+															[
+																$elm$html$Html$Attributes$class('bg-white shadow rounded-lg')
+															]),
+														_List_fromArray(
+															[
+																A2(
 																$elm$html$Html$div,
 																_List_fromArray(
 																	[
-																		$elm$html$Html$Attributes$class('mb-4')
+																		$elm$html$Html$Attributes$class('px-4 py-5 sm:p-6')
 																	]),
 																_List_fromArray(
 																	[
 																		A2(
-																		$elm$html$Html$p,
-																		_List_Nil,
-																		_List_fromArray(
-																			[
-																				$elm$html$Html$text('Non-members can send events to '),
-																				A2(
-																				$elm$html$Html$a,
-																				_List_fromArray(
-																					[
-																						$elm$html$Html$Attributes$href('mailto:suomenpalikkayhteisory@outlook.com')
-																					]),
-																				_List_fromArray(
-																					[
-																						$elm$html$Html$text('email')
-																					])),
-																				$elm$html$Html$text('.')
-																			])),
-																		$author$project$Input$view(
-																		{
-																			accept: $elm$core$Maybe$Nothing,
-																			ariaDescribedBy: $elm$core$Maybe$Nothing,
-																			ariaInvalid: false,
-																			ariaLabel: $elm$core$Maybe$Just('Select Date'),
-																			ariaRequired: false,
-																			autofocus: false,
-																			_class: $elm$core$Maybe$Nothing,
-																			disabled: false,
-																			id: $elm$core$Maybe$Just('calendar-date'),
-																			max: $elm$core$Maybe$Nothing,
-																			min: $elm$core$Maybe$Nothing,
-																			name: $elm$core$Maybe$Nothing,
-																			onBlur: $elm$core$Maybe$Nothing,
-																			onChange: $elm$core$Maybe$Nothing,
-																			onFocus: $elm$core$Maybe$Nothing,
-																			onInput: $elm$core$Maybe$Just($author$project$Main$SetDate),
-																			pattern: $elm$core$Maybe$Nothing,
-																			placeholder: $elm$core$Maybe$Nothing,
-																			readonly: false,
-																			required: false,
-																			step: $elm$core$Maybe$Nothing,
-																			type_: 'date',
-																			value: model.selectedDate
-																		})
-																	]));
-														}
-													}(),
-														A2(
-														$elm$html$Html$map,
-														$author$project$Main$CalendarMsg,
-														$author$project$Calendar$view(model.calendar))
-													]));
-										case 'MapRoute':
-											return A2(
-												$elm$html$Html$map,
-												$author$project$Main$MapMsg,
-												$author$project$Map$view(model.map));
-										case 'EventsRoute':
-											return A2(
-												$elm$html$Html$map,
-												$author$project$Main$EventListMsg,
-												A2($author$project$EventList$view, model.eventList, model.events.events));
-										case 'EventDetail':
-											var id = _v2.a;
-											var _v4 = $elm$core$List$head(
-												A2(
-													$elm$core$List$filter,
-													function (e) {
-														return _Utils_eq(e.id, id);
-													},
-													model.events.events));
-											if (_v4.$ === 'Just') {
-												var event = _v4.a;
-												return A2(
-													$elm$html$Html$map,
-													$author$project$Main$EventDetailMsg,
-													A2($author$project$EventDetail$view, event, model.auth));
-											} else {
-												return A2(
-													$elm$html$Html$h1,
-													_List_Nil,
-													_List_fromArray(
-														[
-															$elm$html$Html$text('Event not found: ' + id)
-														]));
-											}
-										case 'EditEvent':
-											var id = _v2.a;
-											return A2(
-												$elm$html$Html$map,
-												$author$project$Main$EventFormMsg,
-												$author$project$EventForm$view(model.eventForm));
-										case 'CreateEvent':
-											return A2(
-												$elm$html$Html$map,
-												$author$project$Main$EventFormMsg,
-												$author$project$EventForm$view(model.eventForm));
-										case 'Callback':
-											return A2(
-												$elm$html$Html$div,
-												_List_Nil,
-												_List_fromArray(
-													[
-														A2(
-														$elm$html$Html$h1,
-														_List_Nil,
+																		$elm$html$Html$map,
+																		$author$project$Main$MapMsg,
+																		$author$project$Map$view(model.map))
+																	]))
+															]));
+												case 'EventsRoute':
+													return A2(
+														$elm$html$Html$div,
 														_List_fromArray(
 															[
-																$elm$html$Html$text('Authentication Callback')
-															])),
-														A2(
-														$elm$html$Html$p,
-														_List_Nil,
-														_List_fromArray(
-															[
-																$elm$html$Html$text('Processing authentication...')
-															]))
-													]));
-										default:
-											return A2(
-												$elm$html$Html$div,
-												_List_Nil,
-												_List_fromArray(
-													[
-														A2(
-														$elm$html$Html$h1,
-														_List_Nil,
-														_List_fromArray(
-															[
-																$elm$html$Html$text('404 - Page Not Found')
-															])),
-														A2(
-														$elm$html$Html$p,
-														_List_Nil,
-														_List_fromArray(
-															[
-																$elm$html$Html$text('The page you are looking for does not exist.')
-															])),
-														A2(
-														$elm$html$Html$a,
-														_List_fromArray(
-															[
-																$elm$html$Html$Attributes$href('/')
+																$elm$html$Html$Attributes$class('bg-white shadow rounded-lg')
 															]),
 														_List_fromArray(
 															[
-																$elm$html$Html$text('Go Home')
-															]))
-													]));
-									}
-								}
-							}()
+																A2(
+																$elm$html$Html$div,
+																_List_fromArray(
+																	[
+																		$elm$html$Html$Attributes$class('px-4 py-5 sm:p-6')
+																	]),
+																_List_fromArray(
+																	[
+																		A2(
+																		$elm$html$Html$map,
+																		$author$project$Main$EventListMsg,
+																		A2($author$project$EventList$view, model.eventList, model.events.events))
+																	]))
+															]));
+												case 'EventDetail':
+													var id = _v2.a;
+													var _v4 = $elm$core$List$head(
+														A2(
+															$elm$core$List$filter,
+															function (e) {
+																return _Utils_eq(e.id, id);
+															},
+															model.events.events));
+													if (_v4.$ === 'Just') {
+														var event = _v4.a;
+														return A2(
+															$elm$html$Html$div,
+															_List_fromArray(
+																[
+																	$elm$html$Html$Attributes$class('bg-white shadow rounded-lg')
+																]),
+															_List_fromArray(
+																[
+																	A2(
+																	$elm$html$Html$div,
+																	_List_fromArray(
+																		[
+																			$elm$html$Html$Attributes$class('px-4 py-5 sm:p-6')
+																		]),
+																	_List_fromArray(
+																		[
+																			A2(
+																			$elm$html$Html$map,
+																			$author$project$Main$EventDetailMsg,
+																			A2($author$project$EventDetail$view, event, model.auth))
+																		]))
+																]));
+													} else {
+														return A2(
+															$elm$html$Html$div,
+															_List_fromArray(
+																[
+																	$elm$html$Html$Attributes$class('bg-white shadow rounded-lg')
+																]),
+															_List_fromArray(
+																[
+																	A2(
+																	$elm$html$Html$div,
+																	_List_fromArray(
+																		[
+																			$elm$html$Html$Attributes$class('px-4 py-5 sm:p-6')
+																		]),
+																	_List_fromArray(
+																		[
+																			A2(
+																			$elm$html$Html$h1,
+																			_List_fromArray(
+																				[
+																					$elm$html$Html$Attributes$class('text-2xl font-bold text-gray-900')
+																				]),
+																			_List_fromArray(
+																				[
+																					$elm$html$Html$text('Event not found: ' + id)
+																				])),
+																			A2(
+																			$elm$html$Html$div,
+																			_List_fromArray(
+																				[
+																					$elm$html$Html$Attributes$class('mt-4')
+																				]),
+																			_List_fromArray(
+																				[
+																					A2(
+																					$elm$html$Html$a,
+																					_List_fromArray(
+																						[
+																							$elm$html$Html$Attributes$href('/'),
+																							$elm$html$Html$Attributes$class('text-blue-600 hover:text-blue-800')
+																						]),
+																					_List_fromArray(
+																						[
+																							$elm$html$Html$text('← Go Home')
+																						]))
+																				]))
+																		]))
+																]));
+													}
+												case 'EditEvent':
+													var id = _v2.a;
+													return A2(
+														$elm$html$Html$div,
+														_List_fromArray(
+															[
+																$elm$html$Html$Attributes$class('bg-white shadow rounded-lg')
+															]),
+														_List_fromArray(
+															[
+																A2(
+																$elm$html$Html$div,
+																_List_fromArray(
+																	[
+																		$elm$html$Html$Attributes$class('px-4 py-5 sm:p-6')
+																	]),
+																_List_fromArray(
+																	[
+																		A2(
+																		$elm$html$Html$map,
+																		$author$project$Main$EventFormMsg,
+																		$author$project$EventForm$view(model.eventForm))
+																	]))
+															]));
+												case 'CreateEvent':
+													return A2(
+														$elm$html$Html$div,
+														_List_fromArray(
+															[
+																$elm$html$Html$Attributes$class('bg-white shadow rounded-lg')
+															]),
+														_List_fromArray(
+															[
+																A2(
+																$elm$html$Html$div,
+																_List_fromArray(
+																	[
+																		$elm$html$Html$Attributes$class('px-4 py-5 sm:p-6')
+																	]),
+																_List_fromArray(
+																	[
+																		A2(
+																		$elm$html$Html$map,
+																		$author$project$Main$EventFormMsg,
+																		$author$project$EventForm$view(model.eventForm))
+																	]))
+															]));
+												case 'Callback':
+													return A2(
+														$elm$html$Html$div,
+														_List_fromArray(
+															[
+																$elm$html$Html$Attributes$class('bg-white shadow rounded-lg')
+															]),
+														_List_fromArray(
+															[
+																A2(
+																$elm$html$Html$div,
+																_List_fromArray(
+																	[
+																		$elm$html$Html$Attributes$class('px-4 py-5 sm:p-6')
+																	]),
+																_List_fromArray(
+																	[
+																		A2(
+																		$elm$html$Html$h1,
+																		_List_fromArray(
+																			[
+																				$elm$html$Html$Attributes$class('text-2xl font-bold text-gray-900 mb-4')
+																			]),
+																		_List_fromArray(
+																			[
+																				$elm$html$Html$text('Authentication Callback')
+																			])),
+																		A2(
+																		$elm$html$Html$p,
+																		_List_fromArray(
+																			[
+																				$elm$html$Html$Attributes$class('text-gray-600')
+																			]),
+																		_List_fromArray(
+																			[
+																				$elm$html$Html$text('Processing authentication...')
+																			]))
+																	]))
+															]));
+												default:
+													return A2(
+														$elm$html$Html$div,
+														_List_fromArray(
+															[
+																$elm$html$Html$Attributes$class('bg-white shadow rounded-lg')
+															]),
+														_List_fromArray(
+															[
+																A2(
+																$elm$html$Html$div,
+																_List_fromArray(
+																	[
+																		$elm$html$Html$Attributes$class('px-4 py-5 sm:p-6 text-center')
+																	]),
+																_List_fromArray(
+																	[
+																		A2(
+																		$elm$html$Html$h1,
+																		_List_fromArray(
+																			[
+																				$elm$html$Html$Attributes$class('text-3xl font-bold text-gray-900 mb-4')
+																			]),
+																		_List_fromArray(
+																			[
+																				$elm$html$Html$text('404')
+																			])),
+																		A2(
+																		$elm$html$Html$p,
+																		_List_fromArray(
+																			[
+																				$elm$html$Html$Attributes$class('text-xl text-gray-600 mb-6')
+																			]),
+																		_List_fromArray(
+																			[
+																				$elm$html$Html$text('Page Not Found')
+																			])),
+																		A2(
+																		$elm$html$Html$p,
+																		_List_fromArray(
+																			[
+																				$elm$html$Html$Attributes$class('text-gray-500 mb-6')
+																			]),
+																		_List_fromArray(
+																			[
+																				$elm$html$Html$text('The page you are looking for does not exist.')
+																			])),
+																		A2(
+																		$elm$html$Html$a,
+																		_List_fromArray(
+																			[
+																				$elm$html$Html$Attributes$href('/'),
+																				$elm$html$Html$Attributes$class('inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700')
+																			]),
+																		_List_fromArray(
+																			[
+																				$elm$html$Html$text('Go Home')
+																			]))
+																	]))
+															]));
+											}
+										}
+									}()
+									]))
 							]))
 					]))
 			]),

@@ -10,7 +10,7 @@ import EventDetail
 import EventForm
 import EventList
 import Events exposing (Msg(..))
-import Html exposing (Html, a, button, div, h1, header, img, main_, nav, p, strong, text)
+import Html exposing (Html, a, button, div, h1, header, img, label, main_, nav, p, span, strong, text)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Http
@@ -505,167 +505,211 @@ view : Model -> Browser.Document Msg
 view model =
     { title = I18n.get "event_calendar"
     , body =
-        [ div []
-            [ header []
-                [ nav []
-                    [ a [ href "/" ] [ text "Home" ]
-                    , text " | "
-                    , a [ href "/map" ] [ text "Map" ]
-                    , text " | "
-                    , if model.auth /= Nothing then
-                        a [ href "/events" ] [ text "Events" ]
+        [ div [ class "min-h-screen flex flex-col" ]
+            [ header [ class "bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50" ]
+                [ div [ class "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" ]
+                    [ div [ class "flex justify-between items-center h-16" ]
+                        [ nav [ class "flex space-x-8" ]
+                            [ a [ href "/", class "text-gray-900 hover:text-blue-600 px-3 py-2 text-sm font-medium" ] [ text "Home" ]
+                            , a [ href "/map", class "text-gray-500 hover:text-blue-600 px-3 py-2 text-sm font-medium" ] [ text "Map" ]
+                            , if model.auth /= Nothing then
+                                a [ href "/events", class "text-gray-500 hover:text-blue-600 px-3 py-2 text-sm font-medium" ] [ text "Events" ]
 
-                      else
-                        text ""
-                    , text " | "
-                    , a [ href "/callback" ] [ text "Callback" ]
-                    ]
-                , div []
-                    [ case model.auth of
-                        Just auth ->
-                            div []
-                                [ text ("Logged in as: " ++ Maybe.withDefault "Unknown" (Maybe.map .email auth.user))
-                                , Button.view
-                                    { variant = Button.Secondary
-                                    , size = Button.Md
-                                    , disabled = False
-                                    , type_ = "button"
-                                    , ariaLabel = Nothing
-                                    , onClick = Just Logout
-                                    , children = [ text "Logout" ]
-                                    }
-                                ]
+                              else
+                                text ""
+                            ]
+                        , div [ class "flex items-center space-x-4" ]
+                            [ case model.auth of
+                                Just auth ->
+                                    div [ class "flex items-center space-x-4" ]
+                                        [ span [ class "text-sm text-gray-700" ] [ text ("Logged in as: " ++ Maybe.withDefault "Unknown" (Maybe.map .email auth.user)) ]
+                                        , Button.view
+                                            { variant = Button.Secondary
+                                            , size = Button.Sm
+                                            , disabled = False
+                                            , type_ = "button"
+                                            , ariaLabel = Nothing
+                                            , onClick = Just Logout
+                                            , children = [ text "Logout" ]
+                                            }
+                                        ]
 
-                        Nothing ->
-                            div []
-                                [ Button.view
-                                    { variant = Button.Primary
-                                    , size = Button.Md
-                                    , disabled = False
-                                    , type_ = "button"
-                                    , ariaLabel = Nothing
-                                    , onClick = Just Login
-                                    , children = [ text "Login with OIDC" ]
-                                    }
-                                ]
+                                Nothing ->
+                                    Button.view
+                                        { variant = Button.Primary
+                                        , size = Button.Sm
+                                        , disabled = False
+                                        , type_ = "button"
+                                        , ariaLabel = Nothing
+                                        , onClick = Just Login
+                                        , children = [ text "Login with OIDC" ]
+                                        }
+                            ]
+                        ]
                     ]
                 , case model.error of
                     Just err ->
-                        div [ style "color" "red" ] [ text err ]
+                        div [ class "bg-red-50 border-l-4 border-red-400 p-4 max-w-7xl mx-auto" ]
+                            [ div [ class "flex" ]
+                                [ div [ class "ml-3" ]
+                                    [ p [ class "text-sm text-red-700" ] [ text err ]
+                                    ]
+                                ]
+                            ]
 
                     Nothing ->
                         text ""
                 ]
-            , main_ []
-                [ if model.loading then
-                    div [] [ text "Loading..." ]
+            , main_ [ class "flex-1 bg-gray-50" ]
+                [ div [ class "max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8" ]
+                    [ if model.loading then
+                        div [ class "flex justify-center items-center h-64" ]
+                            [ div [ class "animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" ] []
+                            ]
 
-                  else
-                    case model.route of
-                        Home ->
-                            div []
-                                [ h1 [] [ text (I18n.get "public_calendar") ]
-                                , case model.auth of
-                                    Just _ ->
-                                        div [ class "mb-4 flex items-end gap-4" ]
-                                            [ div [ class "flex-1" ]
-                                                [ Input.view
-                                                    { type_ = "date"
-                                                    , value = model.selectedDate
-                                                    , placeholder = Nothing
-                                                    , required = False
-                                                    , disabled = False
-                                                    , readonly = False
-                                                    , ariaLabel = Just "Select Date"
-                                                    , ariaDescribedBy = Nothing
-                                                    , ariaInvalid = False
-                                                    , ariaRequired = False
-                                                    , id = Just "calendar-date"
-                                                    , name = Nothing
-                                                    , pattern = Nothing
-                                                    , min = Nothing
-                                                    , max = Nothing
-                                                    , step = Nothing
-                                                    , accept = Nothing
-                                                    , autofocus = False
-                                                    , class = Nothing
-                                                    , onInput = Just SetDate
-                                                    , onChange = Nothing
-                                                    , onBlur = Nothing
-                                                    , onFocus = Nothing
-                                                    }
-                                                ]
-                                            , button [ class "btn-icon", onClick GoToCreateEvent, title "Add new event" ] [ text "+" ]
+                      else
+                        case model.route of
+                            Home ->
+                                div [ class "space-y-6" ]
+                                    [ div [ class "bg-white shadow rounded-lg" ]
+                                        [ div [ class "px-4 py-5 sm:p-6" ]
+                                            [ h1 [ class "text-2xl font-bold text-gray-900 mb-4" ] [ text (I18n.get "public_calendar") ]
+                                            , case model.auth of
+                                                Just _ ->
+                                                    div [ class "mb-6 flex items-center justify-between" ]
+                                                        [ div [ class "flex items-center space-x-4" ]
+                                                            [ label [ class "block text-sm font-medium text-gray-700" ] [ text "Select Date:" ]
+                                                            , Input.view
+                                                                { type_ = "date"
+                                                                , value = model.selectedDate
+                                                                , placeholder = Nothing
+                                                                , required = False
+                                                                , disabled = False
+                                                                , readonly = False
+                                                                , ariaLabel = Just "Select Date"
+                                                                , ariaDescribedBy = Nothing
+                                                                , ariaInvalid = False
+                                                                , ariaRequired = False
+                                                                , id = Just "calendar-date"
+                                                                , name = Nothing
+                                                                , pattern = Nothing
+                                                                , min = Nothing
+                                                                , max = Nothing
+                                                                , step = Nothing
+                                                                , accept = Nothing
+                                                                , autofocus = False
+                                                                , class = Nothing
+                                                                , onInput = Just SetDate
+                                                                , onChange = Nothing
+                                                                , onBlur = Nothing
+                                                                , onFocus = Nothing
+                                                                }
+                                                            ]
+                                                        , button [ class "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500", onClick GoToCreateEvent, title "Add new event" ]
+                                                            [ text "+ Add Event" ]
+                                                        ]
+
+                                                Nothing ->
+                                                    div [ class "mb-6 bg-blue-50 border border-blue-200 rounded-md p-4" ]
+                                                        [ p [ class "text-sm text-blue-800 mb-4" ]
+                                                            [ text "Non-members can send events to "
+                                                            , a [ href "mailto:suomenpalikkayhteisory@outlook.com", class "text-blue-600 hover:text-blue-800 underline" ] [ text "email" ]
+                                                            , text "."
+                                                            ]
+                                                        , div []
+                                                            [ label [ class "block text-sm font-medium text-gray-700 mb-2" ] [ text "Select Date:" ]
+                                                            , Input.view
+                                                                { type_ = "date"
+                                                                , value = model.selectedDate
+                                                                , placeholder = Nothing
+                                                                , required = False
+                                                                , disabled = False
+                                                                , readonly = False
+                                                                , ariaLabel = Just "Select Date"
+                                                                , ariaDescribedBy = Nothing
+                                                                , ariaInvalid = False
+                                                                , ariaRequired = False
+                                                                , id = Just "calendar-date"
+                                                                , name = Nothing
+                                                                , pattern = Nothing
+                                                                , min = Nothing
+                                                                , max = Nothing
+                                                                , step = Nothing
+                                                                , accept = Nothing
+                                                                , autofocus = False
+                                                                , class = Nothing
+                                                                , onInput = Just SetDate
+                                                                , onChange = Nothing
+                                                                , onBlur = Nothing
+                                                                , onFocus = Nothing
+                                                                }
+                                                            ]
+                                                        ]
+                                            , div [ class "mt-6" ]
+                                                [ Html.map CalendarMsg (Calendar.view model.calendar) ]
+                                            ]
+                                        ]
+                                    ]
+
+                            MapRoute ->
+                                div [ class "bg-white shadow rounded-lg" ]
+                                    [ div [ class "px-4 py-5 sm:p-6" ]
+                                        [ Html.map MapMsg (Map.view model.map) ]
+                                    ]
+
+                            EventsRoute ->
+                                div [ class "bg-white shadow rounded-lg" ]
+                                    [ div [ class "px-4 py-5 sm:p-6" ]
+                                        [ Html.map EventListMsg (EventList.view model.eventList model.events.events) ]
+                                    ]
+
+                            EventDetail id ->
+                                case List.head (List.filter (\e -> e.id == id) model.events.events) of
+                                    Just event ->
+                                        div [ class "bg-white shadow rounded-lg" ]
+                                            [ div [ class "px-4 py-5 sm:p-6" ]
+                                                [ Html.map EventDetailMsg (EventDetail.view event model.auth) ]
                                             ]
 
                                     Nothing ->
-                                        div [ class "mb-4" ]
-                                            [ p []
-                                                [ text "Non-members can send events to "
-                                                , a [ href "mailto:suomenpalikkayhteisory@outlook.com" ] [ text "email" ]
-                                                , text "."
+                                        div [ class "bg-white shadow rounded-lg" ]
+                                            [ div [ class "px-4 py-5 sm:p-6" ]
+                                                [ h1 [ class "text-2xl font-bold text-gray-900" ] [ text ("Event not found: " ++ id) ]
+                                                , div [ class "mt-4" ]
+                                                    [ a [ href "/", class "text-blue-600 hover:text-blue-800" ] [ text "← Go Home" ] ]
                                                 ]
-                                            , Input.view
-                                                { type_ = "date"
-                                                , value = model.selectedDate
-                                                , placeholder = Nothing
-                                                , required = False
-                                                , disabled = False
-                                                , readonly = False
-                                                , ariaLabel = Just "Select Date"
-                                                , ariaDescribedBy = Nothing
-                                                , ariaInvalid = False
-                                                , ariaRequired = False
-                                                , id = Just "calendar-date"
-                                                , name = Nothing
-                                                , pattern = Nothing
-                                                , min = Nothing
-                                                , max = Nothing
-                                                , step = Nothing
-                                                , accept = Nothing
-                                                , autofocus = False
-                                                , class = Nothing
-                                                , onInput = Just SetDate
-                                                , onChange = Nothing
-                                                , onBlur = Nothing
-                                                , onFocus = Nothing
-                                                }
                                             ]
-                                , Html.map CalendarMsg (Calendar.view model.calendar)
-                                ]
 
-                        MapRoute ->
-                            Html.map MapMsg (Map.view model.map)
+                            EditEvent id ->
+                                div [ class "bg-white shadow rounded-lg" ]
+                                    [ div [ class "px-4 py-5 sm:p-6" ]
+                                        [ Html.map EventFormMsg (EventForm.view model.eventForm) ]
+                                    ]
 
-                        EventsRoute ->
-                            Html.map EventListMsg (EventList.view model.eventList model.events.events)
+                            CreateEvent ->
+                                div [ class "bg-white shadow rounded-lg" ]
+                                    [ div [ class "px-4 py-5 sm:p-6" ]
+                                        [ Html.map EventFormMsg (EventForm.view model.eventForm) ]
+                                    ]
 
-                        EventDetail id ->
-                            case List.head (List.filter (\e -> e.id == id) model.events.events) of
-                                Just event ->
-                                    Html.map EventDetailMsg (EventDetail.view event model.auth)
+                            Callback ->
+                                div [ class "bg-white shadow rounded-lg" ]
+                                    [ div [ class "px-4 py-5 sm:p-6" ]
+                                        [ h1 [ class "text-2xl font-bold text-gray-900 mb-4" ] [ text "Authentication Callback" ]
+                                        , p [ class "text-gray-600" ] [ text "Processing authentication..." ]
+                                        ]
+                                    ]
 
-                                Nothing ->
-                                    h1 [] [ text ("Event not found: " ++ id) ]
-
-                        EditEvent id ->
-                            Html.map EventFormMsg (EventForm.view model.eventForm)
-
-                        CreateEvent ->
-                            Html.map EventFormMsg (EventForm.view model.eventForm)
-
-                        Callback ->
-                            div []
-                                [ h1 [] [ text "Authentication Callback" ]
-                                , p [] [ text "Processing authentication..." ]
-                                ]
-
-                        NotFound ->
-                            div []
-                                [ h1 [] [ text "404 - Page Not Found" ]
-                                , p [] [ text "The page you are looking for does not exist." ]
-                                , a [ href "/" ] [ text "Go Home" ]
-                                ]
+                            NotFound ->
+                                div [ class "bg-white shadow rounded-lg" ]
+                                    [ div [ class "px-4 py-5 sm:p-6 text-center" ]
+                                        [ h1 [ class "text-3xl font-bold text-gray-900 mb-4" ] [ text "404" ]
+                                        , p [ class "text-xl text-gray-600 mb-6" ] [ text "Page Not Found" ]
+                                        , p [ class "text-gray-500 mb-6" ] [ text "The page you are looking for does not exist." ]
+                                        , a [ href "/", class "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700" ] [ text "Go Home" ]
+                                        ]
+                                    ]
+                    ]
                 ]
             ]
         ]
