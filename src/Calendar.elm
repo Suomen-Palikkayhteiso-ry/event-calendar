@@ -1,9 +1,11 @@
 module Calendar exposing (..)
 
 import DateUtils
-import Html exposing (Html, button, div, h2, node, text)
-import Html.Attributes exposing (attribute, class)
+import Html exposing (Html, button, div, h2, text)
+import Html.Attributes exposing (class)
 import Html.Events exposing (onClick)
+import Svg exposing (path, svg)
+import Svg.Attributes as SA
 import Time
 import Types exposing (Event)
 
@@ -14,34 +16,34 @@ import Types exposing (Event)
 
 chevronLeftIcon : Html msg
 chevronLeftIcon =
-    node "svg"
-        [ attribute "width" "16"
-        , attribute "height" "16"
-        , attribute "viewBox" "0 0 24 24"
-        , attribute "fill" "none"
-        , attribute "stroke" "currentColor"
-        , attribute "stroke-width" "2"
-        , attribute "stroke-linecap" "round"
-        , attribute "stroke-linejoin" "round"
-        , class "inline-block"
+    svg
+        [ SA.width "16"
+        , SA.height "16"
+        , SA.viewBox "0 0 24 24"
+        , SA.fill "none"
+        , SA.stroke "currentColor"
+        , SA.strokeWidth "2"
+        , SA.strokeLinecap "round"
+        , SA.strokeLinejoin "round"
+        , SA.class "inline-block"
         ]
-        [ node "path" [ attribute "d" "M15 18l-6-6 6-6" ] [] ]
+        [ path [ SA.d "M15 18l-6-6 6-6" ] [] ]
 
 
 chevronRightIcon : Html msg
 chevronRightIcon =
-    node "svg"
-        [ attribute "width" "16"
-        , attribute "height" "16"
-        , attribute "viewBox" "0 0 24 24"
-        , attribute "fill" "none"
-        , attribute "stroke" "currentColor"
-        , attribute "stroke-width" "2"
-        , attribute "stroke-linecap" "round"
-        , attribute "stroke-linejoin" "round"
-        , class "inline-block"
+    svg
+        [ SA.width "16"
+        , SA.height "16"
+        , SA.viewBox "0 0 24 24"
+        , SA.fill "none"
+        , SA.stroke "currentColor"
+        , SA.strokeWidth "2"
+        , SA.strokeLinecap "round"
+        , SA.strokeLinejoin "round"
+        , SA.class "inline-block"
         ]
-        [ node "path" [ attribute "d" "M9 18l6-6-6-6" ] [] ]
+        [ path [ SA.d "M9 18l6-6-6-6" ] [] ]
 
 
 
