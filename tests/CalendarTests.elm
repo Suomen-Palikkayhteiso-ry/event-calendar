@@ -9,6 +9,7 @@ import Calendar
 import Expect
 import Test exposing (..)
 import Time
+import Types exposing (Event)
 
 
 suite : Test
@@ -100,5 +101,223 @@ suite =
                         , \() -> Expect.equal resultMonth Time.Jan
                         ]
                         ()
+            ]
+        , describe "eventOnDay"
+            [ test "should return true for non-all-day event on the same day" <|
+                \_ ->
+                    let
+                        event =
+                            { id = "1"
+                            , title = "Test Event"
+                            , description = Nothing
+                            , startDate = "2024-01-01T10:00:00Z"
+                            , endDate = Nothing
+                            , allDay = False
+                            , url = Nothing
+                            , location = Nothing
+                            , state = Types.Published
+                            , image = Nothing
+                            , imageDescription = Nothing
+                            , point = Nothing
+                            , created = "2024-01-01T00:00:00Z"
+                            , updated = "2024-01-01T00:00:00Z"
+                            }
+
+                        day =
+                            Calendar.dateToPosix 2024 Time.Jan 1
+                    in
+                    Expect.equal (Calendar.eventOnDay day event) True
+            , test "should return false for non-all-day event on different day" <|
+                \_ ->
+                    let
+                        event =
+                            { id = "1"
+                            , title = "Test Event"
+                            , description = Nothing
+                            , startDate = "2024-01-01T10:00:00Z"
+                            , endDate = Nothing
+                            , allDay = False
+                            , url = Nothing
+                            , location = Nothing
+                            , state = Types.Published
+                            , image = Nothing
+                            , imageDescription = Nothing
+                            , point = Nothing
+                            , created = "2024-01-01T00:00:00Z"
+                            , updated = "2024-01-01T00:00:00Z"
+                            }
+
+                        day =
+                            Calendar.dateToPosix 2024 Time.Jan 2
+                    in
+                    Expect.equal (Calendar.eventOnDay day event) False
+            , test "should return true for all-day event on start day" <|
+                \_ ->
+                    let
+                        event =
+                            { id = "1"
+                            , title = "Test Event"
+                            , description = Nothing
+                            , startDate = "2024-01-01T00:00:00Z"
+                            , endDate = Just "2024-01-03T23:59:59Z"
+                            , allDay = True
+                            , url = Nothing
+                            , location = Nothing
+                            , state = Types.Published
+                            , image = Nothing
+                            , imageDescription = Nothing
+                            , point = Nothing
+                            , created = "2024-01-01T00:00:00Z"
+                            , updated = "2024-01-01T00:00:00Z"
+                            }
+
+                        day =
+                            Calendar.dateToPosix 2024 Time.Jan 1
+                    in
+                    Expect.equal (Calendar.eventOnDay day event) True
+            , test "should return true for all-day event on middle day" <|
+                \_ ->
+                    let
+                        event =
+                            { id = "1"
+                            , title = "Test Event"
+                            , description = Nothing
+                            , startDate = "2024-01-01T00:00:00Z"
+                            , endDate = Just "2024-01-03T23:59:59Z"
+                            , allDay = True
+                            , url = Nothing
+                            , location = Nothing
+                            , state = Types.Published
+                            , image = Nothing
+                            , imageDescription = Nothing
+                            , point = Nothing
+                            , created = "2024-01-01T00:00:00Z"
+                            , updated = "2024-01-01T00:00:00Z"
+                            }
+
+                        day =
+                            Calendar.dateToPosix 2024 Time.Jan 2
+                    in
+                    Expect.equal (Calendar.eventOnDay day event) True
+            , test "should return true for all-day event on end day" <|
+                \_ ->
+                    let
+                        event =
+                            { id = "1"
+                            , title = "Test Event"
+                            , description = Nothing
+                            , startDate = "2024-01-01T00:00:00Z"
+                            , endDate = Just "2024-01-03T23:59:59Z"
+                            , allDay = True
+                            , url = Nothing
+                            , location = Nothing
+                            , state = Types.Published
+                            , image = Nothing
+                            , imageDescription = Nothing
+                            , point = Nothing
+                            , created = "2024-01-01T00:00:00Z"
+                            , updated = "2024-01-01T00:00:00Z"
+                            }
+
+                        day =
+                            Calendar.dateToPosix 2024 Time.Jan 3
+                    in
+                    Expect.equal (Calendar.eventOnDay day event) True
+            , test "should return false for all-day event before start day" <|
+                \_ ->
+                    let
+                        event =
+                            { id = "1"
+                            , title = "Test Event"
+                            , description = Nothing
+                            , startDate = "2024-01-02T00:00:00Z"
+                            , endDate = Just "2024-01-03T23:59:59Z"
+                            , allDay = True
+                            , url = Nothing
+                            , location = Nothing
+                            , state = Types.Published
+                            , image = Nothing
+                            , imageDescription = Nothing
+                            , point = Nothing
+                            , created = "2024-01-01T00:00:00Z"
+                            , updated = "2024-01-01T00:00:00Z"
+                            }
+
+                        day =
+                            Calendar.dateToPosix 2024 Time.Jan 1
+                    in
+                    Expect.equal (Calendar.eventOnDay day event) False
+            , test "should return false for all-day event after end day" <|
+                \_ ->
+                    let
+                        event =
+                            { id = "1"
+                            , title = "Test Event"
+                            , description = Nothing
+                            , startDate = "2024-01-01T00:00:00Z"
+                            , endDate = Just "2024-01-02T23:59:59Z"
+                            , allDay = True
+                            , url = Nothing
+                            , location = Nothing
+                            , state = Types.Published
+                            , image = Nothing
+                            , imageDescription = Nothing
+                            , point = Nothing
+                            , created = "2024-01-01T00:00:00Z"
+                            , updated = "2024-01-01T00:00:00Z"
+                            }
+
+                        day =
+                            Calendar.dateToPosix 2024 Time.Jan 3
+                    in
+                    Expect.equal (Calendar.eventOnDay day event) False
+            , test "should return true for all-day event with no end date on start day" <|
+                \_ ->
+                    let
+                        event =
+                            { id = "1"
+                            , title = "Test Event"
+                            , description = Nothing
+                            , startDate = "2024-01-01T00:00:00Z"
+                            , endDate = Nothing
+                            , allDay = True
+                            , url = Nothing
+                            , location = Nothing
+                            , state = Types.Published
+                            , image = Nothing
+                            , imageDescription = Nothing
+                            , point = Nothing
+                            , created = "2024-01-01T00:00:00Z"
+                            , updated = "2024-01-01T00:00:00Z"
+                            }
+
+                        day =
+                            Calendar.dateToPosix 2024 Time.Jan 1
+                    in
+                    Expect.equal (Calendar.eventOnDay day event) True
+            , test "should return false for all-day event with no end date on different day" <|
+                \_ ->
+                    let
+                        event =
+                            { id = "1"
+                            , title = "Test Event"
+                            , description = Nothing
+                            , startDate = "2024-01-01T00:00:00Z"
+                            , endDate = Nothing
+                            , allDay = True
+                            , url = Nothing
+                            , location = Nothing
+                            , state = Types.Published
+                            , image = Nothing
+                            , imageDescription = Nothing
+                            , point = Nothing
+                            , created = "2024-01-01T00:00:00Z"
+                            , updated = "2024-01-01T00:00:00Z"
+                            }
+
+                        day =
+                            Calendar.dateToPosix 2024 Time.Jan 2
+                    in
+                    Expect.equal (Calendar.eventOnDay day event) False
             ]
         ]
