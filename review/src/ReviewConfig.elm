@@ -4,12 +4,13 @@ module ReviewConfig exposing (config)
 Reference: ADR-0010
 -}
 
+import NoUnused.Variables
+import NoUnused.Modules
 import Review.Rule exposing (Rule)
 
 
 config : List Rule
 config =
-    [ Review.Rule.NoUnusedVariables.rule
-    , Review.Rule.NoUnusedModules.rule
-    , Review.Rule.NoExposingEverything.rule
+    [ NoUnused.Variables.rule
+    , NoUnused.Modules.rule
     ]

@@ -55,6 +55,7 @@ elm-format:
 elm-check:
 	elm-format src/ --validate
 	elm-test
+	./scripts/check-file-size.sh 400
 
 .PHONY: elm-spec
 elm-spec: node_modules
