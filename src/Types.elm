@@ -3,7 +3,6 @@ module Types exposing (..)
 import Json.Decode as Decode
 import Json.Decode.Extra as DecodeExtra
 import Json.Encode as Encode
-import Time
 
 
 
@@ -200,16 +199,6 @@ userDecoder =
         |> DecodeExtra.andMap (DecodeExtra.optionalField "avatar" (Decode.nullable Decode.string) |> Decode.map (Maybe.withDefault Nothing))
 
 
-userEncoder : User -> Encode.Value
-userEncoder user =
-    Encode.object
-        [ ( "id", Encode.string user.id )
-        , ( "email", Encode.string user.email )
-        , ( "name", maybeStringEncoder user.name )
-        , ( "avatar", maybeStringEncoder user.avatar )
-        ]
-
-
 type alias Auth =
     { user : Maybe User
     , token : Maybe String
@@ -221,55 +210,3 @@ authDecoder =
     Decode.succeed Auth
         |> DecodeExtra.andMap (DecodeExtra.optionalField "record" (Decode.nullable userDecoder) |> Decode.map (Maybe.withDefault Nothing))
         |> DecodeExtra.andMap (DecodeExtra.optionalField "token" (Decode.nullable Decode.string) |> Decode.map (Maybe.withDefault Nothing))
-
-
-authEncoder : Auth -> Encode.Value
-authEncoder auth =
-    Encode.object
-        [ ( "user", maybeUserEncoder auth.user )
-        , ( "token", maybeStringEncoder auth.token )
-        ]
-
-
-maybeUserEncoder : Maybe User -> Encode.Value
-maybeUserEncoder maybe =
-    case maybe of
-        Just u ->
-            userEncoder u
-
-        Nothing ->
-            Encode.null
-
-
-
--- Calendar state types
-
-
-type alias CalendarState =
-    { view : String
-    , events : List Event
-    , currentDate : Time.Posix
-    , locale : String
-    , firstDay : Int
-    }
-
-
-calendarStateDecoder : Decode.Decoder CalendarState
-calendarStateDecoder =
-    Decode.succeed CalendarState
-        |> DecodeExtra.andMap (Decode.field "view" Decode.string)
-        |> DecodeExtra.andMap (Decode.field "events" (Decode.list eventDecoder))
-        |> DecodeExtra.andMap (Decode.field "currentDate" (Decode.int |> Decode.map Time.millisToPosix))
-        |> DecodeExtra.andMap (Decode.field "locale" Decode.string)
-        |> DecodeExtra.andMap (Decode.field "firstDay" Decode.int)
-
-
-calendarStateEncoder : CalendarState -> Encode.Value
-calendarStateEncoder state =
-    Encode.object
-        [ ( "view", Encode.string state.view )
-        , ( "events", Encode.list eventEncoder state.events )
-        , ( "currentDate", Encode.int (Time.posixToMillis state.currentDate) )
-        , ( "locale", Encode.string state.locale )
-        , ( "firstDay", Encode.int state.firstDay )
-        ]

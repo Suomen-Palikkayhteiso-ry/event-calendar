@@ -1,8 +1,8 @@
 module Button exposing (..)
 
-import Html exposing (Attribute, Html, button, text)
-import Html.Attributes exposing (attribute, class, disabled, type_)
-import Html.Events exposing (onClick)
+import Html exposing (Html, button)
+import Html.Attributes exposing (attribute, class, type_)
+import Html.Events
 
 
 type Variant

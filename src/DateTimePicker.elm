@@ -16,7 +16,11 @@ view :
     -> Html msg
 view config =
     div [ class "mb-4" ]
-        [ label [ class "mb-2 block font-medium text-gray-700", Html.Attributes.for config.id ] [ Html.text config.label ]
+        [ if String.isEmpty config.label then
+            text ""
+
+          else
+            label [ class "mb-2 block font-medium text-gray-700", Html.Attributes.for config.id ] [ Html.text config.label ]
         , if config.allDay then
             div [ class "relative" ]
                 [ input

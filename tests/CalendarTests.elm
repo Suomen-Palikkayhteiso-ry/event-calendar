@@ -9,7 +9,7 @@ import Calendar
 import Expect
 import Test exposing (..)
 import Time
-import Types exposing (Event)
+import Types
 
 
 suite : Test

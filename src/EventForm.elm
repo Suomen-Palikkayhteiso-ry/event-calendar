@@ -1,7 +1,7 @@
 module EventForm exposing (..)
 
 import DateTimePicker
-import Html exposing (Html, br, button, div, input, label, li, text, textarea, ul)
+import Html exposing (button, div, input, label, li, text, textarea, ul)
 import Html.Attributes exposing (checked, disabled, for, id, name, placeholder, type_, value)
 import Html.Events exposing (onCheck, onClick, onInput)
 import Types exposing (Event, EventState(..), Point)

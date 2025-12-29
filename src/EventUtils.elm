@@ -2,7 +2,7 @@ module EventUtils exposing (..)
 
 import DateUtils
 import Time
-import Types exposing (DisplayEvent, Event, EventFormData, EventState(..), Point)
+import Types exposing (DisplayEvent, Event, EventFormData)
 
 
 eventToFormData : Event -> EventFormData
@@ -73,21 +73,3 @@ isEventOngoing now event =
             event.endDate |> Maybe.map DateUtils.parseUTCDate |> Maybe.withDefault start
     in
     Time.posixToMillis now >= Time.posixToMillis start && Time.posixToMillis now <= Time.posixToMillis end
-
-
-isEventUpcoming : Time.Posix -> Event -> Bool
-isEventUpcoming now event =
-    let
-        start =
-            DateUtils.parseUTCDate event.startDate
-    in
-    Time.posixToMillis start > Time.posixToMillis now
-
-
-isEventPast : Time.Posix -> Event -> Bool
-isEventPast now event =
-    let
-        end =
-            event.endDate |> Maybe.map DateUtils.parseUTCDate |> Maybe.withDefault (DateUtils.parseUTCDate event.startDate)
-    in
-    Time.posixToMillis end < Time.posixToMillis now

@@ -9,13 +9,12 @@ import DateUtils
 import EventDetail
 import EventForm
 import EventList
-import Events exposing (Msg(..))
-import Html exposing (Html, a, button, div, h1, header, img, label, main_, nav, node, p, span, strong, text)
+import Events
+import Html exposing (Html, a, button, div, h1, header, label, main_, nav, p, text)
 import Html.Attributes exposing (..)
-import Html.Events exposing (onClick, onInput)
+import Html.Events exposing (onClick)
 import Http
 import I18n
-import Input
 import Json.Decode as Decode
 import KMLUtils
 import PocketBase
@@ -28,7 +27,6 @@ import Time
 import Types
 import Url
 import Url.Parser as Parser exposing ((</>), Parser, oneOf, s, string)
-import Url.Parser.Query as Query
 
 
 
@@ -659,30 +657,13 @@ view model =
                                                     div [ class "mb-4 flex items-center justify-between" ]
                                                         [ div [ class "flex items-center space-x-4" ]
                                                             [ label [ class "block text-sm font-medium text-gray-700" ] [ text (I18n.get "select_date") ]
-                                                            , Input.view
-                                                                { type_ = "date"
-                                                                , value = model.selectedDate
-                                                                , placeholder = Nothing
-                                                                , required = False
+                                                            , DateTimePicker.view
+                                                                { value = model.selectedDate
+                                                                , label = ""
+                                                                , id = "calendar-date"
                                                                 , disabled = False
-                                                                , readonly = False
-                                                                , ariaLabel = Just "Select Date"
-                                                                , ariaDescribedBy = Nothing
-                                                                , ariaInvalid = False
-                                                                , ariaRequired = False
-                                                                , id = Just "calendar-date"
-                                                                , name = Nothing
-                                                                , pattern = Nothing
-                                                                , min = Nothing
-                                                                , max = Nothing
-                                                                , step = Nothing
-                                                                , accept = Nothing
-                                                                , autofocus = False
-                                                                , class = Nothing
-                                                                , onInput = Just SetDate
-                                                                , onChange = Nothing
-                                                                , onBlur = Nothing
-                                                                , onFocus = Nothing
+                                                                , allDay = True
+                                                                , onChange = SetDate
                                                                 }
                                                             ]
                                                         , button [ class "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500", onClick GoToCreateEvent, title "Add new event" ]
@@ -698,30 +679,13 @@ view model =
                                                             ]
                                                         , div []
                                                             [ label [ class "block text-sm font-medium text-gray-700 mb-2" ] [ text (I18n.get "select_date") ]
-                                                            , Input.view
-                                                                { type_ = "date"
-                                                                , value = model.selectedDate
-                                                                , placeholder = Nothing
-                                                                , required = False
+                                                            , DateTimePicker.view
+                                                                { value = model.selectedDate
+                                                                , label = ""
+                                                                , id = "calendar-date"
                                                                 , disabled = False
-                                                                , readonly = False
-                                                                , ariaLabel = Just "Select Date"
-                                                                , ariaDescribedBy = Nothing
-                                                                , ariaInvalid = False
-                                                                , ariaRequired = False
-                                                                , id = Just "calendar-date"
-                                                                , name = Nothing
-                                                                , pattern = Nothing
-                                                                , min = Nothing
-                                                                , max = Nothing
-                                                                , step = Nothing
-                                                                , accept = Nothing
-                                                                , autofocus = False
-                                                                , class = Nothing
-                                                                , onInput = Just SetDate
-                                                                , onChange = Nothing
-                                                                , onBlur = Nothing
-                                                                , onFocus = Nothing
+                                                                , allDay = True
+                                                                , onChange = SetDate
                                                                 }
                                                             ]
                                                         ]

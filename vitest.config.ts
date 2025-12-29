@@ -3,7 +3,8 @@ import { defineConfig } from 'vite';
 
 export default defineConfig({
 	test: {
-		include: ['src/**/*.{test,spec}.{js,ts}'],
+		include: ['src/**/*.{test,spec}.{js,ts}', 'scripts/**/*.{test,spec}.{js,ts}'],
+		exclude: ['tests/**', 'node_modules', 'dist', '.idea', '.git', '.cache'],
 		environment: 'jsdom',
 		coverage: {
 			reporter: ['text', 'json', 'html'],
@@ -14,7 +15,8 @@ export default defineConfig({
 				'dist/',
 				'static/',
 				'agents/',
-				'scripts/'
+				'scripts/',
+				'tests/'
 			],
 			thresholds: {
 				global: {

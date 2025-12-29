@@ -10,7 +10,7 @@ import EventUtils
 import Expect
 import Test exposing (..)
 import Time
-import Types exposing (DisplayEvent, Event, EventFormData, EventState(..), Point)
+import Types exposing (Event, EventState(..))
 
 
 suite : Test

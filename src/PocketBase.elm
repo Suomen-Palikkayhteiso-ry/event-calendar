@@ -2,9 +2,8 @@ module PocketBase exposing (..)
 
 import Http
 import Json.Decode as Decode
-import Json.Encode as Encode
 import Ports
-import Types exposing (Auth, Event, User)
+import Types exposing (Event)
 
 
 
@@ -25,73 +24,12 @@ baseUrl url =
         url
 
 
-
--- Authentication
-
-
-type alias LoginCredentials =
-    { email : String
-    , password : String
-    }
-
-
-login : String -> LoginCredentials -> (Result Http.Error Auth -> msg) -> Cmd msg
-login pocketbaseUrl credentials toMsg =
-    Http.post
-        { url = baseUrl pocketbaseUrl ++ "/collections/users/auth-with-password"
-        , body = Http.jsonBody (loginEncoder credentials)
-        , expect = Http.expectJson toMsg authResponseDecoder
-        }
-
-
 initiateOAuth2Login : String -> Cmd msg
 initiateOAuth2Login provider =
     -- For OAuth2, we need to redirect the user to the OAuth2 provider
     -- This is typically done by setting window.location.href
     -- We'll use a port to handle this on the JavaScript side
     Ports.initiateOAuth2Login provider
-
-
-loginEncoder : LoginCredentials -> Encode.Value
-loginEncoder credentials =
-    Encode.object
-        [ ( "identity", Encode.string credentials.email )
-        , ( "password", Encode.string credentials.password )
-        ]
-
-
-authWithOAuth2Code : String -> String -> Maybe String -> (Result Http.Error Auth -> msg) -> Cmd msg
-authWithOAuth2Code pocketbaseUrl code state toMsg =
-    Http.post
-        { url = baseUrl pocketbaseUrl ++ "/oauth2-redirect"
-        , body = Http.jsonBody (oauth2Encoder code state)
-        , expect = Http.expectJson toMsg authResponseDecoder
-        }
-
-
-oauth2Encoder : String -> Maybe String -> Encode.Value
-oauth2Encoder code state =
-    Encode.object
-        [ ( "code", Encode.string code )
-        , ( "state", Encode.string (Maybe.withDefault "" state) )
-        ]
-
-
-authResponseDecoder : Decode.Decoder Auth
-authResponseDecoder =
-    Decode.map2 Auth
-        (Decode.field "record" (Decode.nullable userDecoder))
-        (Decode.field "token" (Decode.nullable Decode.string))
-
-
-userDecoder : Decode.Decoder User
-userDecoder =
-    Decode.map5 User
-        (Decode.field "id" Decode.string)
-        (Decode.field "email" Decode.string)
-        (Decode.field "username" (Decode.nullable Decode.string))
-        (Decode.field "name" (Decode.nullable Decode.string))
-        (Decode.field "avatar" (Decode.nullable Decode.string))
 
 
 logout : String -> String -> (Result Http.Error () -> msg) -> Cmd msg

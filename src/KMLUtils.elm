@@ -3,7 +3,7 @@ module KMLUtils exposing (..)
 import DateUtils
 import Dict exposing (Dict)
 import Json.Decode as Decode
-import Types exposing (Event, EventState(..), Point)
+import Types exposing (Event, EventState(..))
 
 
 months : Dict String Int
