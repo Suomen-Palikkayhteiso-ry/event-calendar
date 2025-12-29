@@ -493,12 +493,17 @@ view model =
                                                 ("Logged in as: "
                                                     ++ (case auth.user of
                                                             Just user ->
-                                                                case user.username of
-                                                                    Just username ->
-                                                                        username
+                                                                case user.name of
+                                                                    Just name ->
+                                                                        name
 
                                                                     Nothing ->
-                                                                        user.email
+                                                                        case user.username of
+                                                                            Just username ->
+                                                                                username
+
+                                                                            Nothing ->
+                                                                                user.email
 
                                                             Nothing ->
                                                                 "Unknown"
