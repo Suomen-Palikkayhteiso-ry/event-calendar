@@ -14,8 +14,8 @@ test.describe('Event Calendar E2E Tests', () => {
 
 	test('should have navigation buttons', async ({ page }) => {
 		await page.goto('/');
-		const prevButton = page.getByRole('button', { name: /edellinen|prev/i });
-		const nextButton = page.getByRole('button', { name: /seuraava|next/i });
+		const prevButton = page.getByRole('button', { name: '<' });
+		const nextButton = page.getByRole('button', { name: '>' });
 		await expect(prevButton).toBeVisible();
 		await expect(nextButton).toBeVisible();
 	});

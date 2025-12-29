@@ -32,7 +32,7 @@ import Url.Parser.Query as Query
 -- MAIN
 
 
-main : Program () Model Msg
+main : Program (Maybe String) Model Msg
 main =
     Browser.application
         { init = init
@@ -60,16 +60,20 @@ type alias Model =
     , error : Maybe String
     , loading : Bool
     , selectedDate : String
+    , pocketbaseUrl : String
     }
 
 
-init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
-init flags url key =
+init : Maybe String -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
+init maybePocketbaseUrl url key =
     let
+        pocketbaseUrl =
+            Maybe.withDefault "https://data.suomenpalikkayhteiso.fi/api" maybePocketbaseUrl
+
         ( eventsModel, eventsCmd ) =
-            Events.update (Events.FetchEvents Nothing) Events.init
+            Events.update (Events.FetchEvents Nothing) (Events.init pocketbaseUrl)
     in
-    ( Model key url (parseUrl url) Calendar.init eventsModel EventForm.init EventList.init Nothing Nothing True ""
+    ( Model key url (parseUrl url) Calendar.init eventsModel EventForm.init EventList.init Nothing Nothing True "" pocketbaseUrl
     , Cmd.batch
         [ Cmd.map EventsMsg eventsCmd
         , Task.perform SetCurrentTime Time.now
@@ -393,7 +397,7 @@ update msg model =
                 Just auth ->
                     case auth.token of
                         Just token ->
-                            ( model, PocketBase.logout token LogoutResult )
+                            ( model, PocketBase.logout model.pocketbaseUrl token LogoutResult )
 
                         Nothing ->
                             ( model, Cmd.none )

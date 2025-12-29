@@ -16,7 +16,8 @@ import qualified Data.ByteString as BS
 import System.Directory
 import System.FilePath
 import Data.List (sortOn)
-import Control.Monad (forM_)
+import Control.Monad (forM_, when)
+import GHC.Generics
 
 -- PocketBase URL
 pocketbaseUrl :: String
@@ -25,6 +26,18 @@ pocketbaseUrl = "https://data.suomenpalikkayhteiso.fi"
 -- Day abbreviations
 dayAbbr :: [String]
 dayAbbr = ["su", "ma", "ti", "ke", "to", "pe", "la"]
+
+-- PocketBase API response
+data PBResponse a = PBResponse
+  { page :: Int
+  , perPage :: Int
+  , totalItems :: Int
+  , totalPages :: Int
+  , items :: [a]
+  } deriving (Show, Generic)
+
+instance FromJSON a => FromJSON (PBResponse a) where
+  parseJSON = genericParseJSON defaultOptions { fieldLabelModifier = camelTo2 '_' }
 
 -- Event data type
 data Event = Event
@@ -108,10 +121,7 @@ fetchPublishedEvents = do
   let body = responseBody response
   case eitherDecode body of
     Left err -> error $ "Failed to parse JSON: " ++ err
-    Right (Object obj) -> case obj .: "items" of
-      Success items -> return items
-      Error err -> error $ "No items field: " ++ err
-    Right _ -> error "Unexpected JSON structure"
+    Right response -> return $ items response
 
 -- Write static file
 writeStaticFile :: FilePath -> BSL.ByteString -> IO ()

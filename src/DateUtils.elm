@@ -9,14 +9,21 @@ import Time
 
 parseUTCDate : String -> Time.Posix
 parseUTCDate utcString =
-    -- Parse ISO format like 2024-01-01T10:00:00Z
-    case String.split "T" utcString of
+    -- Parse ISO format like 2024-01-01T10:00:00Z or 2024-01-01 10:00:00.000Z
+    let
+        normalizedString =
+            String.replace " " "T" utcString
+    in
+    case String.split "T" normalizedString of
         [ date, timeWithZ ] ->
             let
                 time =
                     String.dropRight 1 timeWithZ
+                        |> String.split "."
+                        |> List.head
+                        |> Maybe.withDefault (String.dropRight 1 timeWithZ)
 
-                -- remove Z
+                -- remove Z and milliseconds
             in
             case String.split "-" date of
                 [ yStr, mStr, dStr ] ->

@@ -7,12 +7,14 @@ console.log('window.Elm:', window.Elm);
 console.log('window.Elm.Main:', window.Elm?.Main);
 
 if (window.Elm && window.Elm.Main) {
+    const pocketbaseUrl = import.meta.env.VITE_POCKETBASE_URL || null;
     const app = window.Elm.Main.init({
-        node: document.getElementById('app')
+        node: document.getElementById('app'),
+        flags: pocketbaseUrl
     });
 
     // Initialize PocketBase client
-    const pb = new PocketBase('https://data.suomenpalikkayhteiso.fi');
+    const pb = new PocketBase(pocketbaseUrl || 'https://data.suomenpalikkayhteiso.fi');
 
     // Auth handling
     const STORAGE_KEY = 'pocketbase_auth';

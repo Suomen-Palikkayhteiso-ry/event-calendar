@@ -54,7 +54,7 @@ test.describe('Documentation Screenshots', () => {
 				fullPage: false
 			});
 
-			await expect(page.locator('.ec')).toBeVisible();
+			await expect(page.locator('.calendar-grid')).toBeVisible();
 		});
 
 		test('calendar-navigation - Navigation controls', async ({ page }) => {
@@ -77,29 +77,28 @@ test.describe('Documentation Screenshots', () => {
 	test.describe('Event Detail Views', () => {
 		test('event-detail - Event detail page', async ({ page }) => {
 			await page.setViewportSize({ width: 1280, height: 900 });
+
 			await page.goto('/');
 
 			// Wait for calendar to load
 			await page.waitForSelector('.calendar', { timeout: 10000 });
 
-			// Try to click on first event if available
-			const eventElement = page.locator('.calendar-event').first();
-			const hasEvents = (await eventElement.count()) > 0;
+			// Wait for events to be rendered (should be available from test database)
+			await page.waitForSelector('.calendar-event', { timeout: 20000 });
 
-			if (hasEvents) {
-				await eventElement.click();
+			// Click on the first event
+			await page.locator('.calendar-event').first().click();
 
-				// Wait for event detail to show
-				await page.waitForTimeout(500);
+			// Wait for event detail to show
+			await page.waitForTimeout(500);
 
-				await page.screenshot({
-					path: path.join(OUTPUT_DIR, 'event-detail.png'),
-					fullPage: false
-				});
-			} else {
-				// Skip if no events available
-				test.skip();
-			}
+			await page.screenshot({
+				path: path.join(OUTPUT_DIR, 'event-detail.png'),
+				fullPage: false
+			});
+
+			// Verify event detail is shown (check for test event title)
+			await expect(page.locator('text=Test Event 1')).toBeVisible();
 		});
 	});
 });

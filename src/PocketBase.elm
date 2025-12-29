@@ -11,9 +11,18 @@ import Types exposing (Auth, Event, User)
 -- Configuration
 
 
-baseUrl : String
-baseUrl =
+defaultBaseUrl : String
+defaultBaseUrl =
     "https://data.suomenpalikkayhteiso.fi/api"
+
+
+baseUrl : String -> String
+baseUrl url =
+    if String.isEmpty url then
+        defaultBaseUrl
+
+    else
+        url
 
 
 
@@ -26,10 +35,10 @@ type alias LoginCredentials =
     }
 
 
-login : LoginCredentials -> (Result Http.Error Auth -> msg) -> Cmd msg
-login credentials toMsg =
+login : String -> LoginCredentials -> (Result Http.Error Auth -> msg) -> Cmd msg
+login pocketbaseUrl credentials toMsg =
     Http.post
-        { url = baseUrl ++ "/collections/users/auth-with-password"
+        { url = baseUrl pocketbaseUrl ++ "/collections/users/auth-with-password"
         , body = Http.jsonBody (loginEncoder credentials)
         , expect = Http.expectJson toMsg authResponseDecoder
         }
@@ -51,10 +60,10 @@ loginEncoder credentials =
         ]
 
 
-authWithOAuth2Code : String -> Maybe String -> (Result Http.Error Auth -> msg) -> Cmd msg
-authWithOAuth2Code code state toMsg =
+authWithOAuth2Code : String -> String -> Maybe String -> (Result Http.Error Auth -> msg) -> Cmd msg
+authWithOAuth2Code pocketbaseUrl code state toMsg =
     Http.post
-        { url = baseUrl ++ "/oauth2-redirect"
+        { url = baseUrl pocketbaseUrl ++ "/oauth2-redirect"
         , body = Http.jsonBody (oauth2Encoder code state)
         , expect = Http.expectJson toMsg authResponseDecoder
         }
@@ -85,12 +94,12 @@ userDecoder =
         (Decode.field "avatar" (Decode.nullable Decode.string))
 
 
-logout : String -> (Result Http.Error () -> msg) -> Cmd msg
-logout token toMsg =
+logout : String -> String -> (Result Http.Error () -> msg) -> Cmd msg
+logout pocketbaseUrl token toMsg =
     Http.request
         { method = "POST"
         , headers = [ Http.header "Authorization" ("Bearer " ++ token) ]
-        , url = baseUrl ++ "/collections/users/auth-refresh"
+        , url = baseUrl pocketbaseUrl ++ "/collections/users/auth-refresh"
         , body = Http.emptyBody
         , expect = Http.expectWhatever toMsg
         , timeout = Nothing
@@ -102,12 +111,12 @@ logout token toMsg =
 -- Event CRUD
 
 
-getEvents : Maybe String -> (Result Http.Error (List Event) -> msg) -> Cmd msg
-getEvents token toMsg =
+getEvents : String -> Maybe String -> (Result Http.Error (List Event) -> msg) -> Cmd msg
+getEvents pocketbaseUrl token toMsg =
     Http.request
         { method = "GET"
         , headers = authHeader token
-        , url = baseUrl ++ "/collections/events/records"
+        , url = baseUrl pocketbaseUrl ++ "/collections/events/records"
         , body = Http.emptyBody
         , expect = Http.expectJson toMsg eventsResponseDecoder
         , timeout = Nothing
@@ -115,12 +124,12 @@ getEvents token toMsg =
         }
 
 
-getEvent : Maybe String -> String -> (Result Http.Error Event -> msg) -> Cmd msg
-getEvent token id toMsg =
+getEvent : String -> Maybe String -> String -> (Result Http.Error Event -> msg) -> Cmd msg
+getEvent pocketbaseUrl token id toMsg =
     Http.request
         { method = "GET"
         , headers = authHeader token
-        , url = baseUrl ++ "/collections/events/records/" ++ id
+        , url = baseUrl pocketbaseUrl ++ "/collections/events/records/" ++ id
         , body = Http.emptyBody
         , expect = Http.expectJson toMsg Types.eventDecoder
         , timeout = Nothing
@@ -133,12 +142,12 @@ eventsResponseDecoder =
     Decode.field "items" (Decode.list Types.eventDecoder)
 
 
-createEvent : Maybe String -> Event -> (Result Http.Error Event -> msg) -> Cmd msg
-createEvent token event toMsg =
+createEvent : String -> Maybe String -> Event -> (Result Http.Error Event -> msg) -> Cmd msg
+createEvent pocketbaseUrl token event toMsg =
     Http.request
         { method = "POST"
         , headers = authHeader token
-        , url = baseUrl ++ "/collections/events/records"
+        , url = baseUrl pocketbaseUrl ++ "/collections/events/records"
         , body = Http.jsonBody (Types.eventEncoder event)
         , expect = Http.expectJson toMsg Types.eventDecoder
         , timeout = Nothing
@@ -146,12 +155,12 @@ createEvent token event toMsg =
         }
 
 
-updateEvent : Maybe String -> String -> Event -> (Result Http.Error Event -> msg) -> Cmd msg
-updateEvent token id event toMsg =
+updateEvent : String -> Maybe String -> String -> Event -> (Result Http.Error Event -> msg) -> Cmd msg
+updateEvent pocketbaseUrl token id event toMsg =
     Http.request
         { method = "PATCH"
         , headers = authHeader token
-        , url = baseUrl ++ "/collections/events/records/" ++ id
+        , url = baseUrl pocketbaseUrl ++ "/collections/events/records/" ++ id
         , body = Http.jsonBody (Types.eventEncoder event)
         , expect = Http.expectJson toMsg Types.eventDecoder
         , timeout = Nothing
@@ -159,12 +168,12 @@ updateEvent token id event toMsg =
         }
 
 
-deleteEvent : Maybe String -> String -> (Result Http.Error () -> msg) -> Cmd msg
-deleteEvent token id toMsg =
+deleteEvent : String -> Maybe String -> String -> (Result Http.Error () -> msg) -> Cmd msg
+deleteEvent pocketbaseUrl token id toMsg =
     Http.request
         { method = "DELETE"
         , headers = authHeader token
-        , url = baseUrl ++ "/collections/events/records/" ++ id
+        , url = baseUrl pocketbaseUrl ++ "/collections/events/records/" ++ id
         , body = Http.emptyBody
         , expect = Http.expectWhatever toMsg
         , timeout = Nothing

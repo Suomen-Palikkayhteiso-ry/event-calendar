@@ -34,10 +34,10 @@ export default defineConfig({
 	],
 
 	/* Run your local dev server before starting the tests */
-	// webServer: {
-	// 	command: 'pnpm dev',
-	// 	url: 'http://127.0.0.1:5174',
-	// 	reuseExistingServer: !process.env.CI,
-	// 	timeout: 120000
-	// }
+	webServer: {
+		command: 'pnpm vite dev --port 5174',
+		url: 'http://localhost:5174',
+		reuseExistingServer: !process.env.CI,
+		timeout: 120000
+	}
 });

@@ -25,7 +25,7 @@ init : Model
 init =
     { view = "month"
     , events = []
-    , currentDate = Time.millisToPosix 0 -- TODO: set to current date
+    , currentDate = Time.millisToPosix 1735689600000 -- December 1, 2025
     , locale = "en"
     , firstDay = 1
     }

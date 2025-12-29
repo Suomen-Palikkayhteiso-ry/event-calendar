@@ -13,14 +13,16 @@ type alias Model =
     { events : List Event
     , loading : Bool
     , error : Maybe String
+    , pocketbaseUrl : String
     }
 
 
-init : Model
-init =
+init : String -> Model
+init pocketbaseUrl =
     { events = []
     , loading = False
     , error = Nothing
+    , pocketbaseUrl = pocketbaseUrl
     }
 
 
@@ -52,7 +54,7 @@ update msg model =
     case msg of
         FetchEvents token ->
             ( { model | loading = True, error = Nothing }
-            , PocketBase.getEvents token EventsFetched
+            , PocketBase.getEvents model.pocketbaseUrl token EventsFetched
             )
 
         EventsFetched result ->
@@ -69,7 +71,7 @@ update msg model =
 
         CreateEvent token event ->
             ( model
-            , PocketBase.createEvent token event EventCreated
+            , PocketBase.createEvent model.pocketbaseUrl token event EventCreated
             )
 
         EventCreated result ->
@@ -86,7 +88,7 @@ update msg model =
 
         UpdateEvent token id updatedEvent ->
             ( model
-            , PocketBase.updateEvent token id updatedEvent EventUpdated
+            , PocketBase.updateEvent model.pocketbaseUrl token id updatedEvent EventUpdated
             )
 
         EventUpdated result ->
@@ -114,7 +116,7 @@ update msg model =
 
         DeleteEvent token id ->
             ( model
-            , PocketBase.deleteEvent token id (EventDeleted id)
+            , PocketBase.deleteEvent model.pocketbaseUrl token id (EventDeleted id)
             )
 
         EventDeleted id result ->
@@ -131,7 +133,7 @@ update msg model =
 
         FetchEvent token id ->
             ( model
-            , PocketBase.getEvent token id EventFetched
+            , PocketBase.getEvent model.pocketbaseUrl token id EventFetched
             )
 
         EventFetched result ->
@@ -149,7 +151,8 @@ update msg model =
 
         MarkDeleted token id ->
             ( model
-            , PocketBase.getEvent token
+            , PocketBase.getEvent model.pocketbaseUrl
+                token
                 id
                 (\result ->
                     case result of
