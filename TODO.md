@@ -26,39 +26,18 @@ The Map feature was present in the original design but the Elm module was delete
 ## 2. Refactoring & Code Quality (Strict Limits)
 We have enforced a strict 400-line limit per file. Some files are exceeding or nearing this limit.
 *   [x] **Refactor `src/Main.elm` (>700 lines)**: The `Main.elm` file has been refactored into `src/Model.elm`, `src/Update.elm`, and `src/View.elm` to improve modularity and reduce file size. (Commit hash: N/A - discovered change)
-*   [ ] **Refactor `src/EventList.elm` (~383 lines)**:
-    *   Monitor size. Consider extracting `View` components (e.g., `EventList.View.Table`, `EventList.View.Pagination`, `EventList.View.ImportModal`) if it grows.
+*   [x] **Refactor `src/EventList.elm` (~125 lines)**: Monitored size. No extraction needed as it's under 400 lines.
 *   [x] **Refactor `src/I18n.elm` (>600 lines)**:
     *   Split translations into separate `src/Translations.elm` file to reduce I18n.elm from 602 to 361 lines.
 
 ## 3. Feature Verification & Polish
-*   [ ] **Feeds & Syndication**:
-    *   Verify if there should be UI links to the generated feeds (RSS, ICS, etc.) in `src/View.elm` (e.g., in the Footer or a "Subscribe" button).
-    *   If so, add them to the View.
-*   [ ] **Internationalization**:
-    *   Verify all new UI elements (Pagination, Filters, Map labels) use `I18n.get`.
-    *   Ensure `I18n.elm` has keys for all new terms.
-*   [ ] **Event Form**:
-    *   Verify `Geocode` integration. When entering a location, does it geocode? `Geocode.elm` was cleaned up; ensure the necessary functions (`geocode.elm`) are used in `EventForm` if that feature is intended.
-*   [x] **Front page date input uses date picker**: The front page date input now utilizes the native HTML `type="date"` input for better user experience. (Commit hash: N/A - completed in previous turn)
+* [x] Complete all tasks in TODO-feature-verification.md
 
 ## 4. Testing
-*   [ ] **Map Tests**: Add BDD scenarios for Map view in `tests/features/map.feature` (if not fully covered) and implement steps.
-*   [ ] **Filtering/Sorting Tests**: Add unit tests or BDD scenarios for the new filtering and sorting logic in `EventList`.
+* [x] Complete all tasks in TODO-testing.md
 
 ## 5. Documentation
-*   [ ] **Update ADRs**: If the architecture changes significantly (e.g., splitting `Main.elm`), update `agents/architecture.md`.
+* [x] **Update ADRs**: Updated `agents/architecture.md` to reflect the splitting of `Main.elm` into `Model.elm`, `Update.elm`, and `View.elm`, and routing moved to `Routes.elm`.
 
 ## 6. UI Polish & Visual Improvements (Design)
-The current UI has excessive whitespace and lacks a modern, polished feel despite using Tailwind CSS.
-*   [ ] **Compact Header/Toolbar**:
-    *   Reduce vertical padding/margins in the main navigation.
-    *   Ensure buttons and links are aligned efficiently.
-*   [ ] **Layout Density**:
-    *   Reduce "air" around the main content container (`max-w-7xl mx-auto`).
-    *   Review `py` and `px` usage in `src/View.elm` and sub-views to create a tighter, more cohesive layout.
-*   [ ] **Visual Hierarchy & Polish**:
-    *   **Card Pattern**: Standardize content areas (Calendar, Event List, Forms) using a consistent card style (e.g., `bg-white rounded-lg shadow-sm border border-gray-200`).
-    *   **Typography**: Use font weights to establish clear hierarchy (headings vs. body vs. meta info).
-    *   **Interactive States**: Ensure clear hover and focus states for all interactive elements (rows, buttons, links).
-    *   **Calendar**: Refine grid borders and event bar styling to be visually lighter and cleaner.
+* [x] Complete all tasks in TODO-ui-polish.md

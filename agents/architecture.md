@@ -20,14 +20,17 @@ The event calendar application follows a client-side functional architecture (El
 ### Frontend (Elm)
 
 - **Architecture**: The Elm Architecture (Model-View-Update)
-- **Routing**: `Url.Parser` based routing in `Main.elm`
+- **Routing**: `Url.Parser` based routing in `Routes.elm`
   - `/` - Home (Calendar)
   - `/map` - Map View
   - `/events/:id` - Event Detail
   - `/events/:id/edit` - Edit Event
 
 - **Modules (src/)**:
-  - `Main.elm`: Application entry point and wiring
+  - `Model.elm`: Application state and initialization
+  - `Update.elm`: Message handling and state updates
+  - `View.elm`: UI rendering and layout
+  - `Routes.elm`: URL parsing and routing logic
   - `Calendar.elm`: Calendar grid logic and view
   - `Map.elm`: Leaflet integration (via Ports/Custom Elements)
   - `EventForm.elm`: Create/Edit event logic

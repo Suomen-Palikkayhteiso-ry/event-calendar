@@ -145,3 +145,95 @@ Then('the event should be updated', async ({ page }) => {
 Then('the event should no longer be visible', async ({ page }) => {
 	await expect(page.locator('text=Event not found')).toBeVisible(); // Or check calendar
 });
+
+Given('I am on the map page', async ({ page }) => {
+	await page.goto('/map');
+});
+
+Then('I should see a map centered on Helsinki', async ({ page }) => {
+	// Check for Leaflet map container
+	await expect(page.locator('.leaflet-container')).toBeVisible();
+});
+
+Then('event markers should be displayed on the map', async ({ page }) => {
+	// Check for marker icons
+	await expect(page.locator('.leaflet-marker-icon')).toBeVisible();
+});
+
+Given('there are event markers on the map', async ({ page }) => {
+	// Ensure markers are present
+	await expect(page.locator('.leaflet-marker-icon')).toHaveCountGreaterThan(0);
+});
+
+When('I click on a marker', async ({ page }) => {
+	await page.locator('.leaflet-marker-icon').first().click();
+});
+
+Then('I should see event information', async ({ page }) => {
+	// Check for popup with event info
+	await expect(page.locator('.leaflet-popup')).toBeVisible();
+});
+
+Given('I am on the events page', async ({ page }) => {
+	await page.goto('/events');
+});
+
+When('I enter "test" in the title filter', async ({ page }) => {
+	await page.fill('input[name="titleFilter"]', 'test');
+});
+
+Then('only events with "test" in the title should be displayed', async ({ page }) => {
+	const eventTitles = page.locator('.event-title');
+	const count = await eventTitles.count();
+	for (let i = 0; i < count; i++) {
+		const title = await eventTitles.nth(i).textContent();
+		expect(title?.toLowerCase()).toContain('test');
+	}
+});
+
+When('I select a date in the date filter', async ({ page }) => {
+	await page.fill('input[name="dateFilter"]', '2025-01-01');
+});
+
+Then('only events on that date should be displayed', async ({ page }) => {
+	// Assuming events show dates, check they match
+	const eventDates = page.locator('.event-date');
+	const count = await eventDates.count();
+	for (let i = 0; i < count; i++) {
+		const date = await eventDates.nth(i).textContent();
+		expect(date).toContain('2025-01-01');
+	}
+});
+
+When('I select "Draft" in the status filter', async ({ page }) => {
+	await page.selectOption('select[name="statusFilter"]', 'Draft');
+});
+
+Then('only draft events should be displayed', async ({ page }) => {
+	const eventStatuses = page.locator('.event-status');
+	const count = await eventStatuses.count();
+	for (let i = 0; i < count; i++) {
+		const status = await eventStatuses.nth(i).textContent();
+		expect(status).toBe('Draft');
+	}
+});
+
+When('I click the title sort button', async ({ page }) => {
+	await page.click('button:has-text("Title")');
+});
+
+Then('events should be sorted alphabetically by title', async ({ page }) => {
+	const titles = await page.locator('.event-title').allTextContents();
+	const sortedTitles = [...titles].sort();
+	expect(titles).toEqual(sortedTitles);
+});
+
+When('I click the date sort button', async ({ page }) => {
+	await page.click('button:has-text("Date")');
+});
+
+Then('events should be sorted by date', async ({ page }) => {
+	const dates = await page.locator('.event-date').allTextContents();
+	const sortedDates = [...dates].sort();
+	expect(dates).toEqual(sortedDates);
+});

@@ -17,3 +17,33 @@ Feature: Event List Management
     And I am on the events page
     When I upload a valid KML file
     Then events should be imported and appear in the list
+
+  Scenario: Filter events by title
+    Given I am authenticated
+    And I am on the events page
+    When I enter "test" in the title filter
+    Then only events with "test" in the title should be displayed
+
+  Scenario: Filter events by date
+    Given I am authenticated
+    And I am on the events page
+    When I select a date in the date filter
+    Then only events on that date should be displayed
+
+  Scenario: Filter events by status
+    Given I am authenticated
+    And I am on the events page
+    When I select "Draft" in the status filter
+    Then only draft events should be displayed
+
+  Scenario: Sort events by title
+    Given I am authenticated
+    And I am on the events page
+    When I click the title sort button
+    Then events should be sorted alphabetically by title
+
+  Scenario: Sort events by date
+    Given I am authenticated
+    And I am on the events page
+    When I click the date sort button
+    Then events should be sorted by date
