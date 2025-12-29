@@ -4,6 +4,7 @@
 
 - [devenv](https://devenv.sh/) for development environment
 - [pnpm](https://pnpm.io/) for package management
+- [Haskell Stack](https://docs.haskellstack.org/) for Haskell scripts
 - Git
 
 ## Environment Setup
@@ -59,7 +60,40 @@ pnpm build
 pnpm generate-statics
 ```
 
-Generates RSS, Atom, JSON, GeoJSON, ICS, and HTML feeds.
+Generates RSS, Atom, JSON, GeoJSON, ICS, and HTML feeds using Haskell scripts.
+
+#### Haskell Scripts
+
+The project includes Haskell scripts for static generation:
+
+- `GenerateUtils.hs` - Common utilities for PocketBase API interaction
+- `GenerateFeeds.hs` - RSS/Atom feed generation
+- `GenerateIcsGeojson.hs` - ICS calendar and GeoJSON generation
+- `GenerateStatics.hs` - HTML static page generation
+- `GenerateEmbed.hs` - Embeddable calendar generation
+
+**Building Haskell scripts:**
+
+```bash
+# Compile Haskell scripts (if needed)
+stack build
+```
+
+**Running Haskell scripts directly:**
+
+```bash
+# Generate feeds
+stack exec generate-feeds
+
+# Generate ICS and GeoJSON
+stack exec generate-ics-geojson
+
+# Generate static HTML
+stack exec generate-statics
+
+# Generate embeddable content
+stack exec generate-embed
+```
 
 ### Code Quality
 
@@ -103,7 +137,14 @@ src/
 ├── index.js       # JS Entry Point & Port Implementation
 └── style.css      # Global Styles
 
-scripts/           # Static generation scripts (Node.js/Elm)
+scripts/           # Static generation scripts (Haskell/Node.js/Elm)
+├── GenerateUtils.hs     # Haskell utilities for PocketBase API
+├── GenerateFeeds.hs     # Haskell RSS/Atom feed generation
+├── GenerateIcsGeojson.hs # Haskell ICS/GeoJSON generation
+├── GenerateStatics.hs   # Haskell HTML static generation
+├── GenerateEmbed.hs     # Haskell embeddable content generation
+├── generate_*.py        # Python equivalents (legacy)
+├── generate_*.js        # Node.js equivalents (legacy)
 agents/            # Documentation and ADRs
 docs/              # Project documentation
 ```

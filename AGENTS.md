@@ -19,8 +19,9 @@ This file defines how LLM coding agents should understand, navigate, and safely 
 - **Project**: Event calendar application (Elm SPA)
 - **Frontend**: Elm (Active Development)
 - **Backend**: PocketBase (External)
+- **Static Generation**: Haskell scripts
 - **Styling**: Tailwind CSS v4
-- **Package Manager**: pnpm (Node/Build), elm (Application)
+- **Package Manager**: pnpm (Node/Build), elm (Application), stack (Haskell)
 - **Environment**: devenv (Nix)
 
 ## Repository Map
@@ -43,7 +44,7 @@ This file defines how LLM coding agents should understand, navigate, and safely 
   Main.elm                 # Core Elm application
   index.js                 # JS Entry point & Ports
   elm.js                   # Compiled Elm application (artifact)
-/scripts/                  # Node.js Build/Utility scripts
+/scripts/                  # Static generation scripts (Haskell/Node.js/Elm)
 ```
 
 ## Agent Work Loop

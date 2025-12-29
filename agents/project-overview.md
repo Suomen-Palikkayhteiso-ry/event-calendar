@@ -19,6 +19,7 @@ This is an event calendar application, currently migrating from SvelteKit to Elm
 
 - **Frontend Framework**: Elm 0.19.1 (Migrating from SvelteKit)
 - **Backend**: PocketBase (self-hosted)
+- **Static Generation**: Haskell scripts for feed generation
 - **Styling**: Tailwind CSS v4
 - **Authentication**: OAuth2 with OIDC
 - **Maps**: Leaflet (via Elm Ports)
@@ -33,7 +34,7 @@ The application follows a client-side architecture using The Elm Architecture (T
 
 - **Frontend**: Pure Elm application managing state, routing, and UI logic.
 - **Interop**: JavaScript Ports handle maps, local storage, and static assets.
-- **Static Generation**: Custom scripts (transitioning to Elm/Node) generate feeds and static content from PocketBase data.
+- **Static Generation**: Haskell scripts generate feeds and static content from PocketBase data.
 - **Backend**: PocketBase provides data persistence, authentication, and file storage.
 
 ## Development Environment

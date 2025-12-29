@@ -65,13 +65,15 @@ During migration, the SvelteKit scaffolding remains to serve the application or 
 
 ### Static Generation
 
-Custom Node.js scripts generate multiple output formats (independent of frontend framework):
+Haskell scripts generate multiple output formats from PocketBase data:
 
-- **HTML**: Embeddable calendar pages
-- **RSS/Atom**: Syndication feeds
-- **JSON**: Structured data access
-- **GeoJSON**: Geographic event data
-- **ICS**: Calendar import files
+- **GenerateFeeds.hs**: RSS/Atom syndication feeds
+- **GenerateIcsGeojson.hs**: ICS calendar files and GeoJSON geographic data
+- **GenerateStatics.hs**: HTML static pages for embedding
+- **GenerateEmbed.hs**: Embeddable calendar widgets
+- **GenerateUtils.hs**: Common utilities for PocketBase API interaction and data processing
+
+The Haskell scripts provide type-safe, efficient generation of static content with proper error handling and timezone support.
 
 ## Data Flow (TEA)
 
