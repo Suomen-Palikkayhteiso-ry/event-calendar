@@ -100,7 +100,7 @@ if (window.Elm && window.Elm.Main) {
         shadowUrl: '/marker-shadow.png',
     });
 
-    app.ports.initMap.subscribe((data) => {
+    app.ports.initMap?.subscribe((data) => {
         if (map) return;
         
         const mapNode = document.getElementById('map');
@@ -121,7 +121,7 @@ if (window.Elm && window.Elm.Main) {
         });
     });
 
-    app.ports.updateMap.subscribe((data) => {
+    app.ports.updateMap?.subscribe((data) => {
         if (!map) return;
         map.setView(data.center, data.zoom);
         // Clear existing markers
@@ -140,7 +140,7 @@ if (window.Elm && window.Elm.Main) {
     });
 
     // KML Parsing
-    app.ports.parseKMLContent.subscribe((text) => {
+    app.ports.parseKMLContent?.subscribe((text) => {
         try {
             const parser = new DOMParser();
             const doc = parser.parseFromString(text, 'application/xml');
@@ -165,10 +165,10 @@ if (window.Elm && window.Elm.Main) {
                     lon: isNaN(lon) ? 0 : lon
                 };
             });
-            app.ports.kmlParsed.send(result);
+            app.ports.kmlContentParsed?.send(result);
         } catch (e) {
             console.error('KML parsing error:', e);
-            app.ports.kmlParsed.send([]);
+            app.ports.kmlContentParsed?.send([]);
         }
     });
 } else {
