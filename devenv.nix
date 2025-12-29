@@ -15,42 +15,30 @@ in
   languages.python.venv.enable = true;
 
   languages.haskell.enable = true;
-
-  packages = with pkgs; [
-    chromium
-    python3
-    nodejs
-    elmPackages.elm-review
-    elmPackages.elm-format
-    elmPackages.elm-test
-    elmPackages.elm-language-server
-    (python3.withPackages (ps: with ps; [
-      requests
-      feedgen
-      icalendar
-      qrcode
-      pillow
-    ]))
-    (haskellPackages.ghcWithPackages (ps: with ps; [
-      aeson
-      http-client
-      http-client-tls
-      time
-      directory
-      filepath
-      text
-      bytestring
-      containers
-      vector
-      unordered-containers
-      scientific
-      uuid
-      base64-bytestring
-      feed
-    ]))
-  ];
+  languages.haskell.package = pkgs.haskellPackages.ghcWithPackages (ps: with ps; [
+    aeson
+    http-client
+    http-client-tls
+    time
+    directory
+    filepath
+    text
+    bytestring
+    containers
+    vector
+    unordered-containers
+    scientific
+    uuid
+    base64-bytestring
+    feed
+  ]);
 
   dotenv.disableHint = true;
+
+  # PocketBase for local testing
+  packages = [
+    pkgs.pocketbase
+  ];
 
   # https://devenv.sh/basics/
   env = {
@@ -65,6 +53,15 @@ in
     elm-check.exec = "elm-format src/ --validate && elm-review && elm-test";
     elm-spec.exec = "pnpm test:spec";
     elm-spec-headed.exec = "pnpm test:spec:headed";
+    pocketbase-init.exec = "mkdir -p .pocketbase && pocketbase migrate";
+    pocketbase-serve.exec = "pocketbase serve --dir=.pocketbase --http=127.0.0.1:8090";
+    pocketbase-admin.exec = "pocketbase admin --dir=.pocketbase";
+    check-db-health.exec = "pnpm check-db-health";
+    export-db.exec = "pnpm export-db";
+    import-test-db.exec = "pnpm import-test-db";
+    test-db-setup.exec = "./scripts/test-db/setup-test-db.sh";
+    test-local.exec = "POCKETBASE_URL=http://127.0.0.1:8090 make test-e2e";
+    test.exec = "devenv run test-db-setup && devenv run check-db-health && devenv run test-local";
     intro.exec = ''
       playwrightNpmVersion="$(grep '"@playwright/test"' package.json | sed 's/.*"\\([^"]*\\)".*/\\1/')"
       echo "❄️ Playwright nix version: ${pkgs.playwright.version}"

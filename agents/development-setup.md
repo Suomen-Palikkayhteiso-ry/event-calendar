@@ -154,3 +154,54 @@ devenv shell -- ./scripts/check-playwright-compat.sh
 ```
 
 See [Playwright Setup](./playwright-setup.md) for detailed configuration and troubleshooting.
+
+## Database Setup for Contributors
+
+This project uses PocketBase as the backend database. For development and testing, a local PocketBase instance is automatically set up.
+
+### Local Database Setup
+
+The development environment automatically provides PocketBase. To set up the test database:
+
+```bash
+# Enter development environment
+devenv shell
+
+# Set up test database (creates admin user and sample data)
+devenv run test-db-setup
+
+# Check database health
+devenv run check-db-health
+```
+
+### Database Health Checks
+
+Before running tests, ensure the database is healthy:
+
+```bash
+# Check database connectivity and data integrity
+pnpm check-db-health
+```
+
+The health check verifies:
+- PocketBase server is running and accessible
+- Required collections exist (events, users)
+- Test data is present and valid
+- Events have future dates for testing
+
+### Environment Variables
+
+- `POCKETBASE_URL`: Database URL (default: `http://127.0.0.1:8090` for local, `https://data.suomenpalikkayhteiso.fi` for production)
+- `POCKETBASE_TOKEN`: Admin token for database operations (optional, used for health checks)
+
+### Running Tests with Local Database
+
+```bash
+# Run all tests with local database
+devenv run test
+
+# Or manually:
+devenv run test-db-setup  # Set up database
+devenv run check-db-health  # Verify health
+make test-e2e             # Run E2E tests
+```
