@@ -14,7 +14,7 @@
 		"check-db-health": "node scripts/check-db-health.js",
 		"export-db": "node scripts/export-db.js",
 		"import-test-db": "node scripts/import-test-db.js",
-		"test": "vitest run; elm-test",
+		"test": "elm-test",
 		"test:watch": "vitest",
 		"test:coverage": "vitest run --coverage",
 		"test:ui": "vitest --ui",
@@ -69,6 +69,7 @@
 		]
 	},
 	"dependencies": {
+		"elm-review": "^2.13.4",
 		"feed": "^5.1.0",
 		"flowbite": "^3.1.2",
 		"ical-generator": "^10.0.0",
