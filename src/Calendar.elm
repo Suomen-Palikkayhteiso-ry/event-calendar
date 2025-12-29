@@ -1,11 +1,47 @@
 module Calendar exposing (..)
 
 import DateUtils
-import Html exposing (Html, button, div, h2, text)
-import Html.Attributes exposing (class)
+import Html exposing (Html, button, div, h2, node, text)
+import Html.Attributes exposing (attribute, class)
 import Html.Events exposing (onClick)
 import Time
 import Types exposing (Event)
+
+
+
+-- ICONS
+
+
+chevronLeftIcon : Html msg
+chevronLeftIcon =
+    node "svg"
+        [ attribute "width" "16"
+        , attribute "height" "16"
+        , attribute "viewBox" "0 0 24 24"
+        , attribute "fill" "none"
+        , attribute "stroke" "currentColor"
+        , attribute "stroke-width" "2"
+        , attribute "stroke-linecap" "round"
+        , attribute "stroke-linejoin" "round"
+        , class "inline-block"
+        ]
+        [ node "path" [ attribute "d" "M15 18l-6-6 6-6" ] [] ]
+
+
+chevronRightIcon : Html msg
+chevronRightIcon =
+    node "svg"
+        [ attribute "width" "16"
+        , attribute "height" "16"
+        , attribute "viewBox" "0 0 24 24"
+        , attribute "fill" "none"
+        , attribute "stroke" "currentColor"
+        , attribute "stroke-width" "2"
+        , attribute "stroke-linecap" "round"
+        , attribute "stroke-linejoin" "round"
+        , class "inline-block"
+        ]
+        [ node "path" [ attribute "d" "M9 18l6-6-6-6" ] [] ]
 
 
 
@@ -521,9 +557,9 @@ view model =
     in
     div [ class "calendar" ]
         [ div [ class "calendar-header" ]
-            [ button [ onClick Previous ] [ text "<" ]
+            [ button [ onClick Previous ] [ chevronLeftIcon ]
             , h2 [] [ text (monthYearString model.currentDate) ]
-            , button [ onClick Next ] [ text ">" ]
+            , button [ onClick Next ] [ chevronRightIcon ]
             ]
         , div [ class "calendar-grid" ]
             (List.concat
