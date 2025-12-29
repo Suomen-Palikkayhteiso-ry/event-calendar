@@ -116,8 +116,13 @@ if (window.Elm && window.Elm.Main) {
 		// Add markers for events
 		data.events.forEach((event) => {
 			if (event.point) {
-				const marker = L.marker([event.point.lat, event.point.lon]).addTo(map);
+				const marker = L.marker([event.point.lat, event.point.lon], { draggable: true }).addTo(map);
 				marker.bindPopup(`<b>${event.title}</b><br><a href="/events/${event.id}">View Details</a>`);
+
+				marker.on('dragend', function (e) {
+					const { lat, lng } = e.target.getLatLng();
+					app.ports.mapMarkerMoved.send([lat, lng]);
+				});
 			}
 		});
 	});
@@ -134,8 +139,13 @@ if (window.Elm && window.Elm.Main) {
 		// Add new markers
 		data.events.forEach((event) => {
 			if (event.point) {
-				const marker = L.marker([event.point.lat, event.point.lon]).addTo(map);
+				const marker = L.marker([event.point.lat, event.point.lon], { draggable: true }).addTo(map);
 				marker.bindPopup(`<b>${event.title}</b><br><a href="/events/${event.id}">View Details</a>`);
+
+				marker.on('dragend', function (e) {
+					const { lat, lng } = e.target.getLatLng();
+					app.ports.mapMarkerMoved.send([lat, lng]);
+				});
 			}
 		});
 	});
