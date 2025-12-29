@@ -13,6 +13,16 @@ clean:
 	rm -rf build
 	rm -rf node_modules
 	rm -rf elm-stuff
+	rm -rf review/elm-stuff
+	rm -rf elm-spec-core/elm-stuff
+	rm -rf test-results
+	rm -rf playwright-report
+	rm -rf coverage
+	rm -rf .pocketbase
+	rm -rf .devenv
+	rm -rf static/kalenteri.*
+	rm -rf scripts/*.hi
+	rm -rf scripts/*.o
 
 .PHONY: install
 install:
