@@ -5,9 +5,8 @@ import Calendar
 import EventForm
 import EventList
 import Events
+import Map
 import Routes
-import Time
-import Map -- New import
 import Types
 import Url
 
@@ -29,7 +28,7 @@ type alias Model =
     }
 
 
-init : Maybe String -> Url.Url -> Nav.Key -> ( Model, Cmd msg )
+init : Maybe String -> Url.Url -> Nav.Key -> ( Model, Cmd Events.Msg )
 init maybePocketbaseUrl url key =
     let
         pocketbaseUrl =

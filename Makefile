@@ -98,3 +98,28 @@ shell:
 .PHONY: test-ci
 test-ci: install test test-coverage test-e2e clean build
 	@echo "✅ All GitHub Actions tests passed locally!"
+
+.PHONY: pocketbase-init
+pocketbase-init:
+	mkdir -p .pocketbase && pocketbase migrate
+
+.PHONY: pocketbase-serve
+pocketbase-serve:
+	pocketbase serve --dir=.pocketbase --http=127.0.0.1:8090
+
+.PHONY: pocketbase-admin
+pocketbase-admin:
+	pocketbase admin --dir=.pocketbase
+
+.PHONY: test-db-setup
+test-db-setup:
+	./scripts/test-db/setup-test-db.sh
+
+.PHONY: test-local
+test-local:
+	POCKETBASE_URL=http://127.0.0.1:8090 make test-e2e
+
+.PHONY: test-all
+test-all: test-db-setup
+	pnpm check-db-health
+	$(MAKE) test-local

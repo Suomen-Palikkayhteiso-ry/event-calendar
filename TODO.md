@@ -6,11 +6,11 @@ Follow the guidelines in AGENTS.md and especially ADR-0000. Do not create any us
 
 ## Tasks
 
-* [ ] Move scripts from devenv.nix into Makefile or all the way into package.json, when it makes more sense (and only alias those in Makefile)
+* [x] Move scripts from devenv.nix into Makefile or all the way into package.json, when it makes more sense (and only alias those in Makefile)
 
-* [ ] Ensure that 'elm-review' is 'make check' and then add 'make check' into pre-commit hook https://devenv.sh/git-hooks/
+* [x] Ensure that 'elm-review' is 'make check' and then add 'make check' into pre-commit hook https://devenv.sh/git-hooks/
 
-* [ ] Move app title from content into toolbar
+* [x] Move app title from content into toolbar
 
 This document lists the remaining tasks to ensure all features are properly implemented in the Elm rewrite of the Event Calendar.
 

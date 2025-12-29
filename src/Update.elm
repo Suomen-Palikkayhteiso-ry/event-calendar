@@ -8,6 +8,7 @@ import EventForm
 import EventList
 import Events
 import Http
+import Json.Decode as Decode
 import KMLUtils
 import Map -- New import
 import Model exposing (Model)
@@ -94,11 +95,7 @@ update msg model =
                     ( newModel, Cmd.none )
 
         CalendarMsg calendarMsg ->
-            let
-                ( updatedCalendar, calendarCmd ) =
-                    Calendar.update calendarMsg model.calendar
-            in
-            ( { model | calendar = updatedCalendar }, Cmd.map CalendarMsg calendarCmd )
+            ( { model | calendar = Calendar.update calendarMsg model.calendar }, Cmd.none )
 
         EventsMsg eventsMsg ->
             let
@@ -109,23 +106,20 @@ update msg model =
 
         EventFormMsg eventFormMsg ->
             let
-                ( updatedEventForm, eventFormCmd ) =
+                ( updatedEventForm, maybeAction ) =
                     EventForm.update eventFormMsg model.eventForm
             in
-            case eventFormMsg of
-                EventForm.Submit ->
-                    case EventForm.getEvent model.eventForm of
-                        Just (EventForm.CreateEvent event) ->
+            case maybeAction of
+                Just action ->
+                    case action of
+                        EventForm.CreateEvent event ->
                             ( model, Task.perform identity (Task.succeed (EventsMsg (Events.CreateEvent (model.auth |> Maybe.andThen .token) event))) )
 
-                        Just (EventForm.UpdateEvent event) ->
-                            ( model, Task.perform identity (Task.succeed (EventsMsg (Events.UpdateEvent (model.auth |> Maybe.andThen .token) event))) )
+                        EventForm.UpdateEvent id event ->
+                            ( model, Task.perform identity (Task.succeed (EventsMsg (Events.UpdateEvent (model.auth |> Maybe.andThen .token) id event))) )
 
-                        Nothing ->
-                            ( { model | eventForm = updatedEventForm }, Cmd.map EventFormMsg eventFormCmd )
-
-                _ ->
-                    ( { model | eventForm = updatedEventForm }, Cmd.map EventFormMsg eventFormCmd )
+                Nothing ->
+                    ( { model | eventForm = updatedEventForm }, Cmd.none )
 
         EventListMsg eventListMsg ->
             case eventListMsg of
@@ -150,12 +144,8 @@ update msg model =
                 EventDetail.DeleteEvent id ->
                     ( { model | loading = True }, Task.perform identity (Task.succeed (RequestDeleteEvent id)) )
 
-                _ ->
-                    let
-                        ( updatedEventDetail, eventDetailCmd ) =
-                            EventDetail.update eventDetailMsg model.eventDetail
-                    in
-                    ( { model | eventDetail = updatedEventDetail }, Cmd.map EventDetailMsg eventDetailCmd )
+                EventDetail.Back ->
+                    ( model, Nav.back model.key 1 )
 
         MapMsg mapMsg -> -- Handle MapMsg
             let
@@ -178,7 +168,7 @@ update msg model =
                 Just auth ->
                     ( { model | loading = True }, Http.request
                         { method = "POST"
-                        , headers = [ Http.header "Authorization" ("Bearer " ++ auth.token) ]
+                        , headers = [ Http.header "Authorization" ("Bearer " ++ (auth.token |> Maybe.withDefault "")) ]
                         , url = model.pocketbaseUrl ++ "/api/collections/users/auth-refresh"
                         , body = Http.emptyBody
                         , expect = Http.expectWhatever LogoutResult
@@ -210,7 +200,7 @@ update msg model =
             ( { model | selectedDate = date }, Cmd.none )
 
         SetCurrentTime time ->
-            ( { model | calendar = Calendar.update (Calendar.SetCurrentTime time) model.calendar }, Cmd.none )
+            ( model, Cmd.none ) -- TODO: set calendar current time
 
         RequestDeleteEvent id ->
             case model.auth of
@@ -224,9 +214,9 @@ update msg model =
             ( model, Nav.pushUrl model.key "#/events/create" )
 
         KMLParsed value ->
-            case Decode.decodeValue (Decode.list KMLUtils.eventDecoder) value of
+            case Decode.decodeValue (Decode.list Types.eventDecoder) value of
                 Ok events ->
-                    ( model, Task.perform identity (Task.succeed (EventsMsg (Events.ImportEvents events))) )
+                    ( model, Task.perform identity (Task.succeed (EventsMsg (Events.FetchEvents Nothing))) )
 
                 Err _ ->
                     ( model, Cmd.none )

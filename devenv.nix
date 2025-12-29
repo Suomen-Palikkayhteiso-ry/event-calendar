@@ -84,4 +84,10 @@ in
   enterShell = ''
     intro
   '';
+
+  git-hooks.hooks = {
+    pre-commit = {
+      text = "make check";
+    };
+  };
 }

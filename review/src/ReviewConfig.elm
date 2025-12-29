@@ -25,9 +25,7 @@ config =
     , NoDebug.TodoOrToString.rule
     , NoLongFiles.rule
         |> Rule.ignoreErrorsForFiles
-            [ "src/Main.elm"
-            , "src/Calendar.elm"
-            , "src/I18n.elm"
+            [ "src/I18n.elm"
             ]
     , NoMissingTypeAnnotation.rule
     , NoSimpleLetBody.rule

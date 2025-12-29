@@ -1,4 +1,4 @@
-module View exposing (..)module View exposing (view)
+module View exposing (view)
 
 import Browser
 import Calendar
@@ -6,15 +6,15 @@ import DateTimePicker
 import EventDetail
 import EventForm
 import EventList
-import Html exposing (Html, a, button, div, h1, header, label, main_, nav, p, text)
+import Html exposing (a, button, div, h1, header, label, main_, nav, p, text)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
 import I18n
 import Icons
+import Map
 import Model exposing (Model)
-import Map -- New import
 import Routes
-import Types
+import Update
 
 
 view : Model -> Browser.Document Update.Msg
@@ -25,14 +25,17 @@ view model =
             [ header [ class "bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50" ]
                 [ div [ class "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" ]
                     [ div [ class "flex justify-between items-center h-12" ]
-                        [ nav [ class "flex space-x-8" ]
-                            [ a [ href "#/", class "text-gray-900 hover:text-blue-600 px-3 py-2 text-sm font-medium", attribute "aria-label" (I18n.get "home") ] [ Icons.homeIcon ]
-                            , if model.auth /= Nothing then
-                                a [ href "#/events", class "text-gray-500 hover:text-blue-600 px-3 py-2 text-sm font-medium", attribute "aria-label" (I18n.get "events") ] [ Icons.calendarIcon ]
+                        [ div [ class "flex items-center space-x-4" ]
+                            [ h1 [ class "text-lg font-semibold text-gray-900" ] [ text (I18n.get "event_calendar") ]
+                            , nav [ class "flex space-x-8" ]
+                                [ a [ href "#/", class "text-gray-900 hover:text-blue-600 px-3 py-2 text-sm font-medium", attribute "aria-label" (I18n.get "home") ] [ Icons.homeIcon ]
+                                , if model.auth /= Nothing then
+                                    a [ href "#/events", class "text-gray-500 hover:text-blue-600 px-3 py-2 text-sm font-medium", attribute "aria-label" (I18n.get "events") ] [ Icons.calendarIcon ]
 
-                              else
-                                text ""
-                            , a [ href "#/map", class "text-gray-500 hover:text-blue-600 px-3 py-2 text-sm font-medium", attribute "aria-label" (I18n.get "map") ] [ Icons.mapIcon ] -- Add Map link
+                                  else
+                                    text ""
+                                , a [ href "#/map", class "text-gray-500 hover:text-blue-600 px-3 py-2 text-sm font-medium", attribute "aria-label" (I18n.get "map") ] [ Icons.mapIcon ] -- Add Map link
+                                ]
                             ]
                         , div [ class "flex items-center space-x-4" ]
                             [ case model.auth of
@@ -68,17 +71,18 @@ view model =
                                                         Just n ->
                                                             n
 
-                                                        Just u ->
-                                                            u
-
                                                         Nothing ->
-                                                            "User"
+                                                            case username of
+                                                                Just u ->
+                                                                    u
 
-                                Nothing ->
-                                    ""
-                            , case model.auth of
-                                Just _ ->
-                                    button [ class "text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium", onClick Update.Logout, attribute "aria-label" (I18n.get "logout") ] [ Icons.logoutIcon ]
+                                                                Nothing ->
+                                                                    user.email
+
+                                                Nothing ->
+                                                    "User"
+                                    in
+                                    button [ class "text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium", onClick Update.Logout, attribute "aria-label" (I18n.get "logout"), title displayName ] [ Icons.logoutIcon ]
 
                                 Nothing ->
                                     button [ class "text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium", onClick Update.Login, attribute "aria-label" (I18n.get "login") ] [ Icons.loginIcon ]
@@ -88,20 +92,18 @@ view model =
                 ]
             , main_ [ class "flex-1" ]
                 [ div [ class "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6" ]
-                    [ case model.loading of
-                        True ->
-                            div [ class "flex justify-center items-center h-64" ]
-                                [ div [ class "animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" ] []
-                                ]
+                    [ if model.loading then
+                        div [ class "flex justify-center items-center h-64" ]
+                            [ div [ class "animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" ] []
+                            ]
 
-                        False ->
-                            case model.route of
+                      else
+                        case model.route of
                                 Routes.Home ->
                                     div [ class "space-y-4" ]
                                         [ div [ class "bg-white shadow rounded-lg" ]
                                             [ div [ class "px-3 py-2 sm:p-3" ]
-                                                [ h1 [ class "text-2xl font-bold text-gray-900 mb-2" ] [ text (I18n.get "public_calendar") ]
-                                                , case model.auth of
+                                                [ case model.auth of
                                                     Just _ ->
                                                         div [ class "mb-4 flex items-center justify-between" ]
                                                             [ div [ class "flex items-center space-x-4" ]

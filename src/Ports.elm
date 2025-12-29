@@ -14,6 +14,12 @@ port storeAuth : Auth -> Cmd msg
 port removeAuth : () -> Cmd msg
 
 
+port login : () -> Cmd msg
+
+
+port logout : () -> Cmd msg
+
+
 port initiateOAuth2Login : String -> Cmd msg
 
 
