@@ -10,7 +10,7 @@ import EventUtils
 import Expect
 import Test exposing (..)
 import Time
-import Types exposing (Event, EventFormData, EventState(..), Point, DisplayEvent)
+import Types exposing (DisplayEvent, Event, EventFormData, EventState(..), Point)
 
 
 suite : Test
@@ -38,7 +38,8 @@ suite =
                             , updated = "2024-01-01T09:00:00Z"
                             }
 
-                        formData = EventUtils.eventToFormData event
+                        formData =
+                            EventUtils.eventToFormData event
                     in
                     Expect.all
                         [ \fd -> Expect.equal fd.title "Test Event"
@@ -75,7 +76,8 @@ suite =
                             , updated = "2024-01-01T09:00:00Z"
                             }
 
-                        formData = EventUtils.eventToFormData event
+                        formData =
+                            EventUtils.eventToFormData event
                     in
                     Expect.all
                         [ \fd -> Expect.equal fd.title "Test Event"
@@ -114,7 +116,8 @@ suite =
                             , updated = "2024-01-01T09:00:00Z"
                             }
 
-                        formatted = EventUtils.formatEventForDisplay event
+                        formatted =
+                            EventUtils.formatEventForDisplay event
                     in
                     Expect.all
                         [ \e -> Expect.equal e.displayDate "1.1.2024"
@@ -144,13 +147,14 @@ suite =
                             , updated = "2024-01-01T09:00:00Z"
                             }
 
-                        now = Time.millisToPosix (Time.posixToMillis (DateUtils.parseUTCDate "2024-01-01T11:00:00Z"))
+                        now =
+                            Time.millisToPosix (Time.posixToMillis (DateUtils.parseUTCDate "2024-01-01T11:00:00Z"))
                     in
                     Expect.equal (EventUtils.isEventOngoing now event) True
             , test "should return false if event is in the past" <|
                 \_ ->
                     let
-                        event = 
+                        event =
                             { id = "test-id"
                             , title = "Test Event"
                             , description = Just "Test description"
@@ -167,7 +171,8 @@ suite =
                             , updated = "2024-01-01T09:00:00Z"
                             }
 
-                        now = Time.millisToPosix (Time.posixToMillis (DateUtils.parseUTCDate "2024-01-02T11:00:00Z"))
+                        now =
+                            Time.millisToPosix (Time.posixToMillis (DateUtils.parseUTCDate "2024-01-02T11:00:00Z"))
                     in
                     Expect.equal (EventUtils.isEventOngoing now event) False
             ]

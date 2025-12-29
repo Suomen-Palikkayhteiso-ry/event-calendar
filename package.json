@@ -9,7 +9,6 @@
 		"preview": "vite preview",
 		"format": "prettier --write .",
 		"lint": "prettier --check . && eslint .",
-		"generate-statics": "node scripts/generate-statics.js",
 		"generate-screenshots": "npx tsx scripts/generate-screenshots.ts",
 		"screenshots": "playwright test tests/screenshots.spec.ts --project=chromium",
 		"check-db-health": "node scripts/check-db-health.js",

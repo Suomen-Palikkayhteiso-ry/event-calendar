@@ -1,9 +1,9 @@
 #!/usr/bin/env runhaskell
 
-import GenerateUtils
 import GenerateEmbed
 import GenerateFeeds
 import GenerateIcsGeojson
+import GenerateUtils
 
 main :: IO ()
 main = do

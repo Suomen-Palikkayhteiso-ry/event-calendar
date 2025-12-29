@@ -59,11 +59,20 @@ suite =
             [ test "should add one month to January 1st" <|
                 \_ ->
                     let
-                        jan1 = Calendar.dateToPosix 2024 Time.Jan 1
-                        feb1 = Calendar.addMonths 1 jan1
-                        resultYear = Time.toYear Time.utc feb1
-                        resultMonth = Time.toMonth Time.utc feb1
-                        resultDay = Time.toDay Time.utc feb1
+                        jan1 =
+                            Calendar.dateToPosix 2024 Time.Jan 1
+
+                        feb1 =
+                            Calendar.addMonths 1 jan1
+
+                        resultYear =
+                            Time.toYear Time.utc feb1
+
+                        resultMonth =
+                            Time.toMonth Time.utc feb1
+
+                        resultDay =
+                            Time.toDay Time.utc feb1
                     in
                     Expect.all
                         [ \() -> Expect.equal resultYear 2024
@@ -74,10 +83,17 @@ suite =
             , test "should handle year rollover" <|
                 \_ ->
                     let
-                        dec1 = Calendar.dateToPosix 2023 Time.Dec 1
-                        jan1 = Calendar.addMonths 1 dec1
-                        resultYear = Time.toYear Time.utc jan1
-                        resultMonth = Time.toMonth Time.utc jan1
+                        dec1 =
+                            Calendar.dateToPosix 2023 Time.Dec 1
+
+                        jan1 =
+                            Calendar.addMonths 1 dec1
+
+                        resultYear =
+                            Time.toYear Time.utc jan1
+
+                        resultMonth =
+                            Time.toMonth Time.utc jan1
                     in
                     Expect.all
                         [ \() -> Expect.equal resultYear 2024

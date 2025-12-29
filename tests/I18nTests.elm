@@ -5,9 +5,9 @@ Reference: agents/adr/0005-internationalization.md
 ADRs: ADR-0012, ADR-0005
 -}
 
+import Expect
 import I18n
 import Test exposing (..)
-import Expect
 
 
 suite : Test
@@ -26,8 +26,11 @@ suite =
             , test "should handle all main UI keys" <|
                 \_ ->
                     let
-                        keys = ["calendar", "list", "today", "prev", "next_button", "back"]
-                        translations = List.map I18n.get keys
+                        keys =
+                            [ "calendar", "list", "today", "prev", "next_button", "back" ]
+
+                        translations =
+                            List.map I18n.get keys
                     in
                     Expect.all
                         (List.map (\t -> \() -> Expect.notEqual t "") translations)

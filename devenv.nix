@@ -31,6 +31,7 @@ in
     uuid
     base64-bytestring
     feed
+    ormolu
   ]);
 
   dotenv.disableHint = true;
@@ -39,6 +40,7 @@ in
   packages = [
     pkgs.pocketbase
     pkgs.treefmt
+    pkgs.ormolu
   ];
 
   # https://devenv.sh/basics/
