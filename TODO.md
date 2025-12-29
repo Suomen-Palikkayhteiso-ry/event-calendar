@@ -28,10 +28,8 @@ We have enforced a strict 400-line limit per file. Some files are exceeding or n
 *   [x] **Refactor `src/Main.elm` (>700 lines)**: The `Main.elm` file has been refactored into `src/Model.elm`, `src/Update.elm`, and `src/View.elm` to improve modularity and reduce file size. (Commit hash: N/A - discovered change)
 *   [ ] **Refactor `src/EventList.elm` (~383 lines)**:
     *   Monitor size. Consider extracting `View` components (e.g., `EventList.View.Table`, `EventList.View.Pagination`, `EventList.View.ImportModal`) if it grows.
-*   [ ] **Refactor `src/I18n.elm` (>600 lines)**:
-    *   This file is large due to translation strings.
-    *   Consider splitting translations into separate files (e.g., `I18n.Fi`, `I18n.En`) or loading them from JSON flags if dynamic loading is preferred (though Elm type-safety for i18n is nice).
-    *   Alternatively, accept that `I18n` might be an exception, or split the `get` logic from the `translations` data.
+*   [x] **Refactor `src/I18n.elm` (>600 lines)**:
+    *   Split translations into separate `src/Translations.elm` file to reduce I18n.elm from 602 to 361 lines.
 
 ## 3. Feature Verification & Polish
 *   [ ] **Feeds & Syndication**:
