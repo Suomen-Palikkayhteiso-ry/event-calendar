@@ -488,58 +488,56 @@ view model =
                         , div [ class "flex items-center space-x-4" ]
                             [ case model.auth of
                                 Just auth ->
+                                    let
+                                        displayName =
+                                            case auth.user of
+                                                Just user ->
+                                                    let
+                                                        name =
+                                                            user.name
+                                                                |> Maybe.andThen
+                                                                    (\n ->
+                                                                        if String.isEmpty n then
+                                                                            Nothing
+
+                                                                        else
+                                                                            Just n
+                                                                    )
+
+                                                        username =
+                                                            user.username
+                                                                |> Maybe.andThen
+                                                                    (\u ->
+                                                                        if String.isEmpty u then
+                                                                            Nothing
+
+                                                                        else
+                                                                            Just u
+                                                                    )
+                                                    in
+                                                    case name of
+                                                        Just n ->
+                                                            n
+
+                                                        Nothing ->
+                                                            case username of
+                                                                Just u ->
+                                                                    u
+
+                                                                Nothing ->
+                                                                    user.email
+
+                                                Nothing ->
+                                                    "Unknown"
+                                    in
                                     div [ class "flex items-center space-x-4" ]
-                                        [ span [ class "text-sm text-gray-700" ]
-                                            [ text
-                                                ("Logged in as: "
-                                                    ++ (case auth.user of
-                                                            Just user ->
-                                                                let
-                                                                    name =
-                                                                        user.name
-                                                                            |> Maybe.andThen
-                                                                                (\n ->
-                                                                                    if String.isEmpty n then
-                                                                                        Nothing
-
-                                                                                    else
-                                                                                        Just n
-                                                                                )
-
-                                                                    username =
-                                                                        user.username
-                                                                            |> Maybe.andThen
-                                                                                (\u ->
-                                                                                    if String.isEmpty u then
-                                                                                        Nothing
-
-                                                                                    else
-                                                                                        Just u
-                                                                                )
-                                                                in
-                                                                case name of
-                                                                    Just n ->
-                                                                        n
-
-                                                                    Nothing ->
-                                                                        case username of
-                                                                            Just u ->
-                                                                                u
-
-                                                                            Nothing ->
-                                                                                user.email
-
-                                                            Nothing ->
-                                                                "Unknown"
-                                                       )
-                                                )
-                                            ]
-                                        , Button.view
+                                        [ Button.view
                                             { variant = Button.Secondary
                                             , size = Button.Sm
                                             , disabled = False
                                             , type_ = "button"
                                             , ariaLabel = Nothing
+                                            , title = Just displayName
                                             , onClick = Just Logout
                                             , children = [ text (I18n.get "logout") ]
                                             }
@@ -552,6 +550,7 @@ view model =
                                         , disabled = False
                                         , type_ = "button"
                                         , ariaLabel = Nothing
+                                        , title = Nothing
                                         , onClick = Just Login
                                         , children = [ text (I18n.get "login") ]
                                         }

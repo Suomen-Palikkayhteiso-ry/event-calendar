@@ -23,6 +23,7 @@ view :
     , disabled : Bool
     , type_ : String
     , ariaLabel : Maybe String
+    , title : Maybe String
     , onClick : Maybe msg
     , children : List (Html msg)
     }
@@ -69,6 +70,13 @@ view config =
                 ++ (case config.ariaLabel of
                         Just label ->
                             [ attribute "aria-label" label ]
+
+                        Nothing ->
+                            []
+                   )
+                ++ (case config.title of
+                        Just t ->
+                            [ Html.Attributes.title t ]
 
                         Nothing ->
                             []
