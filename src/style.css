@@ -166,6 +166,11 @@
 	height: 2.5rem;
 }
 
+/* SVG Icons */
+.btn svg {
+	color: inherit;
+}
+
 /* Navigation */
 nav {
 	margin-bottom: 1rem;
@@ -179,6 +184,10 @@ nav a {
 
 nav a:hover {
 	text-decoration: underline;
+}
+
+nav a svg {
+	color: inherit;
 }
 
 /* Main Layout */
