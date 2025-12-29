@@ -20,6 +20,7 @@ import Json.Decode as Decode
 import KMLUtils
 import PocketBase
 import Ports
+import String
 import Task
 import Time
 import Types
@@ -493,14 +494,37 @@ view model =
                                                 ("Logged in as: "
                                                     ++ (case auth.user of
                                                             Just user ->
-                                                                case user.name of
-                                                                    Just name ->
-                                                                        name
+                                                                let
+                                                                    name =
+                                                                        user.name
+                                                                            |> Maybe.andThen
+                                                                                (\n ->
+                                                                                    if String.isEmpty n then
+                                                                                        Nothing
+
+                                                                                    else
+                                                                                        Just n
+                                                                                )
+
+                                                                    username =
+                                                                        user.username
+                                                                            |> Maybe.andThen
+                                                                                (\u ->
+                                                                                    if String.isEmpty u then
+                                                                                        Nothing
+
+                                                                                    else
+                                                                                        Just u
+                                                                                )
+                                                                in
+                                                                case name of
+                                                                    Just n ->
+                                                                        n
 
                                                                     Nothing ->
-                                                                        case user.username of
-                                                                            Just username ->
-                                                                                username
+                                                                        case username of
+                                                                            Just u ->
+                                                                                u
 
                                                                             Nothing ->
                                                                                 user.email
