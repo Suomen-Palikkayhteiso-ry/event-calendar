@@ -1,4 +1,4 @@
-module DateHelpers exposing (addMonths, dateToPosix, daysInMonth, isLeapYear, monthToInt, intToMonth)
+module DateHelpers exposing (addMonths, dateToPosix, daysInMonth, intToMonth, isLeapYear, monthToInt)
 
 import Time
 

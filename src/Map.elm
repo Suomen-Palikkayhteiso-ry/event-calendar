@@ -1,9 +1,10 @@
 module Map exposing (..)
 
-import Html exposing (div)
-import Html.Attributes exposing (id, style)
+import Html exposing (Html, div)
+import Html.Attributes exposing (class, id)
 import Ports
 import Types exposing (Event)
+
 
 
 -- MODEL
@@ -75,6 +76,6 @@ update msg model =
 -- VIEW
 
 
-view : Model -> Html.Html Msg
-view model =
-    div [ id "map", style "height" "400px" ] []
+view : Model -> Html Msg
+view _ =
+    div [ id "map", class "w-full h-96" ] []

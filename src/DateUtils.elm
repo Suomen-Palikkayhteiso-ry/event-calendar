@@ -215,16 +215,6 @@ monthToInt month =
             12
 
 
-
--- Convert local date to UTC
-
-
-localDateToUTC : String -> String
-localDateToUTC localDateString =
-    -- Assume local is Helsinki, convert to UTC
-    localDateString ++ "T00:00:00.000Z"
-
-
 dateToString : { year : Int, month : Int, day : Int } -> String
 dateToString { year, month, day } =
     String.fromInt year

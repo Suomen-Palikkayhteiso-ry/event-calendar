@@ -37,6 +37,7 @@ init maybePocketbaseUrl url key =
         ( eventsModel, eventsCmd ) =
             Events.update (Events.FetchEvents Nothing) (Events.init pocketbaseUrl)
     in
-    ( Model key url (Routes.parseUrl url) Calendar.init eventsModel EventForm.init EventList.init Map.init Nothing Nothing True "" pocketbaseUrl -- Initialize Map.init
+    ( Model key url (Routes.parseUrl url) Calendar.init eventsModel EventForm.init EventList.init Map.init Nothing Nothing True "" pocketbaseUrl
+      -- Initialize Map.init
     , eventsCmd
     )

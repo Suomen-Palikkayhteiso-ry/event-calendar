@@ -2,7 +2,6 @@ module PocketBase exposing (..)
 
 import Http
 import Json.Decode as Decode
-import Ports
 import Types exposing (Event)
 
 
@@ -22,27 +21,6 @@ baseUrl url =
 
     else
         url
-
-
-initiateOAuth2Login : String -> Cmd msg
-initiateOAuth2Login provider =
-    -- For OAuth2, we need to redirect the user to the OAuth2 provider
-    -- This is typically done by setting window.location.href
-    -- We'll use a port to handle this on the JavaScript side
-    Ports.initiateOAuth2Login provider
-
-
-logout : String -> String -> (Result Http.Error () -> msg) -> Cmd msg
-logout pocketbaseUrl token toMsg =
-    Http.request
-        { method = "POST"
-        , headers = [ Http.header "Authorization" ("Bearer " ++ token) ]
-        , url = baseUrl pocketbaseUrl ++ "/collections/users/auth-refresh"
-        , body = Http.emptyBody
-        , expect = Http.expectWhatever toMsg
-        , timeout = Nothing
-        , tracker = Nothing
-        }
 
 
 

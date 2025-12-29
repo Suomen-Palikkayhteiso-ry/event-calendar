@@ -1,5 +1,7 @@
 module Update exposing (Msg(..), update)
 
+-- New import
+
 import Browser
 import Browser.Navigation as Nav
 import Calendar
@@ -9,8 +11,7 @@ import EventList
 import Events
 import Http
 import Json.Decode as Decode
-import KMLUtils
-import Map -- New import
+import Map
 import Model exposing (Model)
 import Ports
 import Routes
@@ -86,7 +87,8 @@ update msg model =
                         Nothing ->
                             ( newModel, Cmd.none )
 
-                Routes.MapRoute -> -- Handle MapRoute
+                Routes.MapRoute ->
+                    -- Handle MapRoute
                     ( newModel
                     , Map.update Map.InitMap newModel.map |> Tuple.second |> Cmd.map MapMsg
                     )
@@ -147,7 +149,8 @@ update msg model =
                 EventDetail.Back ->
                     ( model, Nav.back model.key 1 )
 
-        MapMsg mapMsg -> -- Handle MapMsg
+        MapMsg mapMsg ->
+            -- Handle MapMsg
             let
                 ( updatedMap, mapCmd ) =
                     Map.update mapMsg model.map
@@ -166,7 +169,8 @@ update msg model =
         Logout ->
             case model.auth of
                 Just auth ->
-                    ( { model | loading = True }, Http.request
+                    ( { model | loading = True }
+                    , Http.request
                         { method = "POST"
                         , headers = [ Http.header "Authorization" ("Bearer " ++ (auth.token |> Maybe.withDefault "")) ]
                         , url = model.pocketbaseUrl ++ "/api/collections/users/auth-refresh"
@@ -200,8 +204,9 @@ update msg model =
             ( { model | selectedDate = date }, Cmd.none )
 
         SetCurrentTime time ->
-            ( model, Cmd.none ) -- TODO: set calendar current time
+            ( model, Cmd.none )
 
+        -- TODO: set calendar current time
         RequestDeleteEvent id ->
             case model.auth of
                 Just auth ->

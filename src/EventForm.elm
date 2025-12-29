@@ -1,9 +1,5 @@
 module EventForm exposing (..)
 
-import DateTimePicker
-import Html exposing (button, div, input, label, li, text, textarea, ul)
-import Html.Attributes exposing (checked, disabled, for, id, name, placeholder, type_, value)
-import Html.Events exposing (onCheck, onClick, onInput)
 import Types exposing (Event, EventState(..), Point)
 
 
@@ -222,81 +218,3 @@ fromEvent event =
     , mode = Edit event.id
     , loading = False
     }
-
-
-
--- View
-
-
-view : Model -> Html.Html Msg
-view model =
-    div []
-        [ div []
-            [ label [ for "title" ] [ text "Title" ]
-            , input [ type_ "text", id "title", value model.title, onInput SetTitle, placeholder "Event title" ] []
-            ]
-        , DateTimePicker.view
-            { value = model.startDate
-            , label = "Start Date"
-            , id = "startDate"
-            , disabled = False
-            , allDay = model.allDay
-            , onChange = SetStartDate
-            }
-        , DateTimePicker.view
-            { value = model.endDate
-            , label = "End Date"
-            , id = "endDate"
-            , disabled = False
-            , allDay = model.allDay
-            , onChange = SetEndDate
-            }
-        , div []
-            [ label [ for "allDay" ] [ text "All Day" ]
-            , input [ type_ "checkbox", id "allDay", checked model.allDay, onCheck SetAllDay ] []
-            ]
-        , div []
-            [ label [ for "location" ] [ text "Location" ]
-            , input [ type_ "text", id "location", value model.location, onInput SetLocation, placeholder "Event location" ] []
-            ]
-        , div []
-            [ label [ for "description" ] [ text "Description" ]
-            , textarea [ id "description", value model.description, onInput SetDescription, placeholder "Event description" ] []
-            ]
-        , div []
-            [ label [ for "url" ] [ text "URL" ]
-            , input [ type_ "url", id "url", value model.url, onInput SetUrl, placeholder "Event URL" ] []
-            ]
-        , div []
-            [ label [ for "image" ] [ text "Image URL" ]
-            , input [ type_ "url", id "image", value (Maybe.withDefault "" model.image), onInput SetImage, placeholder "Image URL" ] []
-            ]
-        , div []
-            [ label [ for "imageDescription" ] [ text "Image Description" ]
-            , input [ type_ "text", id "imageDescription", value model.imageDescription, onInput SetImageDescription, placeholder "Image description" ] []
-            ]
-        , div []
-            [ label [] [ text "State" ]
-            , div []
-                [ label [] [ input [ type_ "radio", name "state", checked (model.state == Draft), onClick (SetState Draft) ] [], text "Draft" ]
-                , label [] [ input [ type_ "radio", name "state", checked (model.state == Pending), onClick (SetState Pending) ] [], text "Pending" ]
-                , label [] [ input [ type_ "radio", name "state", checked (model.state == Published), onClick (SetState Published) ] [], text "Published" ]
-                , label [] [ input [ type_ "radio", name "state", checked (model.state == Deleted), onClick (SetState Deleted) ] [], text "Deleted" ]
-                ]
-            ]
-        , if not (List.isEmpty model.errors) then
-            ul [] (List.map (\error -> li [] [ text error ]) model.errors)
-
-          else
-            text ""
-        , button [ onClick Submit, disabled (not (List.isEmpty model.errors) || model.loading) ]
-            [ text
-                (if model.loading then
-                    "Submitting..."
-
-                 else
-                    "Submit"
-                )
-            ]
-        , button [ onClick Validate ] [ text "Validate" ]
-        ]

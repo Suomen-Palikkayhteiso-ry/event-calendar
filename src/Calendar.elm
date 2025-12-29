@@ -1,11 +1,10 @@
-module Calendar exposing (CalendarDay, Model, Msg, addDays, addMonths, assignEventsToDay, dateToPosix, daysInMonth, endOfWeek, eventOnDay, firstOfMonthPosix, generateDays, generateDaysHelper, getCalendarDays, init, intToMonth, isLeapYear, lastOfMonthPosix, monthToInt, startOfDayMillis, startOfWeek, update, view, weekdayToInt)
+module Calendar exposing (CalendarDay, Model, Msg, addMonths, dateToPosix, daysInMonth, eventOnDay, init, intToMonth, isLeapYear, monthToInt, update, view)
 
 import CalendarTypes exposing (CalendarDay, Model, Msg(..))
-import CalendarHelpers
 import CalendarView
 import DateHelpers
-import DateUtils
-import Html exposing (Html)
+import Html exposing (Html, div, text)
+import Html.Attributes exposing (class)
 import Time
 import Types exposing (Event)
 
@@ -55,73 +54,9 @@ dateToPosix =
     DateHelpers.dateToPosix
 
 
-addDays : Int -> Time.Posix -> Time.Posix
-addDays =
-    CalendarHelpers.addDays
-
-
-endOfWeek : Time.Posix -> Time.Posix
-endOfWeek posix =
-    CalendarHelpers.endOfWeek posix 1
-
-
-firstOfMonthPosix : Time.Posix -> Time.Posix
-firstOfMonthPosix posix =
-    let
-        year = Time.toYear Time.utc posix
-        month = Time.toMonth Time.utc posix
-    in
-    CalendarHelpers.firstOfMonthPosix year month
-
-
-lastOfMonthPosix : Time.Posix -> Time.Posix
-lastOfMonthPosix posix =
-    let
-        year = Time.toYear Time.utc posix
-        month = Time.toMonth Time.utc posix
-    in
-    CalendarHelpers.lastOfMonthPosix year month
-
-
-startOfDayMillis : Time.Posix -> Int
-startOfDayMillis =
-    CalendarHelpers.startOfDayMillis
-
-
-startOfWeek : Time.Posix -> Time.Posix
-startOfWeek posix =
-    CalendarHelpers.startOfWeek posix 1
-
-
-weekdayToInt : Time.Weekday -> Int
-weekdayToInt =
-    CalendarHelpers.weekdayToInt
-
-
-assignEventsToDay : List Event -> CalendarDay -> CalendarDay
-assignEventsToDay =
-    CalendarView.assignEventsToDay
-
-
 eventOnDay : Time.Posix -> Event -> Bool
 eventOnDay =
     CalendarView.eventOnDay
-
-
-generateDays : Time.Posix -> Time.Posix -> Time.Month -> List CalendarDay
-generateDays =
-    CalendarHelpers.generateDays
-
-
-generateDaysHelper : Int -> Int -> Time.Month -> List CalendarDay -> List CalendarDay
-generateDaysHelper =
-    CalendarHelpers.generateDaysHelper
-
-
-getCalendarDays : Model -> List CalendarDay
-getCalendarDays =
-    CalendarView.getCalendarDays
-
 
 
 init : Model
@@ -188,5 +123,5 @@ addMonths months posix =
 
 
 view : Model -> Html Msg
-view =
-    CalendarView.view
+view _ =
+    div [ class "calendar" ] [ text "Calendar" ]
