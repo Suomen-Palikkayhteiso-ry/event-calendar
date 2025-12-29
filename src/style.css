@@ -7,6 +7,7 @@
 
 /* Calendar Styles */
 .calendar {
+	width: 100%;
 	max-width: 1200px;
 	margin: 0 auto;
 	font-family: var(--font-family-sans);
@@ -40,7 +41,7 @@
 
 .calendar-grid {
 	display: grid;
-	grid-template-columns: repeat(7, 1fr);
+	grid-template-columns: repeat(7, minmax(120px, 1fr));
 	gap: 1px;
 	background: #e5e7eb;
 	border: 1px solid #e5e7eb;
