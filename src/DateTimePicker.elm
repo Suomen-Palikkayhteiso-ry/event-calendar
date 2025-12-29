@@ -1,6 +1,6 @@
 module DateTimePicker exposing (..)
 
-import Html exposing (Html, div, input, label, text)
+import Html exposing (Html, input)
 import Html.Attributes exposing (class, disabled, id, placeholder, type_, value)
 import Html.Events exposing (onInput)
 
@@ -15,38 +15,28 @@ view :
     }
     -> Html msg
 view config =
-    div [ class "mb-4" ]
-        [ if String.isEmpty config.label then
-            text ""
+    if config.allDay then
+        input
+            [ type_ "text"
+            , id config.id
+            , value (formatFinnishDate config.value)
+            , disabled config.disabled
+            , onInput (parseFinnishDate >> config.onChange)
+            , placeholder "p.k.vvvv (esim. 25.12.2024)"
+            , class "form-input"
+            ]
+            []
 
-          else
-            label [ class "mb-2 block font-medium text-gray-700", Html.Attributes.for config.id ] [ Html.text config.label ]
-        , if config.allDay then
-            div [ class "relative" ]
-                [ input
-                    [ type_ "text"
-                    , id config.id
-                    , value (formatFinnishDate config.value)
-                    , disabled config.disabled
-                    , onInput (parseFinnishDate >> config.onChange)
-                    , placeholder "p.k.vvvv (esim. 25.12.2024)"
-                    , class "form-input"
-                    ]
-                    []
-                , div [ class "mt-1 text-sm text-gray-500" ] [ text "Anna päivämäärä muodossa p.k.vvvv" ]
-                ]
-
-          else
-            input
-                [ type_ "datetime-local"
-                , id config.id
-                , value config.value
-                , disabled config.disabled
-                , onInput config.onChange
-                , class "form-input"
-                ]
-                []
-        ]
+      else
+        input
+            [ type_ "datetime-local"
+            , id config.id
+            , value config.value
+            , disabled config.disabled
+            , onInput config.onChange
+            , class "form-input"
+            ]
+            []
 
 
 formatFinnishDate : String -> String

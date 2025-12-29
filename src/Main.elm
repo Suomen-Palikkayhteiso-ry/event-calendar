@@ -657,14 +657,17 @@ view model =
                                                     div [ class "mb-4 flex items-center justify-between" ]
                                                         [ div [ class "flex items-center space-x-4" ]
                                                             [ label [ class "block text-sm font-medium text-gray-700" ] [ text (I18n.get "select_date") ]
-                                                            , DateTimePicker.view
-                                                                { value = model.selectedDate
-                                                                , label = ""
-                                                                , id = "calendar-date"
-                                                                , disabled = False
-                                                                , allDay = True
-                                                                , onChange = SetDate
-                                                                }
+                                                            , div []
+                                                                [ DateTimePicker.view
+                                                                    { value = model.selectedDate
+                                                                    , label = ""
+                                                                    , id = "calendar-date"
+                                                                    , disabled = False
+                                                                    , allDay = True
+                                                                    , onChange = SetDate
+                                                                    }
+                                                                , div [ class "mt-1 text-sm text-gray-500" ] [ text "Anna päivämäärä muodossa p.k.vvvv" ]
+                                                                ]
                                                             ]
                                                         , button [ class "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500", onClick GoToCreateEvent, title "Add new event" ]
                                                             [ text ("+ " ++ I18n.get "add_new_event") ]
@@ -687,6 +690,7 @@ view model =
                                                                 , allDay = True
                                                                 , onChange = SetDate
                                                                 }
+                                                            , div [ class "mt-1 text-sm text-gray-500" ] [ text "Anna päivämäärä muodossa p.k.vvvv" ]
                                                             ]
                                                         ]
                                             , div [ class "mt-4" ]
