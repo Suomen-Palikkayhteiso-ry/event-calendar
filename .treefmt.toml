@@ -1,0 +1,14 @@
+[formatter.elm]
+command = "elm-format"
+options = ["--yes"]
+includes = ["*.elm"]
+
+[formatter.prettier]
+command = "prettier"
+options = ["--write"]
+includes = ["*.js", "*.ts", "*.json", "*.css", "*.md", "*.html", "*.yaml", "*.yml"]
+
+[formatter.ormolu]
+command = "ormolu"
+options = ["--mode", "inplace"]
+includes = ["*.hs"]

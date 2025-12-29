@@ -2,35 +2,56 @@
 
 module GenerateEmbed where
 
-import GenerateUtils
-import Data.Time
-import Data.Time.LocalTime
+import qualified Data.ByteString.Lazy as BSL
+import Data.Function (on)
+import Data.List (groupBy, sortOn)
+import Data.Monoid ((<>))
 import qualified Data.Text as T
 import qualified Data.Text.Lazy as TL
 import qualified Data.Text.Lazy.Builder as TB
-import Data.List (groupBy, sortOn)
-import Data.Function (on)
-import Data.Monoid ((<>))
+import Data.Time
+import Data.Time.LocalTime
+import GenerateUtils
 
 baseUrl :: String
 baseUrl = "https://kalenteri.suomenpalikkayhteiso.fi"
 
 monthNames :: [String]
-monthNames = [
-  "Tammikuu", "Helmikuu", "Maaliskuu", "Huhtikuu", "Toukokuu",
-  "Kesäkuu", "Heinäkuu", "Elokuu", "Syyskuu", "Lokakuu",
-  "Marraskuu", "Joulukuu"
-]
+monthNames =
+  [ "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec"
+  ]
 
 groupEventsByMonth :: [Event] -> [(Integer, Int, [Event])]
-groupEventsByMonth events = 
+groupEventsByMonth events =
   let sortedEvents = sortOn (localDay . fromJust . toHelsinkiTime . startDate) events
-      grouped = groupBy ((==) `on` (\e -> let lt = fromJust $ toHelsinkiTime $ startDate e
-                                             (y,m,_) = toGregorian $ localDay lt
-                                         in (y,m))) sortedEvents
-  in map (\es -> let lt = fromJust $ toHelsinkiTime $ startDate $ head es
-                     (y,m,_) = toGregorian $ localDay lt
-                 in (y, m, es)) grouped
+      grouped =
+        groupBy
+          ( (==)
+              `on` ( \e ->
+                       let lt = fromJust $ toHelsinkiTime $ startDate e
+                           (y, m, _) = toGregorian $ localDay lt
+                        in (y, m)
+                   )
+          )
+          sortedEvents
+   in map
+        ( \es ->
+            let lt = fromJust $ toHelsinkiTime $ startDate $ head es
+                (y, m, _) = toGregorian $ localDay lt
+             in (y, m, es)
+        )
+        grouped
 
 generateQrCodeDataUrl :: String -> IO T.Text
 generateQrCodeDataUrl url = do
@@ -67,25 +88,26 @@ generateMonthSection year month events = do
 generateEventItem :: Event -> IO TB.Builder
 generateEventItem event = do
   -- For now, skip QR code
-  let qr = TB.empty
+  let qr = mempty
   let title = TB.fromText $ "<li><strong>" ++ T.unpack (title event) ++ "</strong><br>"
       date = TB.fromText $ formatEventDisplayDate event ++ "<br>"
       desc = case description event of
-               Just d -> TB.fromText $ T.unpack d ++ "<br>"
-               Nothing -> TB.empty
+        Just d -> TB.fromText $ T.unpack d ++ "<br>"
+        Nothing -> mempty
       loc = case location event of
-              Just l -> TB.fromText $ "Paikka: " ++ T.unpack l ++ "<br>"
-              Nothing -> TB.empty
+        Just l -> TB.fromText $ "Paikka: " ++ T.unpack l ++ "<br>"
+        Nothing -> mempty
       end = TB.fromText "</li>\n"
   return $ title <> date <> qr <> desc <> loc <> end
 
 formatEventDisplayDate :: Event -> String
-formatEventDisplayDate event = 
+formatEventDisplayDate event =
   let startFormatted = formatDateInHelsinki (startDate event) (allDay event)
       dateStr = startFormatted
-  in case endDate event of
-       Nothing -> dateStr
-       Just end -> let endFormatted = formatDateInHelsinki end (allDay event)
-                   in if startFormatted == endFormatted
-                      then dateStr
-                      else dateStr ++ "–" ++ endFormatted
+   in case endDate event of
+        Nothing -> dateStr
+        Just end ->
+          let endFormatted = formatDateInHelsinki end (allDay event)
+           in if startFormatted == endFormatted
+                then dateStr
+                else dateStr ++ "–" ++ endFormatted
