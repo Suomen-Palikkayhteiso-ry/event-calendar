@@ -31,7 +31,7 @@ export default defineConfig({
 	projects: [
 		{
 			name: 'chromium',
-			use: { 
+			use: {
 				...devices['Desktop Chrome'],
 				/* Environment variables for the browser */
 				extraHTTPHeaders: {

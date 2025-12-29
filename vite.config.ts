@@ -5,6 +5,5 @@ import elm from 'vite-plugin-elm-watch';
 export default defineConfig({
 	plugins: [tailwindcss(), elm()],
 	base: '/',
-	server: {
-	}
+	server: {}
 });

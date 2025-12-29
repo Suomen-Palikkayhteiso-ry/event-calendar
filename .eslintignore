@@ -1,0 +1,12 @@
+elm.js
+test-elm.js
+elm-stuff/
+node_modules/
+.pocketbase/
+build/
+static/
+coverage/
+playwright-report/
+test-results/
+.devenv/
+.venv/

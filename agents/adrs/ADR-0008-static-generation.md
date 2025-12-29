@@ -31,11 +31,13 @@ Requirements:
 We maintain **Node.js scripts** for static feed generation, integrated with SvelteKit's build process.
 
 **Script-based generation:**
+
 - `scripts/generate-statics.js` - Main generation script
 - `scripts/generate-utils.js` - Utility functions for feed formats
 - Runs during SvelteKit build via package.json scripts
 
 The scripts:
+
 1. Fetch events from PocketBase API
 2. Transform data to multiple formats (RSS, Atom, ICS, JSON, GeoJSON)
 3. Generate static files in `static/` directory
@@ -77,48 +79,51 @@ The scripts:
 ## Implementation
 
 **Main generation script:**
+
 ```javascript
 // scripts/generate-statics.js
 import { generateFeeds } from './generate-utils.js';
 
 async function main() {
-  const events = await fetchEventsFromPocketBase();
-  await generateFeeds(events);
-  console.log('Static feeds generated successfully');
+	const events = await fetchEventsFromPocketBase();
+	await generateFeeds(events);
+	console.log('Static feeds generated successfully');
 }
 
 main().catch(console.error);
 ```
 
 **Feed generation utilities:**
+
 ```javascript
 // scripts/generate-utils.js
 export async function generateFeeds(events) {
-  // Generate RSS
-  const rssContent = generateRSS(events);
-  await writeFile('static/kalenteri.atom', rssContent);
+	// Generate RSS
+	const rssContent = generateRSS(events);
+	await writeFile('static/kalenteri.atom', rssContent);
 
-  // Generate ICS
-  const icsContent = generateICS(events);
-  await writeFile('static/kalenteri.ics', icsContent);
+	// Generate ICS
+	const icsContent = generateICS(events);
+	await writeFile('static/kalenteri.ics', icsContent);
 
-  // Generate JSON/GeoJSON
-  const jsonContent = generateJSON(events);
-  await writeFile('static/kalenteri.json', jsonContent);
+	// Generate JSON/GeoJSON
+	const jsonContent = generateJSON(events);
+	await writeFile('static/kalenteri.json', jsonContent);
 
-  const geoJsonContent = generateGeoJSON(events);
-  await writeFile('static/kalenteri.geo.json', geoJsonContent);
+	const geoJsonContent = generateGeoJSON(events);
+	await writeFile('static/kalenteri.geo.json', geoJsonContent);
 }
 ```
 
 **Build integration:**
+
 ```json
 // package.json
 {
-  "scripts": {
-    "build": "generate-statics && svelte-kit sync && vite build",
-    "generate-statics": "node scripts/generate-statics.js"
-  }
+	"scripts": {
+		"build": "generate-statics && svelte-kit sync && vite build",
+		"generate-statics": "node scripts/generate-statics.js"
+	}
 }
 ```
 

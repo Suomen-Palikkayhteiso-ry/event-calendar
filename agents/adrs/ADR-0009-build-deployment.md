@@ -25,11 +25,13 @@ With the migration to Elm (ADR-0012), we maintain SvelteKit v2 as the build/host
 We adopt **Nix Flake + devenv** as the build and deployment system for hybrid SvelteKit + Elm development.
 
 **Nix Flake** provides:
+
 - Reproducible build environments across machines
 - Declarative dependency management
 - Integration with both SvelteKit and Elm build processes
 
 **devenv** provides:
+
 - Fast, cached development environments
 - Dual toolchain management (Node.js/pnpm for SvelteKit, Elm for application)
 - Process orchestration for parallel development servers (Vite + elm-watch)
@@ -72,6 +74,7 @@ We adopt **Nix Flake + devenv** as the build and deployment system for hybrid Sv
 ## Implementation
 
 **flake.nix** defines:
+
 ```nix
 {
   inputs = {
@@ -98,8 +101,9 @@ We adopt **Nix Flake + devenv** as the build and deployment system for hybrid Sv
 ```
 
 **devenv.nix** configures the development environment:
+
 ```nix
-{ pkgs, ... }: 
+{ pkgs, ... }:
 
 let
   # Playwright browser compatibility shim for multiple Playwright versions
@@ -116,10 +120,10 @@ let
     # Vitest 3.2.4 + Playwright 1.56 expect revision 1194
     ln -s ${pkgs.playwright-driver.browsers}/chromium-1181 $out/chromium-1194
     ln -s ${pkgs.playwright-driver.browsers}/chromium_headless_shell-1181 $out/chromium_headless_shell-1194
-    
+
     # Playwright 1.57.0 expects firefox-1497
     ln -s ${pkgs.playwright-driver.browsers}/firefox-1489 $out/firefox-1497
-    
+
     # elm-spec-runner (Playwright 1.11.1) expects chromium_headless_shell-1200
     ln -s ${pkgs.playwright-driver.browsers}/chromium_headless_shell-1181 $out/chromium_headless_shell-1200
   '';
@@ -127,18 +131,18 @@ in
 {
   languages.javascript.enable = true;
   languages.elm.enable = true;
-  
+
   packages = with pkgs; [
     playwright-driver
     playwright-driver.browsers
     playwrightBrowsersCompat
     /* additional packages */
   ];
-  
+
   # Point Playwright to Nix-provided browsers with compatibility layer
   env.PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD = "1";
   env.PLAYWRIGHT_BROWSERS_PATH = "${playwrightBrowsersCompat}";
-  
+
   scripts = {
     "elm-build" = "elm make src/Main.elm --output=elm.js";
     "elm-check" = "elm-format --validate src/ && elm-review";

@@ -12,6 +12,7 @@ Accepted (Updated for hybrid SvelteKit/Elm migration)
 
 The project requires code quality tools for a hybrid SvelteKit + Elm environment.
 We need:
+
 - Formatting and Linting for JavaScript/TypeScript/Svelte (Legacy/Shell)
 - Formatting and Linting for Elm (Application Logic)
 - Integration with nix flake/devenv build system
@@ -19,6 +20,7 @@ We need:
 ## Decision
 
 We chose a dual-stack approach:
+
 1. **ESLint** and **Prettier** for JS/TS/Svelte
 2. **elm-format** and **elm-review** for Elm
 
@@ -52,6 +54,7 @@ All tools integrated into devenv scripts and git hooks.
 ## Implementation
 
 **devenv.nix configuration:**
+
 ```nix
 { pkgs, ... }: {
   languages.javascript.enable = true;
@@ -70,30 +73,32 @@ All tools integrated into devenv scripts and git hooks.
 ```
 
 **ESLint configuration (eslint.config.js):**
+
 ```javascript
 export default [
-  {
-    files: ['**/*.js', '**/*.ts', '**/*.svelte'],
-    rules: {
-      'no-unused-vars': 'error',
-      'prefer-const': 'error'
-    }
-  }
+	{
+		files: ['**/*.js', '**/*.ts', '**/*.svelte'],
+		rules: {
+			'no-unused-vars': 'error',
+			'prefer-const': 'error'
+		}
+	}
 ];
 ```
 
 **elm-review configuration:**
+
 ```json
 {
-  "package": "jfmengels/elm-review",
-  "source-directories": ["src"],
-  "elmjson": "elm.json",
-  "config": {
-    "rules": {
-      "NoUnused.Variables": "error",
-      "NoUnused.Modules": "error"
-    }
-  }
+	"package": "jfmengels/elm-review",
+	"source-directories": ["src"],
+	"elmjson": "elm.json",
+	"config": {
+		"rules": {
+			"NoUnused.Variables": "error",
+			"NoUnused.Modules": "error"
+		}
+	}
 }
 ```
 

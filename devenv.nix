@@ -38,6 +38,7 @@ in
   # PocketBase for local testing
   packages = [
     pkgs.pocketbase
+    pkgs.treefmt
   ];
 
   # https://devenv.sh/basics/

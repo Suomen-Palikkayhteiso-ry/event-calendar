@@ -225,6 +225,7 @@ pnpm check-db-health
 ```
 
 The health check verifies:
+
 - PocketBase server is running and accessible
 - Required collections exist (events, users)
 - Test data is present and valid

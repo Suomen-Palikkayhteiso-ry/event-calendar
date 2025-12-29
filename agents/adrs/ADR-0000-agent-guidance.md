@@ -213,6 +213,7 @@ Reviewed-by: John Doe
 ### Agent Requirements
 
 When creating commits, agents MUST:
+
 1. Use lowercase for type and scope
 2. Use imperative mood in description ("add" not "added")
 3. Keep description under 72 characters
@@ -241,6 +242,7 @@ Agents must use this format for review and compliance tasks:
 ---
 
 ## 14. Example `AGENTS.md`
+
 ```md
 # AGENTS.md
 
@@ -299,4 +301,3 @@ Stop and escalate if:
 - Slight redundancy and increased maintenance overhead are accepted.
 
 This ADR establishes the **foundation for agent-first repository governance** and self-guided LLM contributions.
-

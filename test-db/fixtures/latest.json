@@ -1,471 +1,471 @@
 {
-  "exported_at": "2025-12-29T08:57:10.224Z",
-  "source": "https://data.suomenpalikkayhteiso.fi",
-  "collections": {
-    "events": [
-      {
-        "all_day": true,
-        "collectionId": "pbc_1687431684",
-        "collectionName": "events",
-        "created": "2025-11-03 19:28:01.944Z",
-        "description": "Pieni Lego-näyttely vitriinissä Nurmon kirjastossa. Teokset Elias 9v, Eemi 7v, Oiva 6v (vasen vitriini) ja Miro 9v (oikea vitriini). Mikäli paikan päällä pääsee käymään voi vieraskirjaan jättää nimen.",
-        "end_date": "2025-11-27 22:00:00.000Z",
-        "id": "481wo99pit133iw",
-        "image": "nurmo_sktahqx6k0.jpg",
-        "image_description": "Kuva: Kaisa Leppä",
-        "location": "Nurmo, kirjasto",
-        "point": {
-          "lon": 22.90976,
-          "lat": 62.828657
-        },
-        "start_date": "2025-11-02 22:00:00.000Z",
-        "state": "published",
-        "title": "Lego-näyttely",
-        "updated": "2025-11-29 19:01:45.674Z",
-        "url": "https://kirjasto.seinajoki.fi/kirjastot-ja-aukioloajat/nurmon-kirjasto/tapahtumat-ja-nayttelyt/"
-      },
-      {
-        "all_day": false,
-        "collectionId": "pbc_1687431684",
-        "collectionName": "events",
-        "created": "2025-11-06 05:47:34.536Z",
-        "description": "Suuri Snadi -pienoisrautatie- ja pienoismallitapahtuma palaa uudistuneena Helsinkiin. Suuri Snadi Special - tapahtuma järjestetään marraskuun 15. päivänä Akk Arcadassa, Arabianrannassa Helsingissä - entistä mielenkiintoisempana!",
-        "end_date": "2025-11-15 15:00:00.000Z",
-        "id": "8ugpc9bj93m4udi",
-        "image": "",
-        "image_description": "",
-        "location": "Helsinki, Akk Arcada",
-        "point": {
-          "lon": 24.965303,
-          "lat": 60.201472
-        },
-        "start_date": "2025-11-15 08:00:00.000Z",
-        "state": "published",
-        "title": "Suuri Snadi Special",
-        "updated": "2025-11-29 18:47:23.129Z",
-        "url": "https://suurisnadi.fi/"
-      },
-      {
-        "all_day": false,
-        "collectionId": "pbc_1687431684",
-        "collectionName": "events",
-        "created": "2025-11-06 20:47:56.406Z",
-        "description": "Tervetuloa mukaan huikaisevaan LEGO-tapahtumaan! Laukaan Kirkonkylän Vanhempainyhdistys ry ja MLL Laukaa ry järjestävät yhdessä huikaisevan koko perheen LEGOLYSTI-päivän Laukaan kirkonkylän koululla.",
-        "end_date": "2025-11-15 13:00:00.000Z",
-        "id": "mm52krmbrlu9aob",
-        "image": "",
-        "image_description": "",
-        "location": "Laukaa, kirkonkylän koulu",
-        "point": {
-          "lon": 25.95654,
-          "lat": 62.416926
-        },
-        "start_date": "2025-11-15 08:00:00.000Z",
-        "state": "published",
-        "title": "Legolysti",
-        "updated": "2025-11-29 18:47:38.854Z",
-        "url": "https://visitlaukaa.fi/tapahtuma/legolysti/"
-      },
-      {
-        "all_day": true,
-        "collectionId": "pbc_1687431684",
-        "collectionName": "events",
-        "created": "2025-11-06 22:27:34.392Z",
-        "description": "Panttilan Palikka järjestää Lego- ja lastentapahtuman Seinäjoella toukokuussa 2026.",
-        "end_date": "2026-05-01 21:00:00.000Z",
-        "id": "d7pt0u7102m1tp5",
-        "image": "",
-        "image_description": "",
-        "location": "Seinäjoki, Seinäjoen ravikeskus",
-        "point": {
-          "lon": 22.85489,
-          "lat": 62.801891
-        },
-        "start_date": "2026-05-01 21:00:00.000Z",
-        "state": "published",
-        "title": "Lego- ja lastentapahtuma",
-        "updated": "2025-11-29 18:54:37.189Z",
-        "url": ""
-      },
-      {
-        "all_day": true,
-        "collectionId": "pbc_1687431684",
-        "collectionName": "events",
-        "created": "2025-11-07 05:45:41.616Z",
-        "description": "Panttilan Palikka järjestää tapahtuman Vaasassa elokuussa 2026.",
-        "end_date": "2026-08-14 21:00:00.000Z",
-        "id": "lw0vk9y1pptdec2",
-        "image": "",
-        "image_description": "",
-        "location": "Vaasa, Arbetets vänner",
-        "point": {
-          "lon": 21.623128,
-          "lat": 63.093577
-        },
-        "start_date": "2026-08-14 21:00:00.000Z",
-        "state": "published",
-        "title": "Lego- ja lastentapahtuma",
-        "updated": "2025-11-29 18:56:02.148Z",
-        "url": ""
-      },
-      {
-        "all_day": true,
-        "collectionId": "pbc_1687431684",
-        "collectionName": "events",
-        "created": "2025-11-10 17:10:33.051Z",
-        "description": "Tapahtuma on Panttilan Palikan ja kirjaston yhteistyö.",
-        "end_date": "2026-02-24 22:00:00.000Z",
-        "id": "czmrxzcdvmd6ytr",
-        "image": "",
-        "image_description": "",
-        "location": "Alajärvi, kirjasto",
-        "point": {
-          "lon": 23.823942,
-          "lat": 62.999162
-        },
-        "start_date": "2026-02-24 22:00:00.000Z",
-        "state": "published",
-        "title": "LEGOpäivä",
-        "updated": "2025-11-29 18:42:55.865Z",
-        "url": ""
-      },
-      {
-        "all_day": true,
-        "collectionId": "pbc_1687431684",
-        "collectionName": "events",
-        "created": "2025-11-10 17:27:07.011Z",
-        "description": "Tule mukaan seuraamaan, kun syksyn Otahallin tapahtuma-areena muuttuu yhden viikonlopun ajaksi pieniksi ihmemaailmoiksi!",
-        "end_date": "2026-09-26 21:00:00.000Z",
-        "id": "jh9a9b0eees7lmq",
-        "image": "",
-        "image_description": "",
-        "location": "Espoo, Otahalli",
-        "point": {
-          "lon": 24.835086,
-          "lat": 60.18427
-        },
-        "start_date": "2026-09-25 21:00:00.000Z",
-        "state": "published",
-        "title": "Ihmeellinen pieni maailma",
-        "updated": "2025-11-29 18:55:16.219Z",
-        "url": "https://www.ihmeellinenpienimaailma.fi/lipunmyynti-ja-aukioloajat/"
-      },
-      {
-        "all_day": false,
-        "collectionId": "pbc_1687431684",
-        "collectionName": "events",
-        "created": "2025-11-10 20:00:32.434Z",
-        "description": "Lego-näyttelyä ja rakentelupisteitä osana tapahtumaa.",
-        "end_date": "2026-03-21 14:00:00.000Z",
-        "id": "gqi7k8rsrldwzz6",
-        "image": "",
-        "image_description": "",
-        "location": "Laihia, kulttuuritalo Orrela",
-        "point": {
-          "lon": 21.738292,
-          "lat": 62.479823
-        },
-        "start_date": "2026-03-21 08:00:00.000Z",
-        "state": "published",
-        "title": "Meidän kylän kulttuuria",
-        "updated": "2025-11-29 18:51:47.439Z",
-        "url": ""
-      },
-      {
-        "all_day": true,
-        "collectionId": "pbc_1687431684",
-        "collectionName": "events",
-        "created": "2025-11-12 13:43:03.094Z",
-        "description": "Koko Annantalon henkilökunta on jouluvitriinissä esillä Lego -hahmoina, kuten itse Annantalokin! Lisäksi näytteillä teoksen tekijän oma Fabuland-kokoelma. Ma-pe 9.00-20.00 ja la 10.00-17.00.",
-        "end_date": "2025-12-19 22:00:00.000Z",
-        "id": "o7htfcvyyf3l2hg",
-        "image": "",
-        "image_description": "",
-        "location": "Helsinki, Annantalo",
-        "point": {
-          "lon": 24.934598,
-          "lat": 60.167798
-        },
-        "start_date": "2025-11-13 22:00:00.000Z",
-        "state": "published",
-        "title": "Annantalon jouluvitriinit",
-        "updated": "2025-11-29 18:36:46.567Z",
-        "url": "https://www.annantalo.fi/fi/tapahtumat/event/5AA6338CF344AEFCCE1D68102C17BA0B/Annantalo_s_Christmas_displays_"
-      },
-      {
-        "all_day": true,
-        "collectionId": "pbc_1687431684",
-        "collectionName": "events",
-        "created": "2025-11-29 20:31:31.008Z",
-        "description": "ComiCon type event with big LEGO area.",
-        "end_date": "2026-01-10 22:00:00.000Z",
-        "id": "nn9qu8ntylap8jy",
-        "image": "",
-        "image_description": "",
-        "location": "Latvia",
-        "point": {
-          "lon": 24.079206,
-          "lat": 56.955498
-        },
-        "start_date": "2026-01-09 22:00:00.000Z",
-        "state": "published",
-        "title": "WinterCon 2026",
-        "updated": "2025-11-29 20:34:57.222Z",
-        "url": ""
-      },
-      {
-        "all_day": true,
-        "collectionId": "pbc_1687431684",
-        "collectionName": "events",
-        "created": "2025-11-29 20:31:31.061Z",
-        "description": "\"Brick Rumble\" EstLUGs flagship event. 10th time in the row. Event takes place in school, where we have almost the entire building filled with exhibition and different LEGO-activities.",
-        "end_date": "2026-04-11 21:00:00.000Z",
-        "id": "xeqh8jonj5c226p",
-        "image": "",
-        "image_description": "",
-        "location": "Estonia",
-        "point": {
-          "lon": 25.60073,
-          "lat": 59.492126
-        },
-        "start_date": "2026-04-10 21:00:00.000Z",
-        "state": "published",
-        "title": "Klotsimöll 2026",
-        "updated": "2025-11-29 20:35:30.636Z",
-        "url": ""
-      },
-      {
-        "all_day": true,
-        "collectionId": "pbc_1687431684",
-        "collectionName": "events",
-        "created": "2025-11-29 20:31:31.107Z",
-        "description": "Annual popular culture event",
-        "end_date": "2026-05-21 21:00:00.000Z",
-        "id": "wsrqbs45x689rni",
-        "image": "",
-        "image_description": "",
-        "location": "Lithuania",
-        "point": {
-          "lon": 25.226225,
-          "lat": 54.6794274
-        },
-        "start_date": "2026-05-21 21:00:00.000Z",
-        "state": "published",
-        "title": "ComicCon Baltics 2026",
-        "updated": "2025-11-29 20:42:31.992Z",
-        "url": ""
-      },
-      {
-        "all_day": true,
-        "collectionId": "pbc_1687431684",
-        "collectionName": "events",
-        "created": "2025-11-29 20:31:31.161Z",
-        "description": "\"MiniWorld\". Same type event as Ihmeellinen Pieni Maailma in Finland. Maybe bit bigger.",
-        "end_date": "2026-05-30 21:00:00.000Z",
-        "id": "fzm4vipzhjxbpw9",
-        "image": "",
-        "image_description": "",
-        "location": "Estonia",
-        "point": {
-          "lon": 24.7134481,
-          "lat": 59.4053722
-        },
-        "start_date": "2026-05-29 21:00:00.000Z",
-        "state": "published",
-        "title": "Minimaailm 2026",
-        "updated": "2025-11-29 20:42:30.377Z",
-        "url": ""
-      },
-      {
-        "all_day": true,
-        "collectionId": "pbc_1687431684",
-        "collectionName": "events",
-        "created": "2025-11-29 20:31:31.207Z",
-        "description": "\"BrickMania\" Annual LEGO event what takes place in Tartu Toy Museum. Exhibition area is not big but event is very loved in southern Estonia.",
-        "end_date": "2026-10-14 21:00:00.000Z",
-        "id": "byj7wyhwvkx9kjk",
-        "image": "",
-        "image_description": "",
-        "location": "Estonia",
-        "point": {
-          "lon": 26.7173559,
-          "lat": 58.3819871
-        },
-        "start_date": "2026-10-14 21:00:00.000Z",
-        "state": "published",
-        "title": "Klotsimaania 2026",
-        "updated": "2025-11-29 20:42:25.477Z",
-        "url": ""
-      },
-      {
-        "all_day": true,
-        "collectionId": "pbc_1687431684",
-        "collectionName": "events",
-        "created": "2025-11-29 20:31:31.268Z",
-        "description": "Video games event featuring the largest games expo in the Baltics, game development and game culture conferences, cosplay etc",
-        "end_date": "2026-10-24 21:00:00.000Z",
-        "id": "e2vtl93t7wiq4e6",
-        "image": "",
-        "image_description": "",
-        "location": "Lithuania",
-        "point": {
-          "lon": 25.2257476,
-          "lat": 54.6795453
-        },
-        "start_date": "2026-10-22 21:00:00.000Z",
-        "state": "published",
-        "title": "GameOn 2026",
-        "updated": "2025-11-29 20:42:18.530Z",
-        "url": ""
-      },
-      {
-        "all_day": true,
-        "collectionId": "pbc_1687431684",
-        "collectionName": "events",
-        "created": "2025-11-29 20:31:31.319Z",
-        "description": "Oldest gathering in Lithuania of people interested in speculative fiction – fantasy, science fiction, horror.",
-        "end_date": "2026-10-30 22:00:00.000Z",
-        "id": "utkzpmcpaqny6he",
-        "image": "",
-        "image_description": "",
-        "location": "Lithuania",
-        "point": {
-          "lon": 25.2876346,
-          "lat": 54.7168648
-        },
-        "start_date": "2026-09-30 21:00:00.000Z",
-        "state": "published",
-        "title": "LituaniCon 2026",
-        "updated": "2025-11-29 20:42:28.101Z",
-        "url": ""
-      },
-      {
-        "all_day": true,
-        "collectionId": "pbc_1687431684",
-        "collectionName": "events",
-        "created": "2025-11-29 20:31:31.367Z",
-        "description": "\"joy from bricks\". no exact dates yet. Annual LEGO event what takes place in old submarine factory. Location is close to Tallinn port - so very convinient to participate for Afols from Finland or Sweden.",
-        "end_date": "2026-11-29 22:00:00.000Z",
-        "id": "eey7hzftjlbgwtn",
-        "image": "",
-        "image_description": "",
-        "location": "Estonia",
-        "point": {
-          "lon": 24.7303503,
-          "lat": 59.4516382
-        },
-        "start_date": "2026-10-31 22:00:00.000Z",
-        "state": "published",
-        "title": "Klotsilust 2026",
-        "updated": "2025-11-29 20:42:12.056Z",
-        "url": ""
-      },
-      {
-        "all_day": true,
-        "collectionId": "pbc_1687431684",
-        "collectionName": "events",
-        "created": "2025-11-29 21:04:01.978Z",
-        "description": "ComiCon type event with big LEGO area. No exact dates available yet.",
-        "end_date": "2026-08-15 21:00:00.000Z",
-        "id": "8gi67r7m7fbg4ub",
-        "image": "",
-        "image_description": "",
-        "location": "Latvia, Riga",
-        "point": {
-          "lon": 24.078768,
-          "lat": 56.955857
-        },
-        "start_date": "2026-08-14 21:00:00.000Z",
-        "state": "published",
-        "title": "UNICON 2026",
-        "updated": "2025-11-29 21:04:01.978Z",
-        "url": ""
-      },
-      {
-        "all_day": true,
-        "collectionId": "pbc_1687431684",
-        "collectionName": "events",
-        "created": "2025-11-29 22:23:10.227Z",
-        "description": "Mini Piipoo tarjoaa LEGO-rakentelua kolmessa teemassa:\r\n- LEGO Arkkitehtuurirakentelu\r\n- LEGO Minecraft -rakentelu\r\n- LEGO Klassinen punainen 2x4 rakentelu\r\nPerjantai 24.4. klo 9-18\r\nLauantai 25.4. klo 9-18\r\nSunnuntai 26.4. klo 9-17\r\n",
-        "end_date": "2026-04-25 21:00:00.000Z",
-        "id": "v0sen0med371ud4",
-        "image": "",
-        "image_description": "",
-        "location": "Helsinki, Messukeskus",
-        "point": {
-          "lon": 24.936441,
-          "lat": 60.202951
-        },
-        "start_date": "2026-04-23 21:00:00.000Z",
-        "state": "published",
-        "title": "Mini Pii Poo Lapsimessuilla",
-        "updated": "2025-11-29 22:23:10.227Z",
-        "url": "https://www.piipoo.com/pages/lapsimessut"
-      },
-      {
-        "all_day": false,
-        "collectionId": "pbc_1687431684",
-        "collectionName": "events",
-        "created": "2025-12-03 21:32:11.858Z",
-        "description": "Koko perheen joulutapahtuma Tervakosken seuratalolla. Tapahtumassa myös lego-rakentelupiste, jossa valmistuu kaikkien aikojen Joulumaa! Vapaa pääsy.",
-        "end_date": "2025-12-13 14:00:00.000Z",
-        "id": "y6psjhfvl5r0tfo",
-        "image": "",
-        "image_description": "",
-        "location": "Janakkala,  Tervakosken seuratalo",
-        "point": {
-          "lon": 24.626711,
-          "lat": 60.811795
-        },
-        "start_date": "2025-12-13 12:00:00.000Z",
-        "state": "published",
-        "title": "Joulupukki matkaan jo käy",
-        "updated": "2025-12-03 21:32:11.858Z",
-        "url": "https://www.janakkala.fi/tapahtumat/joulupukki-matkaan-jo-kay-iloinen-joulutapahtuma/"
-      },
-      {
-        "all_day": true,
-        "collectionId": "pbc_1687431684",
-        "collectionName": "events",
-        "created": "2025-12-10 05:28:28.105Z",
-        "description": "Palikkatakomo ry:n LEGO-näyttely Suomen ilmailumuseolla 28.–29.3.2026\r\n",
-        "end_date": "2026-03-28 22:00:00.000Z",
-        "id": "v5cdwr4hpyojl6k",
-        "image": "",
-        "image_description": "",
-        "location": "Vantaa, Suomen ilmailumuseo",
-        "point": {
-          "lon": 24.960944,
-          "lat": 60.304274
-        },
-        "start_date": "2026-03-27 22:00:00.000Z",
-        "state": "published",
-        "title": "LEGO-näyttely ilmailumuseolla",
-        "updated": "2025-12-10 05:28:28.105Z",
-        "url": ""
-      },
-      {
-        "all_day": true,
-        "collectionId": "pbc_1687431684",
-        "collectionName": "events",
-        "created": "2025-12-11 10:19:15.272Z",
-        "description": "Luova palikka Lego-yhteisön satojen 1980-2000 lukujen Lego-settien näyttely Lapua 1808 -museon erikoisnäyttelytilassa Kulttuurikeskus Vanhan Paukun makasiinissa Lapualla.",
-        "end_date": "2025-12-27 22:00:00.000Z",
-        "id": "4zzoq42lupbf9c8",
-        "image": "40bbb2ef_67ee_4542_929f_ee8ba22c6a19_mnomr2nhwz.jpeg",
-        "image_description": "",
-        "location": "Lapua, Kulttuurikeskus Vanha Paukku",
-        "point": {
-          "lon": 23.018812,
-          "lat": 62.96777
-        },
-        "start_date": "2025-12-10 22:00:00.000Z",
-        "state": "published",
-        "title": "Luova palikka -yhteisön näyttely",
-        "updated": "2025-12-11 10:20:39.844Z",
-        "url": "https://www.epkalenteri.fi/event/eptapahtumat:agngftihbi"
-      }
-    ],
-    "users": []
-  }
+	"exported_at": "2025-12-29T08:57:10.224Z",
+	"source": "https://data.suomenpalikkayhteiso.fi",
+	"collections": {
+		"events": [
+			{
+				"all_day": true,
+				"collectionId": "pbc_1687431684",
+				"collectionName": "events",
+				"created": "2025-11-03 19:28:01.944Z",
+				"description": "Pieni Lego-näyttely vitriinissä Nurmon kirjastossa. Teokset Elias 9v, Eemi 7v, Oiva 6v (vasen vitriini) ja Miro 9v (oikea vitriini). Mikäli paikan päällä pääsee käymään voi vieraskirjaan jättää nimen.",
+				"end_date": "2025-11-27 22:00:00.000Z",
+				"id": "481wo99pit133iw",
+				"image": "nurmo_sktahqx6k0.jpg",
+				"image_description": "Kuva: Kaisa Leppä",
+				"location": "Nurmo, kirjasto",
+				"point": {
+					"lon": 22.90976,
+					"lat": 62.828657
+				},
+				"start_date": "2025-11-02 22:00:00.000Z",
+				"state": "published",
+				"title": "Lego-näyttely",
+				"updated": "2025-11-29 19:01:45.674Z",
+				"url": "https://kirjasto.seinajoki.fi/kirjastot-ja-aukioloajat/nurmon-kirjasto/tapahtumat-ja-nayttelyt/"
+			},
+			{
+				"all_day": false,
+				"collectionId": "pbc_1687431684",
+				"collectionName": "events",
+				"created": "2025-11-06 05:47:34.536Z",
+				"description": "Suuri Snadi -pienoisrautatie- ja pienoismallitapahtuma palaa uudistuneena Helsinkiin. Suuri Snadi Special - tapahtuma järjestetään marraskuun 15. päivänä Akk Arcadassa, Arabianrannassa Helsingissä - entistä mielenkiintoisempana!",
+				"end_date": "2025-11-15 15:00:00.000Z",
+				"id": "8ugpc9bj93m4udi",
+				"image": "",
+				"image_description": "",
+				"location": "Helsinki, Akk Arcada",
+				"point": {
+					"lon": 24.965303,
+					"lat": 60.201472
+				},
+				"start_date": "2025-11-15 08:00:00.000Z",
+				"state": "published",
+				"title": "Suuri Snadi Special",
+				"updated": "2025-11-29 18:47:23.129Z",
+				"url": "https://suurisnadi.fi/"
+			},
+			{
+				"all_day": false,
+				"collectionId": "pbc_1687431684",
+				"collectionName": "events",
+				"created": "2025-11-06 20:47:56.406Z",
+				"description": "Tervetuloa mukaan huikaisevaan LEGO-tapahtumaan! Laukaan Kirkonkylän Vanhempainyhdistys ry ja MLL Laukaa ry järjestävät yhdessä huikaisevan koko perheen LEGOLYSTI-päivän Laukaan kirkonkylän koululla.",
+				"end_date": "2025-11-15 13:00:00.000Z",
+				"id": "mm52krmbrlu9aob",
+				"image": "",
+				"image_description": "",
+				"location": "Laukaa, kirkonkylän koulu",
+				"point": {
+					"lon": 25.95654,
+					"lat": 62.416926
+				},
+				"start_date": "2025-11-15 08:00:00.000Z",
+				"state": "published",
+				"title": "Legolysti",
+				"updated": "2025-11-29 18:47:38.854Z",
+				"url": "https://visitlaukaa.fi/tapahtuma/legolysti/"
+			},
+			{
+				"all_day": true,
+				"collectionId": "pbc_1687431684",
+				"collectionName": "events",
+				"created": "2025-11-06 22:27:34.392Z",
+				"description": "Panttilan Palikka järjestää Lego- ja lastentapahtuman Seinäjoella toukokuussa 2026.",
+				"end_date": "2026-05-01 21:00:00.000Z",
+				"id": "d7pt0u7102m1tp5",
+				"image": "",
+				"image_description": "",
+				"location": "Seinäjoki, Seinäjoen ravikeskus",
+				"point": {
+					"lon": 22.85489,
+					"lat": 62.801891
+				},
+				"start_date": "2026-05-01 21:00:00.000Z",
+				"state": "published",
+				"title": "Lego- ja lastentapahtuma",
+				"updated": "2025-11-29 18:54:37.189Z",
+				"url": ""
+			},
+			{
+				"all_day": true,
+				"collectionId": "pbc_1687431684",
+				"collectionName": "events",
+				"created": "2025-11-07 05:45:41.616Z",
+				"description": "Panttilan Palikka järjestää tapahtuman Vaasassa elokuussa 2026.",
+				"end_date": "2026-08-14 21:00:00.000Z",
+				"id": "lw0vk9y1pptdec2",
+				"image": "",
+				"image_description": "",
+				"location": "Vaasa, Arbetets vänner",
+				"point": {
+					"lon": 21.623128,
+					"lat": 63.093577
+				},
+				"start_date": "2026-08-14 21:00:00.000Z",
+				"state": "published",
+				"title": "Lego- ja lastentapahtuma",
+				"updated": "2025-11-29 18:56:02.148Z",
+				"url": ""
+			},
+			{
+				"all_day": true,
+				"collectionId": "pbc_1687431684",
+				"collectionName": "events",
+				"created": "2025-11-10 17:10:33.051Z",
+				"description": "Tapahtuma on Panttilan Palikan ja kirjaston yhteistyö.",
+				"end_date": "2026-02-24 22:00:00.000Z",
+				"id": "czmrxzcdvmd6ytr",
+				"image": "",
+				"image_description": "",
+				"location": "Alajärvi, kirjasto",
+				"point": {
+					"lon": 23.823942,
+					"lat": 62.999162
+				},
+				"start_date": "2026-02-24 22:00:00.000Z",
+				"state": "published",
+				"title": "LEGOpäivä",
+				"updated": "2025-11-29 18:42:55.865Z",
+				"url": ""
+			},
+			{
+				"all_day": true,
+				"collectionId": "pbc_1687431684",
+				"collectionName": "events",
+				"created": "2025-11-10 17:27:07.011Z",
+				"description": "Tule mukaan seuraamaan, kun syksyn Otahallin tapahtuma-areena muuttuu yhden viikonlopun ajaksi pieniksi ihmemaailmoiksi!",
+				"end_date": "2026-09-26 21:00:00.000Z",
+				"id": "jh9a9b0eees7lmq",
+				"image": "",
+				"image_description": "",
+				"location": "Espoo, Otahalli",
+				"point": {
+					"lon": 24.835086,
+					"lat": 60.18427
+				},
+				"start_date": "2026-09-25 21:00:00.000Z",
+				"state": "published",
+				"title": "Ihmeellinen pieni maailma",
+				"updated": "2025-11-29 18:55:16.219Z",
+				"url": "https://www.ihmeellinenpienimaailma.fi/lipunmyynti-ja-aukioloajat/"
+			},
+			{
+				"all_day": false,
+				"collectionId": "pbc_1687431684",
+				"collectionName": "events",
+				"created": "2025-11-10 20:00:32.434Z",
+				"description": "Lego-näyttelyä ja rakentelupisteitä osana tapahtumaa.",
+				"end_date": "2026-03-21 14:00:00.000Z",
+				"id": "gqi7k8rsrldwzz6",
+				"image": "",
+				"image_description": "",
+				"location": "Laihia, kulttuuritalo Orrela",
+				"point": {
+					"lon": 21.738292,
+					"lat": 62.479823
+				},
+				"start_date": "2026-03-21 08:00:00.000Z",
+				"state": "published",
+				"title": "Meidän kylän kulttuuria",
+				"updated": "2025-11-29 18:51:47.439Z",
+				"url": ""
+			},
+			{
+				"all_day": true,
+				"collectionId": "pbc_1687431684",
+				"collectionName": "events",
+				"created": "2025-11-12 13:43:03.094Z",
+				"description": "Koko Annantalon henkilökunta on jouluvitriinissä esillä Lego -hahmoina, kuten itse Annantalokin! Lisäksi näytteillä teoksen tekijän oma Fabuland-kokoelma. Ma-pe 9.00-20.00 ja la 10.00-17.00.",
+				"end_date": "2025-12-19 22:00:00.000Z",
+				"id": "o7htfcvyyf3l2hg",
+				"image": "",
+				"image_description": "",
+				"location": "Helsinki, Annantalo",
+				"point": {
+					"lon": 24.934598,
+					"lat": 60.167798
+				},
+				"start_date": "2025-11-13 22:00:00.000Z",
+				"state": "published",
+				"title": "Annantalon jouluvitriinit",
+				"updated": "2025-11-29 18:36:46.567Z",
+				"url": "https://www.annantalo.fi/fi/tapahtumat/event/5AA6338CF344AEFCCE1D68102C17BA0B/Annantalo_s_Christmas_displays_"
+			},
+			{
+				"all_day": true,
+				"collectionId": "pbc_1687431684",
+				"collectionName": "events",
+				"created": "2025-11-29 20:31:31.008Z",
+				"description": "ComiCon type event with big LEGO area.",
+				"end_date": "2026-01-10 22:00:00.000Z",
+				"id": "nn9qu8ntylap8jy",
+				"image": "",
+				"image_description": "",
+				"location": "Latvia",
+				"point": {
+					"lon": 24.079206,
+					"lat": 56.955498
+				},
+				"start_date": "2026-01-09 22:00:00.000Z",
+				"state": "published",
+				"title": "WinterCon 2026",
+				"updated": "2025-11-29 20:34:57.222Z",
+				"url": ""
+			},
+			{
+				"all_day": true,
+				"collectionId": "pbc_1687431684",
+				"collectionName": "events",
+				"created": "2025-11-29 20:31:31.061Z",
+				"description": "\"Brick Rumble\" EstLUGs flagship event. 10th time in the row. Event takes place in school, where we have almost the entire building filled with exhibition and different LEGO-activities.",
+				"end_date": "2026-04-11 21:00:00.000Z",
+				"id": "xeqh8jonj5c226p",
+				"image": "",
+				"image_description": "",
+				"location": "Estonia",
+				"point": {
+					"lon": 25.60073,
+					"lat": 59.492126
+				},
+				"start_date": "2026-04-10 21:00:00.000Z",
+				"state": "published",
+				"title": "Klotsimöll 2026",
+				"updated": "2025-11-29 20:35:30.636Z",
+				"url": ""
+			},
+			{
+				"all_day": true,
+				"collectionId": "pbc_1687431684",
+				"collectionName": "events",
+				"created": "2025-11-29 20:31:31.107Z",
+				"description": "Annual popular culture event",
+				"end_date": "2026-05-21 21:00:00.000Z",
+				"id": "wsrqbs45x689rni",
+				"image": "",
+				"image_description": "",
+				"location": "Lithuania",
+				"point": {
+					"lon": 25.226225,
+					"lat": 54.6794274
+				},
+				"start_date": "2026-05-21 21:00:00.000Z",
+				"state": "published",
+				"title": "ComicCon Baltics 2026",
+				"updated": "2025-11-29 20:42:31.992Z",
+				"url": ""
+			},
+			{
+				"all_day": true,
+				"collectionId": "pbc_1687431684",
+				"collectionName": "events",
+				"created": "2025-11-29 20:31:31.161Z",
+				"description": "\"MiniWorld\". Same type event as Ihmeellinen Pieni Maailma in Finland. Maybe bit bigger.",
+				"end_date": "2026-05-30 21:00:00.000Z",
+				"id": "fzm4vipzhjxbpw9",
+				"image": "",
+				"image_description": "",
+				"location": "Estonia",
+				"point": {
+					"lon": 24.7134481,
+					"lat": 59.4053722
+				},
+				"start_date": "2026-05-29 21:00:00.000Z",
+				"state": "published",
+				"title": "Minimaailm 2026",
+				"updated": "2025-11-29 20:42:30.377Z",
+				"url": ""
+			},
+			{
+				"all_day": true,
+				"collectionId": "pbc_1687431684",
+				"collectionName": "events",
+				"created": "2025-11-29 20:31:31.207Z",
+				"description": "\"BrickMania\" Annual LEGO event what takes place in Tartu Toy Museum. Exhibition area is not big but event is very loved in southern Estonia.",
+				"end_date": "2026-10-14 21:00:00.000Z",
+				"id": "byj7wyhwvkx9kjk",
+				"image": "",
+				"image_description": "",
+				"location": "Estonia",
+				"point": {
+					"lon": 26.7173559,
+					"lat": 58.3819871
+				},
+				"start_date": "2026-10-14 21:00:00.000Z",
+				"state": "published",
+				"title": "Klotsimaania 2026",
+				"updated": "2025-11-29 20:42:25.477Z",
+				"url": ""
+			},
+			{
+				"all_day": true,
+				"collectionId": "pbc_1687431684",
+				"collectionName": "events",
+				"created": "2025-11-29 20:31:31.268Z",
+				"description": "Video games event featuring the largest games expo in the Baltics, game development and game culture conferences, cosplay etc",
+				"end_date": "2026-10-24 21:00:00.000Z",
+				"id": "e2vtl93t7wiq4e6",
+				"image": "",
+				"image_description": "",
+				"location": "Lithuania",
+				"point": {
+					"lon": 25.2257476,
+					"lat": 54.6795453
+				},
+				"start_date": "2026-10-22 21:00:00.000Z",
+				"state": "published",
+				"title": "GameOn 2026",
+				"updated": "2025-11-29 20:42:18.530Z",
+				"url": ""
+			},
+			{
+				"all_day": true,
+				"collectionId": "pbc_1687431684",
+				"collectionName": "events",
+				"created": "2025-11-29 20:31:31.319Z",
+				"description": "Oldest gathering in Lithuania of people interested in speculative fiction – fantasy, science fiction, horror.",
+				"end_date": "2026-10-30 22:00:00.000Z",
+				"id": "utkzpmcpaqny6he",
+				"image": "",
+				"image_description": "",
+				"location": "Lithuania",
+				"point": {
+					"lon": 25.2876346,
+					"lat": 54.7168648
+				},
+				"start_date": "2026-09-30 21:00:00.000Z",
+				"state": "published",
+				"title": "LituaniCon 2026",
+				"updated": "2025-11-29 20:42:28.101Z",
+				"url": ""
+			},
+			{
+				"all_day": true,
+				"collectionId": "pbc_1687431684",
+				"collectionName": "events",
+				"created": "2025-11-29 20:31:31.367Z",
+				"description": "\"joy from bricks\". no exact dates yet. Annual LEGO event what takes place in old submarine factory. Location is close to Tallinn port - so very convinient to participate for Afols from Finland or Sweden.",
+				"end_date": "2026-11-29 22:00:00.000Z",
+				"id": "eey7hzftjlbgwtn",
+				"image": "",
+				"image_description": "",
+				"location": "Estonia",
+				"point": {
+					"lon": 24.7303503,
+					"lat": 59.4516382
+				},
+				"start_date": "2026-10-31 22:00:00.000Z",
+				"state": "published",
+				"title": "Klotsilust 2026",
+				"updated": "2025-11-29 20:42:12.056Z",
+				"url": ""
+			},
+			{
+				"all_day": true,
+				"collectionId": "pbc_1687431684",
+				"collectionName": "events",
+				"created": "2025-11-29 21:04:01.978Z",
+				"description": "ComiCon type event with big LEGO area. No exact dates available yet.",
+				"end_date": "2026-08-15 21:00:00.000Z",
+				"id": "8gi67r7m7fbg4ub",
+				"image": "",
+				"image_description": "",
+				"location": "Latvia, Riga",
+				"point": {
+					"lon": 24.078768,
+					"lat": 56.955857
+				},
+				"start_date": "2026-08-14 21:00:00.000Z",
+				"state": "published",
+				"title": "UNICON 2026",
+				"updated": "2025-11-29 21:04:01.978Z",
+				"url": ""
+			},
+			{
+				"all_day": true,
+				"collectionId": "pbc_1687431684",
+				"collectionName": "events",
+				"created": "2025-11-29 22:23:10.227Z",
+				"description": "Mini Piipoo tarjoaa LEGO-rakentelua kolmessa teemassa:\r\n- LEGO Arkkitehtuurirakentelu\r\n- LEGO Minecraft -rakentelu\r\n- LEGO Klassinen punainen 2x4 rakentelu\r\nPerjantai 24.4. klo 9-18\r\nLauantai 25.4. klo 9-18\r\nSunnuntai 26.4. klo 9-17\r\n",
+				"end_date": "2026-04-25 21:00:00.000Z",
+				"id": "v0sen0med371ud4",
+				"image": "",
+				"image_description": "",
+				"location": "Helsinki, Messukeskus",
+				"point": {
+					"lon": 24.936441,
+					"lat": 60.202951
+				},
+				"start_date": "2026-04-23 21:00:00.000Z",
+				"state": "published",
+				"title": "Mini Pii Poo Lapsimessuilla",
+				"updated": "2025-11-29 22:23:10.227Z",
+				"url": "https://www.piipoo.com/pages/lapsimessut"
+			},
+			{
+				"all_day": false,
+				"collectionId": "pbc_1687431684",
+				"collectionName": "events",
+				"created": "2025-12-03 21:32:11.858Z",
+				"description": "Koko perheen joulutapahtuma Tervakosken seuratalolla. Tapahtumassa myös lego-rakentelupiste, jossa valmistuu kaikkien aikojen Joulumaa! Vapaa pääsy.",
+				"end_date": "2025-12-13 14:00:00.000Z",
+				"id": "y6psjhfvl5r0tfo",
+				"image": "",
+				"image_description": "",
+				"location": "Janakkala,  Tervakosken seuratalo",
+				"point": {
+					"lon": 24.626711,
+					"lat": 60.811795
+				},
+				"start_date": "2025-12-13 12:00:00.000Z",
+				"state": "published",
+				"title": "Joulupukki matkaan jo käy",
+				"updated": "2025-12-03 21:32:11.858Z",
+				"url": "https://www.janakkala.fi/tapahtumat/joulupukki-matkaan-jo-kay-iloinen-joulutapahtuma/"
+			},
+			{
+				"all_day": true,
+				"collectionId": "pbc_1687431684",
+				"collectionName": "events",
+				"created": "2025-12-10 05:28:28.105Z",
+				"description": "Palikkatakomo ry:n LEGO-näyttely Suomen ilmailumuseolla 28.–29.3.2026\r\n",
+				"end_date": "2026-03-28 22:00:00.000Z",
+				"id": "v5cdwr4hpyojl6k",
+				"image": "",
+				"image_description": "",
+				"location": "Vantaa, Suomen ilmailumuseo",
+				"point": {
+					"lon": 24.960944,
+					"lat": 60.304274
+				},
+				"start_date": "2026-03-27 22:00:00.000Z",
+				"state": "published",
+				"title": "LEGO-näyttely ilmailumuseolla",
+				"updated": "2025-12-10 05:28:28.105Z",
+				"url": ""
+			},
+			{
+				"all_day": true,
+				"collectionId": "pbc_1687431684",
+				"collectionName": "events",
+				"created": "2025-12-11 10:19:15.272Z",
+				"description": "Luova palikka Lego-yhteisön satojen 1980-2000 lukujen Lego-settien näyttely Lapua 1808 -museon erikoisnäyttelytilassa Kulttuurikeskus Vanhan Paukun makasiinissa Lapualla.",
+				"end_date": "2025-12-27 22:00:00.000Z",
+				"id": "4zzoq42lupbf9c8",
+				"image": "40bbb2ef_67ee_4542_929f_ee8ba22c6a19_mnomr2nhwz.jpeg",
+				"image_description": "",
+				"location": "Lapua, Kulttuurikeskus Vanha Paukku",
+				"point": {
+					"lon": 23.018812,
+					"lat": 62.96777
+				},
+				"start_date": "2025-12-10 22:00:00.000Z",
+				"state": "published",
+				"title": "Luova palikka -yhteisön näyttely",
+				"updated": "2025-12-11 10:20:39.844Z",
+				"url": "https://www.epkalenteri.fi/event/eptapahtumat:agngftihbi"
+			}
+		],
+		"users": []
+	}
 }

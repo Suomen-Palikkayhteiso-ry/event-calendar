@@ -17,16 +17,19 @@ With the migration to elm-pages (ADR-0001), the current build system relies on V
 We will remove all pnpm, TypeScript, and related JavaScript tooling dependencies as part of the elm-pages migration:
 
 ### Remove Files
+
 - `package.json` and `pnpm-lock.yaml`
 - All `*.ts` and `*.js` configuration files (except `src/index.js` for ports)
 - TypeScript test files and configurations
 - Vite, Playwright, and testing configurations
 
 ### Keep Files (Temporarily)
+
 - `src/index.js` - Required for Elm ports (Leaflet integration)
 - Build output in `dist/` - May be needed during transition
 
 ### Update Build System
+
 - Rely entirely on Nix flake + devenv for dependencies
 - Use `make` commands for Elm-specific operations
 - Remove all npm/pnpm script references
@@ -50,6 +53,7 @@ We will remove all pnpm, TypeScript, and related JavaScript tooling dependencies
 ## Current Dependencies to Remove
 
 ### DevDependencies (package.json)
+
 ```
 @cucumber/cucumber, @eslint/compat, @eslint/js, @fontsource/fira-mono,
 @playwright/test, @tailwindcss/forms, @tailwindcss/typography,
@@ -61,11 +65,13 @@ tailwindcss, tsx, typescript, typescript-eslint, vite, vite-plugin-elm-watch, vi
 ```
 
 ### Dependencies (package.json)
+
 ```
 feed, flowbite, ical-generator, leaflet, pocketbase, qrcode
 ```
 
 ### Files to Remove
+
 - `playwright-bdd.config.ts`
 - `vite.config.ts`
 - `vitest.config.ts`
@@ -80,28 +86,33 @@ feed, flowbite, ical-generator, leaflet, pocketbase, qrcode
 - `test-bdd.js`
 
 ### Files to Keep (Modified)
+
 - `src/index.js` - Elm ports for Leaflet
 - `Makefile` - Update to remove npm/pnpm references
 
 ## Implementation Plan
 
 ### Phase 1: Backup and Analysis
+
 1. Document all current npm scripts and their purposes
 2. Identify any critical functionality that needs Elm replacement
 3. Backup all configuration files before removal
 
 ### Phase 2: Core Removal
+
 1. Delete package.json, pnpm-lock.yaml
 2. Remove all TypeScript and JavaScript tooling files
 3. Update Makefile to use only Nix/devenv commands
 4. Update CI/CD configuration
 
 ### Phase 3: Elm-Only Replacements
+
 1. Replace `scripts/generate-statics.js` with Elm BackendTask
 2. Replace `scripts/generate-screenshots.ts` with elm-program-test
 3. Move static generation logic to elm-pages BackendTask
 
 ### Phase 4: Validation
+
 1. Confirm all Elm functionality works with Nix build
 2. Test deployment with elm-pages
 3. Validate that no critical features were lost
@@ -109,6 +120,7 @@ feed, flowbite, ical-generator, leaflet, pocketbase, qrcode
 ## Migration Dependencies
 
 This ADR depends on:
+
 - ADR-0012: Migration Plan (overall coordination)
 - ADR-0009: Build System (Nix flake + devenv)
 - ADR-0011: Testing Strategy (elm-program-test replacement)
@@ -124,6 +136,7 @@ This ADR depends on:
 ## Rollback Plan
 
 If issues arise:
+
 1. Restore package.json from git history
 2. Reinstall dependencies with pnpm
 3. Gradually migrate back individual components

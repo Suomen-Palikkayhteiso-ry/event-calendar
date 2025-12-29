@@ -39,15 +39,17 @@ The event calendar application follows a client-side functional architecture (El
 The application uses specific ports to communicate with JavaScript for features not available in pure Elm.
 
 **Authentication (`src/Ports.elm` ↔ `src/index.js`)**
-*   `storeAuth : Auth -> Cmd msg`: Sends authentication data (token + user) to JS for localStorage persistence.
-*   `removeAuth : () -> Cmd msg`: Signals JS to clear auth data from localStorage.
-*   `authStored : (Auth -> msg) -> Sub msg`: Subscription receiving auth data restored from localStorage on app init.
-*   `authRemoved : (() -> msg) -> Sub msg`: Subscription confirming auth data removal.
+
+- `storeAuth : Auth -> Cmd msg`: Sends authentication data (token + user) to JS for localStorage persistence.
+- `removeAuth : () -> Cmd msg`: Signals JS to clear auth data from localStorage.
+- `authStored : (Auth -> msg) -> Sub msg`: Subscription receiving auth data restored from localStorage on app init.
+- `authRemoved : (() -> msg) -> Sub msg`: Subscription confirming auth data removal.
 
 **Leaflet Map (`src/Ports.elm` ↔ `src/index.js`)**
-*   `initMap : MapConfig -> Cmd msg`: Initializes the Leaflet map with center, zoom, and optional marker.
-*   `updateMap : MapConfig -> Cmd msg`: Updates the map view or marker position programmatically.
-*   `mapMarkerMoved : ((Float, Float) -> msg) -> Sub msg`: Subscription receiving new coordinates when the user drags the marker.
+
+- `initMap : MapConfig -> Cmd msg`: Initializes the Leaflet map with center, zoom, and optional marker.
+- `updateMap : MapConfig -> Cmd msg`: Updates the map view or marker position programmatically.
+- `mapMarkerMoved : ((Float, Float) -> msg) -> Sub msg`: Subscription receiving new coordinates when the user drags the marker.
 
 ### Backend (PocketBase)
 

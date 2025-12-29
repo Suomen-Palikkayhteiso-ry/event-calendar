@@ -10,9 +10,9 @@ build: install elm-check
 .PHONY: clean
 clean:
 	rm -rf dist
+	rm -rf build
 	rm -rf node_modules
 	rm -rf elm-stuff
-	rm -rf .svelte-kit
 
 .PHONY: install
 install:
@@ -77,7 +77,6 @@ format: elm-format
 .PHONY: check
 check: elm-check
 	pnpm run lint
-	pnpm run check
 	pnpm run test
 
 .PHONY: shell

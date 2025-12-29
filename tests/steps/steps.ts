@@ -1,4 +1,4 @@
-import { Given, When, Then, Before, After } from 'playwright-bdd';
+import { Given, When, Then } from 'playwright-bdd';
 import { expect } from '@playwright/test';
 
 Given('I am on the home page', async ({ page }) => {
@@ -126,7 +126,7 @@ Then('events should be displayed if available', async ({ page }) => {
 	// Check if there are any event elements in the calendar
 	const eventElements = page.locator('.calendar-day-events .calendar-event');
 	// If events exist, they should be visible
-	if (await eventElements.count() > 0) {
+	if ((await eventElements.count()) > 0) {
 		await expect(eventElements.first()).toBeVisible();
 	}
 	// If no events, that's also fine (test passes)

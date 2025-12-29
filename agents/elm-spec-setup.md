@@ -165,7 +165,7 @@ The following npm scripts are configured in `package.json`:
 - `test:spec` - Run with jsdom (fastest, no real browser)
 - `test:spec:chromium` - Run with Chromium browser
 - `test:spec:headed` - Run with Chromium, visible window (debugging)
-- `test:spec:firefox` - Run with Firefox browser  
+- `test:spec:firefox` - Run with Firefox browser
 - `test:spec:webkit` - Run with WebKit browser
 
 ### elm-spec-runner CLI
@@ -186,6 +186,7 @@ Add `--visible` flag to see the browser window during test execution.
 This is a separate `elm.json` that includes `elm-spec` as a direct dependency. The runner compiles specs using this configuration, which references your source directories (`../src` and `../tests`).
 
 This separation is necessary because:
+
 1. elm-spec needs to be a direct dependency for the runner
 2. It keeps your main application's dependencies separate from test dependencies
 3. The runner needs access to both your source code and test files
@@ -193,11 +194,13 @@ This separation is necessary because:
 ## Integration with Existing Tests
 
 This setup works alongside:
+
 - **elm-test**: Unit tests for pure Elm functions (`tests/*Tests.elm`) - Run with `pnpm elm-test`
 - **Playwright E2E**: End-to-end tests (`tests/*.spec.ts`) - Run with `pnpm test:e2e`
 - **Playwright BDD**: Cucumber-style tests (`tests/features/*.feature`) - Run with `pnpm test:bdd`
 
 Each test type serves a different purpose:
+
 - **elm-test**: Fast unit tests for logic and pure functions
 - **elm-spec**: Component-level behavior testing with simulated or real browser
 - **Playwright E2E/BDD**: Full application integration testing
@@ -235,6 +238,7 @@ pnpm test:spec:webkit         # Headless WebKit
 The devenv.nix configuration provides Playwright browsers via Nix packages, with compatibility shims for version mismatches between nixpkgs and the Playwright versions used by elm-spec-runner and other tools.
 
 If you encounter browser compatibility issues:
+
 1. Prefer jsdom for routine testing (no browser required)
 2. Use real browsers only when needed for visual/CSS testing
 3. Restart your devenv shell after updating devenv.nix
@@ -254,6 +258,7 @@ make elm-spec-headed
 ### Verbose Output
 
 The elm-spec-runner provides detailed output by default, showing:
+
 - Compilation progress
 - Test scenarios and results
 - Detailed error messages for failures
@@ -293,6 +298,7 @@ For full browser testing in CI, ensure Playwright browsers are available. The Gi
 elm-spec-runner (v2.5.1) uses Playwright 1.11.1 internally, which may have version conflicts with Nix-provided browsers. The devenv.nix includes compatibility shims, but if issues persist:
 
 **Solution**: Use jsdom for routine testing:
+
 ```bash
 pnpm test:spec  # No browser required, fastest
 ```

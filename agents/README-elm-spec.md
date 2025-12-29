@@ -30,7 +30,7 @@ Refer to [elm-spec documentation](https://github.com/brian-watkins/elm-spec) for
 ## Setup Summary
 
 - **elm-spec** v3.2.0 - Testing framework
-- **elm-spec-runner** v2.5.1 - Test runner  
+- **elm-spec-runner** v2.5.1 - Test runner
 - **Playwright** v1.57.0 - Browser automation
 - **jsdom** - Lightweight DOM (default, fastest)
 

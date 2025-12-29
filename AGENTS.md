@@ -87,11 +87,13 @@ Stop and escalate when:
 ## Key Commands
 
 ### Elm (Primary)
+
 - `devenv script elm-build` (or `make elm-build`) - Compile Elm application
 - `devenv script elm-check` (or `make elm-check`) - Format, Review, and Test Elm code
 - `make watch` - Start Elm development server with hot-reload (elm-live)
 
 ### Build / Test
+
 - `pnpm install` - Install Node dependencies
 - `pnpm dev` - Start Vite development server
 - `pnpm build` - Build application for production
@@ -105,9 +107,9 @@ Stop and escalate when:
 - **Quotes**: Double quotes (Elm standard).
 - **Naming**: camelCase for functions/variables, PascalCase for Types/Modules.
 - **Msg Conventions**:
-    - **Top-Level**: `PageMsg SubModule.Msg` (e.g., `CalendarMsg Calendar.Msg`).
-    - **Events**: `VerbSubject` (e.g., `ClickSave`, `ReceiveEvents`).
-    - **Http**: `FetchedResource (Result Http.Error DataType)`.
+  - **Top-Level**: `PageMsg SubModule.Msg` (e.g., `CalendarMsg Calendar.Msg`).
+  - **Events**: `VerbSubject` (e.g., `ClickSave`, `ReceiveEvents`).
+  - **Http**: `FetchedResource (Result Http.Error DataType)`.
 
 ## Testing Practices
 
@@ -126,6 +128,7 @@ Stop and escalate when:
   - Step definitions must contain minimal logic.
 
 **Example:**
+
 ```gherkin
 # Covers US-014
 # Constrained by ADR-003, ADR-0000
@@ -140,6 +143,7 @@ Scenario: Creating a user with existing email
 All commits MUST follow [Conventional Commits 1.0.0](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ### Format
+
 ```
 <type>[optional scope]: <description>
 
@@ -149,6 +153,7 @@ All commits MUST follow [Conventional Commits 1.0.0](https://www.conventionalcom
 ```
 
 ### Types
+
 - `feat:` - New feature (MINOR in SemVer)
 - `fix:` - Bug fix (PATCH in SemVer)
 - `docs:` - Documentation only
@@ -162,10 +167,12 @@ All commits MUST follow [Conventional Commits 1.0.0](https://www.conventionalcom
 - `revert:` - Reverts a previous commit
 
 ### Breaking Changes
+
 - Append `!` after type/scope: `feat!:` or `feat(api)!:`
 - Or add `BREAKING CHANGE:` footer
 
 ### Requirements
+
 1. Use lowercase for type and scope
 2. Use imperative mood ("add" not "added")
 3. Keep description under 72 characters
@@ -173,6 +180,7 @@ All commits MUST follow [Conventional Commits 1.0.0](https://www.conventionalcom
 5. Add `BREAKING CHANGE:` footer when changing public APIs
 
 ### Examples
+
 ```bash
 feat(auth): add OAuth2 authentication support
 

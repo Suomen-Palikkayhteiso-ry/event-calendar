@@ -13,6 +13,7 @@ Accepted
 The project requires component-level behavior testing for Elm UI components and modules. While ADR-0011 established elm-test for unit tests and elm-program-test for integration tests, there's a gap for testing component behavior in browser-like environments with user interactions.
 
 We need:
+
 - Component-level behavior-driven testing (BDD) for Elm UI components
 - Ability to test user interactions (clicks, input, events) on individual components
 - Option to test in both lightweight environments (fast) and real browsers (accurate)
@@ -44,12 +45,14 @@ We adopt **elm-spec** with **Playwright integration** as our component testing s
 ### Test Execution Modes
 
 **Default: jsdom (Fast)**
+
 - Lightweight JavaScript DOM implementation
 - No browser required
 - Fast execution for routine testing
 - Command: `pnpm test:spec` or `make elm-spec`
 
 **Optional: Real Browsers (Accurate)**
+
 - Chromium, Firefox, WebKit via Playwright
 - Full browser environment with rendering
 - For visual, CSS, and browser-specific testing
@@ -62,17 +65,19 @@ We adopt **elm-spec** with **Playwright integration** as our component testing s
 ### Integration Points
 
 **package.json Scripts:**
+
 ```json
 {
-  "test:spec": "npx elm-spec --specRoot=./elm-spec-core --specs='../tests/**/*Spec.elm'",
-  "test:spec:chromium": "npx elm-spec --specRoot=./elm-spec-core --specs='../tests/**/*Spec.elm' --browser=chromium",
-  "test:spec:headed": "npx elm-spec --specRoot=./elm-spec-core --specs='../tests/**/*Spec.elm' --browser=chromium --visible",
-  "test:spec:firefox": "npx elm-spec --specRoot=./elm-spec-core --specs='../tests/**/*Spec.elm' --browser=firefox",
-  "test:spec:webkit": "npx elm-spec --specRoot=./elm-spec-core --specs='../tests/**/*Spec.elm' --browser=webkit"
+	"test:spec": "npx elm-spec --specRoot=./elm-spec-core --specs='../tests/**/*Spec.elm'",
+	"test:spec:chromium": "npx elm-spec --specRoot=./elm-spec-core --specs='../tests/**/*Spec.elm' --browser=chromium",
+	"test:spec:headed": "npx elm-spec --specRoot=./elm-spec-core --specs='../tests/**/*Spec.elm' --browser=chromium --visible",
+	"test:spec:firefox": "npx elm-spec --specRoot=./elm-spec-core --specs='../tests/**/*Spec.elm' --browser=firefox",
+	"test:spec:webkit": "npx elm-spec --specRoot=./elm-spec-core --specs='../tests/**/*Spec.elm' --browser=webkit"
 }
 ```
 
 **devenv.nix Scripts:**
+
 ```nix
 scripts = {
   elm-spec.exec = "pnpm test:spec";
@@ -81,6 +86,7 @@ scripts = {
 ```
 
 **Makefile Targets:**
+
 ```makefile
 elm-spec: node_modules
 	pnpm test:spec
@@ -109,23 +115,23 @@ let
     # Vitest 3.2.4 + Playwright 1.56 expect revision 1194
     ln -s ${pkgs.playwright-driver.browsers}/chromium-1181 $out/chromium-1194
     ln -s ${pkgs.playwright-driver.browsers}/chromium_headless_shell-1181 $out/chromium_headless_shell-1194
-    
+
     # Playwright 1.57.0 expects firefox-1497
     ln -s ${pkgs.playwright-driver.browsers}/firefox-1489 $out/firefox-1497
-    
+
     # elm-spec-runner (Playwright 1.11.1) expects chromium_headless_shell-1200
     ln -s ${pkgs.playwright-driver.browsers}/chromium_headless_shell-1181 $out/chromium_headless_shell-1200
   '';
 in
 {
   # ... rest of devenv config
-  
+
   packages = with pkgs; [
     playwright-driver
     playwright-driver.browsers
     playwrightBrowsersCompat  # Include compatibility layer
   ];
-  
+
   # Point Playwright to compatibility layer
   env.PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD = "1";
   env.PLAYWRIGHT_BROWSERS_PATH = "${playwrightBrowsersCompat}";
@@ -133,6 +139,7 @@ in
 ```
 
 **Why this is needed:**
+
 - elm-spec-runner (v2.5.1) uses Playwright 1.11.1 internally
 - E2E tests use Playwright 1.57.0
 - Vitest uses Playwright 1.56
@@ -197,16 +204,16 @@ elm-spec-core/
 
 ```json
 {
-  "test-dependencies": {
-    "direct": {
-      "brian-watkins/elm-spec": "3.2.0",
-      "elm-explorations/test": "2.2.0"
-    },
-    "indirect": {
-      "elm/random": "1.0.0",
-      "elm/regex": "1.0.0"
-    }
-  }
+	"test-dependencies": {
+		"direct": {
+			"brian-watkins/elm-spec": "3.2.0",
+			"elm-explorations/test": "2.2.0"
+		},
+		"indirect": {
+			"elm/random": "1.0.0",
+			"elm/regex": "1.0.0"
+		}
+	}
 }
 ```
 
@@ -214,35 +221,35 @@ elm-spec-core/
 
 ```json
 {
-  "type": "application",
-  "source-directories": ["../src", "../tests"],
-  "elm-version": "0.19.1",
-  "dependencies": {
-    "direct": {
-      "brian-watkins/elm-spec": "3.2.0",
-      "elm/browser": "1.0.2",
-      "elm/core": "1.0.5",
-      "elm/file": "1.0.5",
-      "elm/html": "1.0.1",
-      "elm/http": "2.0.0",
-      "elm/json": "1.1.4",
-      "elm/regex": "1.0.0",
-      "elm/time": "1.0.0",
-      "elm/url": "1.0.0",
-      "elm-community/json-extra": "4.3.0"
-    },
-    "indirect": {
-      "elm/bytes": "1.0.8",
-      "elm/parser": "1.1.0",
-      "elm/random": "1.0.0",
-      "elm/virtual-dom": "1.0.5",
-      "rtfeldman/elm-iso8601-date-strings": "1.1.4"
-    }
-  },
-  "test-dependencies": {
-    "direct": {},
-    "indirect": {}
-  }
+	"type": "application",
+	"source-directories": ["../src", "../tests"],
+	"elm-version": "0.19.1",
+	"dependencies": {
+		"direct": {
+			"brian-watkins/elm-spec": "3.2.0",
+			"elm/browser": "1.0.2",
+			"elm/core": "1.0.5",
+			"elm/file": "1.0.5",
+			"elm/html": "1.0.1",
+			"elm/http": "2.0.0",
+			"elm/json": "1.1.4",
+			"elm/regex": "1.0.0",
+			"elm/time": "1.0.0",
+			"elm/url": "1.0.0",
+			"elm-community/json-extra": "4.3.0"
+		},
+		"indirect": {
+			"elm/bytes": "1.0.8",
+			"elm/parser": "1.1.0",
+			"elm/random": "1.0.0",
+			"elm/virtual-dom": "1.0.5",
+			"rtfeldman/elm-iso8601-date-strings": "1.1.4"
+		}
+	},
+	"test-dependencies": {
+		"direct": {},
+		"indirect": {}
+	}
 }
 ```
 
@@ -297,6 +304,7 @@ spec =
 ### When to Use elm-spec
 
 **Use elm-spec for:**
+
 - Testing UI component behavior with user interactions
 - Verifying view rendering based on model state
 - Testing form interactions and validation
@@ -304,6 +312,7 @@ spec =
 - Testing event handlers and DOM updates
 
 **Don't use elm-spec for:**
+
 - Pure logic and data transformations (use elm-test)
 - Full application E2E workflows (use Playwright E2E)
 - User story acceptance testing (use Playwright BDD)
@@ -312,6 +321,7 @@ spec =
 ### Browser Environment Selection
 
 **Use jsdom (default) when:**
+
 - Testing component logic and state
 - Testing user interactions (clicks, input)
 - Running in CI/CD
@@ -319,6 +329,7 @@ spec =
 - Visual rendering is not critical
 
 **Use real browsers when:**
+
 - Testing CSS-dependent behavior
 - Testing animations or transitions
 - Verifying browser-specific features
@@ -364,6 +375,7 @@ spec =
 For existing projects adopting this setup:
 
 1. **Install Dependencies**:
+
    ```bash
    pnpm add -D elm-spec-runner@^2.5.1
    ```

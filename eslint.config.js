@@ -7,7 +7,26 @@ import ts from 'typescript-eslint';
 
 const gitignorePath = fileURLToPath(new URL('./.gitignore', import.meta.url));
 
-export default defineConfig(
+export default [
+	{
+		ignores: [
+			'**/elm.js',
+			'**/test-elm.js',
+			'**/elm-stuff/**',
+			'**/node_modules/**',
+			'**/.pocketbase/**',
+			'**/build/**',
+			'**/static/**',
+			'**/coverage/**',
+			'**/playwright-report/**',
+			'**/test-results/**',
+			'**/.devenv/**',
+			'**/.venv/**',
+			'**/review/**',
+			'**/elm-spec-core/**',
+			'**/scripts/**'
+		]
+	},
 	includeIgnoreFile(gitignorePath),
 	js.configs.recommended,
 	...ts.configs.recommended,
@@ -22,4 +41,4 @@ export default defineConfig(
 			'no-undef': 'off'
 		}
 	}
-);
+];

@@ -14,6 +14,7 @@ The application needs a CSS framework.
 With the migration to Elm (ADR-0012), maintaining SvelteKit v2 as the shell, we need a styling solution that works across both Elm components and Svelte components.
 
 Design requirements:
+
 - Custom color palette (brand colors)
 - Responsive calendar interface
 - Accessible components
@@ -54,21 +55,23 @@ It is used in Elm via standard `class` attributes.
 ## Implementation
 
 **tailwind.config.js** (updated for hybrid setup):
+
 ```javascript
 export default {
-  content: ['./src/**/*.{html,js,elm,ts,svelte}', './routes/**/*.{svelte}']
+	content: ['./src/**/*.{html,js,elm,ts,svelte}', './routes/**/*.{svelte}']
 };
 ```
 
 **style.css** (hybrid compatible):
+
 ```css
-@import "tailwindcss";
+@import 'tailwindcss';
 
 /* Custom theme configuration */
 @theme {
-  --color-primary: #3b82f6;
-  --color-secondary: #64748b;
-  /* ... other custom colors */
+	--color-primary: #3b82f6;
+	--color-secondary: #64748b;
+	/* ... other custom colors */
 }
 ```
 

@@ -23,6 +23,7 @@ With the migration to Elm (ADR-0012), maintaining SvelteKit v2 as the shell, we 
 We adopt **OIDC authentication handled by SvelteKit**, with **user state passed to Elm via Flags/Ports**.
 
 The authentication flow is:
+
 1. User clicks "Login" in Elm frontend
 2. Elm sends message to JavaScript via Port
 3. JavaScript redirects to SvelteKit auth route
@@ -67,22 +68,24 @@ The authentication flow is:
 ## Implementation
 
 **SvelteKit auth route (server-side):**
+
 ```typescript
 // routes/auth/callback/+server.ts
 import { redirect } from '@sveltejs/kit';
 import { pb } from '$lib/pocketbase';
 
 export async function GET({ url, cookies }) {
-  const code = url.searchParams.get('code');
-  // OIDC handshake with PocketBase
-  const user = await pb.authStore.loadFromCookie(cookies.get('pb_auth'));
-  // Store session
-  cookies.set('session', encodeSession(user), { httpOnly: true });
-  throw redirect(302, '/');
+	const code = url.searchParams.get('code');
+	// OIDC handshake with PocketBase
+	const user = await pb.authStore.loadFromCookie(cookies.get('pb_auth'));
+	// Store session
+	cookies.set('session', encodeSession(user), { httpOnly: true });
+	throw redirect(302, '/');
 }
 ```
 
 **Elm Port for login:**
+
 ```elm
 port login : () -> Cmd msg
 
@@ -92,14 +95,16 @@ LoginClicked ->
 ```
 
 **JavaScript Port subscription:**
+
 ```javascript
 // src/index.js
 app.ports.login.subscribe(() => {
-  window.location.href = '/auth/login';
+	window.location.href = '/auth/login';
 });
 ```
 
 **Elm Flags for user data:**
+
 ```elm
 type alias Flags =
     { user : Maybe User

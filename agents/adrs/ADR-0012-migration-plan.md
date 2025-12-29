@@ -17,18 +17,21 @@ All existing ADRs have been reviewed and confirmed compatible with elm-pages mig
 We will migrate from SvelteKit + Elm hybrid to pure elm-pages architecture following this phased approach:
 
 ### Phase 1: Infrastructure Migration
+
 1. **Replace SvelteKit with elm-pages** - Migrate routing, pages, and build system
 2. **Update build system** - Remove Vite, pnpm, TypeScript, ESLint, Prettier
 3. **Migrate PocketBase integration** - Update from Ports/JS SDK to BackendTask.Http + elm/http
 4. **Update testing strategy** - Replace Playwright with elm-program-test
 
 ### Phase 2: Component Migration
+
 1. **Migrate Svelte components to Elm** - Convert remaining UI components
 2. **Update authentication flow** - Implement Server.Session-based auth
 3. **Migrate forms and interactions** - Use Pages.Form API
 4. **Update static generation** - Use BackendTask for feeds and data
 
 ### Phase 3: Optimization and Cleanup
+
 1. **Remove legacy dependencies** - Clean up package.json, remove unused files
 2. **Update deployment** - Configure for elm-pages hosting requirements
 3. **Performance optimization** - Leverage elm-pages' static generation benefits
@@ -53,6 +56,7 @@ We will migrate from SvelteKit + Elm hybrid to pure elm-pages architecture follo
 ## Implementation Details
 
 ### File Structure Changes
+
 ```
 Current (SvelteKit):
 src/
@@ -75,6 +79,7 @@ shared/             # NEW: Shared Elm modules
 ```
 
 ### Key API Changes
+
 - **HTTP Requests**: `src/PocketBase.elm` needs BackendTask.Http for server-side + elm/http for client-side
 - **Authentication**: Replace JWT handling with Server.Session API
 - **Forms**: Replace Svelte forms with Pages.Form API
@@ -82,6 +87,7 @@ shared/             # NEW: Shared Elm modules
 - **Static Generation**: Replace SvelteKit's +page.server.ts with BackendTask
 
 ### Testing Strategy
+
 - **Unit Tests**: Keep elm-test for pure functions
 - **Integration Tests**: Use elm-program-test for complete application flows
 - **Build Validation**: Use `make elm-check` for comprehensive validation
@@ -89,24 +95,28 @@ shared/             # NEW: Shared Elm modules
 ## Migration Checklist
 
 ### Infrastructure
+
 - [ ] Set up elm-pages project structure
 - [ ] Configure Nix flake for elm-pages
 - [ ] Remove Vite, pnpm, TypeScript dependencies
 - [ ] Update CI/CD to use elm-pages build commands
 
 ### Core Components
+
 - [ ] Migrate main layout and navigation
 - [ ] Convert event list/calendar views to Elm
 - [ ] Implement elm-pages routing for all pages
 - [ ] Update PocketBase integration for dual HTTP patterns
 
 ### Features
+
 - [ ] Implement Server.Session authentication
 - [ ] Convert forms to Pages.Form API
 - [ ] Update map integration (ports remain compatible)
 - [ ] Migrate static feed generation to BackendTask
 
 ### Quality Assurance
+
 - [ ] Update all tests to work with new architecture
 - [ ] Validate SEO and performance requirements
 - [ ] Test deployment and hosting configuration
@@ -115,6 +125,7 @@ shared/             # NEW: Shared Elm modules
 ## Rollback Plan
 
 If migration encounters blocking issues:
+
 1. Maintain current SvelteKit version as stable fallback
 2. Implement elm-pages migration incrementally per route
 3. Use feature flags to switch between implementations

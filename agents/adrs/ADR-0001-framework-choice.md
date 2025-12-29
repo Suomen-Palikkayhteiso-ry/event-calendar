@@ -14,6 +14,7 @@ The project requires a modern web framework.
 Originally started as a **SvelteKit v2** application, the project is now migrating to **Elm** (see ADR-0012) for improved type safety and maintainability.
 
 Current requirements:
+
 - Hosting the Elm application (entry point).
 - Serving legacy Svelte components during migration.
 - Static site generation (SSG) for feeds/assets.
@@ -49,6 +50,7 @@ Explored as a complete replacement for SvelteKit v2. elm-pages is a statically t
 - Static site generation capabilities
 
 **Feature Parity Assessment:**
+
 - ✅ Routing: File-based routing matches SvelteKit's conventions
 - ✅ Static Generation: Excellent SSG for feeds (RSS, Atom, ICS)
 - ✅ Authentication: Session API supports OIDC integration
@@ -57,12 +59,14 @@ Explored as a complete replacement for SvelteKit v2. elm-pages is a statically t
 - ✅ Type Safety: Full Elm type system throughout
 
 **Migration Path:**
+
 - Current Elm components (Calendar, Map, Forms) are directly compatible
 - PocketBase integration via BackendTasks and server-rendered routes
 - Existing Elm code can be migrated with minimal changes
 - Build system shifts from Vite + elm-watch to elm-pages CLI
 
 **Considered but requires further evaluation:**
+
 - Integration with existing PocketBase backend
 - Handling of complex calendar interactions
 - Deployment and hosting options
