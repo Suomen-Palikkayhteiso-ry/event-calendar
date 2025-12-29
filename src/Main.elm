@@ -8,14 +8,14 @@ import Update
 import View
 
 
-main : Program (Maybe String) Model.Model Update.Msg
+main : Program () Model.Model Update.Msg
 main =
     Browser.application
         { init =
-            \flags url key ->
+            \() url key ->
                 let
                     ( m, c ) =
-                        Model.init flags url key
+                        Model.init Nothing url key
                 in
                 ( m, Cmd.map Update.EventsMsg c )
         , view = View.view

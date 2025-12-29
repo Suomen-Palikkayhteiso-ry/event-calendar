@@ -36,7 +36,7 @@ start:
 	pnpm dev
 
 .PHONY: watch
-watch: elm-build
+watch:
 	pnpm dev
 
 .PHONY: elm-build

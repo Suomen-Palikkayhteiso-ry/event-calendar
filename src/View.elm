@@ -10,6 +10,7 @@ import Model
 import Routes
 import Update
 
+
 view : Model.Model -> Browser.Document Update.Msg
 view model =
     { title = I18n.get "event_calendar"

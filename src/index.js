@@ -9,7 +9,7 @@ console.log('window.Elm.Main:', window.Elm?.Main);
 if (window.Elm && window.Elm.Main) {
 	const pocketbaseUrl = import.meta.env.VITE_POCKETBASE_URL || null;
 	const app = window.Elm.Main.init({
-		node: document.getElementById('app'),
+		node: document.getElementById('elm'),
 		flags: pocketbaseUrl
 	});
 
