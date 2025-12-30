@@ -6,10 +6,10 @@ As a member of Suomen Palikkayhteisö ry, I want to authenticate so that I can c
 
 ## Acceptance Criteria
 
-- Authentication is handled via PocketBase
+- Authentication is handled via PocketBase 'oidc' auth
 - Auth state is stored in localStorage
 - Authenticated users can access event management features
-- Non-authenticated users see membership instructions
+- Non-authenticated users see mailto:-link with instructions for submitting their events
 - Auth token is included in API requests
 
 ## Scenarios

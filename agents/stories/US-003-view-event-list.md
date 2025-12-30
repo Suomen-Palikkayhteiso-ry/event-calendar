@@ -6,7 +6,7 @@ As an authenticated member, I want to view a list of all events so that I can ma
 
 ## Acceptance Criteria
 
-- Authenticated users can access event list at /events
+- Authenticated users can access event list at /#/events
 - List shows all events with title, dates, and status
 - Authenticated users see Edit and Delete buttons for each event
 - List supports pagination
@@ -17,7 +17,7 @@ As an authenticated member, I want to view a list of all events so that I can ma
 
 ## Scenarios
 
-- Auth user navigates to /events -> sees paginated event list
+- Auth user navigates to /#/events -> sees paginated event list
 - Auth user enters text in "Filter by title" -> list updates to show matching events
 - Auth user selects a status in filter -> list updates to show events with that status
 - Auth user clicks column header (Title/Date/Status) -> list sorts by that column

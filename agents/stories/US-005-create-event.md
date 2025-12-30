@@ -6,8 +6,8 @@ As an authenticated member, I want to create new events so that I can add them t
 
 ## Acceptance Criteria
 
-- Authenticated users can access the event creation form at /events
-- Non-authenticated users are redirected to home page with membership instructions
+- Authenticated users can access the event creation form at /#/events
+- Non-authenticated users see mailto:-link with instructions for submitting their events
 - The form requires title, location, and description
 - User can search for a location address to automatically fill coordinates (Geocoding)
 - User can manually enter Latitude and Longitude if geocoding is disabled
@@ -23,7 +23,7 @@ As an authenticated member, I want to create new events so that I can add them t
 
 ## Scenarios
 
-- Non-auth user tries to access /events -> redirected to /
+- Non-auth user tries to access /#/events -> redirected to /
 - Auth user fills and submits form -> success message
 - Auth user searches for address -> coordinates filled
 - Auth user enters manual coordinates -> form valid
