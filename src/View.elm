@@ -2,7 +2,7 @@ module View exposing (view)
 
 import Browser
 import Calendar
-import Html exposing (Html, a, div, footer, h1, nav, text)
+import Html exposing (Html, a, button, div, footer, h1, h2, nav, p, text)
 import Html.Attributes exposing (class, href)
 import I18n
 import Map
@@ -53,7 +53,15 @@ mainView model =
     div [ class "flex-1" ]
         [ case model.route of
             Routes.Home ->
-                Html.map Update.CalendarMsg (Calendar.view model.calendar)
+                div []
+                    [ case model.auth of
+                        Nothing ->
+                            loginInstructions
+                        
+                        Just _ ->
+                            text ""
+                    , Html.map Update.CalendarMsg (Calendar.view model.calendar)
+                    ]
 
             Routes.EventsRoute ->
                 text "Event List View"
@@ -75,6 +83,16 @@ mainView model =
 
             Routes.NotFound ->
                 text "Not Found"
+        ]
+
+
+loginInstructions : Html msg
+loginInstructions =
+    div [ class "max-w-md mx-auto mt-8 p-6 bg-white rounded-lg shadow-md" ]
+        [ h2 [ class "text-xl font-semibold mb-4" ] [ text "Welcome to the Event Calendar" ]
+        , p [ class "mb-4" ] [ text "To view and manage events, please log in as a member." ]
+        , p [ class "mb-4" ] [ text "If you don't have an account, contact an administrator to become a member." ]
+        , button [ class "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" ] [ text "Login" ]
         ]
 
 
