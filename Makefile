@@ -4,7 +4,7 @@
 all: build
 
 .PHONY: build
-build: install elm-check
+build: install elm-build elm-check
 	pnpm build
 
 .PHONY: clean
@@ -36,7 +36,7 @@ start:
 	pnpm dev
 
 .PHONY: watch
-watch:
+watch: elm-build node_modules
 	pnpm dev
 
 .PHONY: elm-build
