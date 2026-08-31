@@ -2,6 +2,7 @@
 
 Event calendar for Suomen Palikkaharrastajat ry, built with Elm 0.19, Haskell, and PocketBase.
 
+
 ## Overview
 
 The project combines:
